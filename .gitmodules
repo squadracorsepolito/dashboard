@@ -2,3 +2,6 @@
 	path = Lib/SCan
 	url = https://github.com/squadracorsepolito/SCan.git
 	branch = build
+[submodule "Lib/PCA9555"]
+	path = Lib/PCA9555
+	url = https://github.com/squadracorsepolito/PCA9555.git
