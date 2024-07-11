@@ -133,24 +133,6 @@ void Error_Handler(void);
 #define SDC_OUT_3V3_GPIO_IN_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
-#define PCBVER 2
-
-// PCB ver 1 (Francesco Minichelli's original design)
-#if PCBVER == 1
-
-#define BAT_FAN_PWM_TIM htim2
-#define BAT_FAN_PWM_CH TIM_CHANNEL_0
-
-#define POWERTRAIN_COOLING_PWM_TIM htim2
-#define POWERTRAIN_COOLING_PWM_CH TIM_CHANNEL_1
-
-#define ASB_MOTOR_PWM_TIM htim8
-#define ASB_MOTOR_PWM_CH TIM_CHANNEL_1
-
-#define COUNTER_TIM htim3
-
-// PCB ver 2 (the black one)
-#elif PCBVER == 2
 
 #define BAT_FAN_PWM_TIM htim3
 #define BAT_FAN_PWM_CH TIM_CHANNEL_2
@@ -162,8 +144,6 @@ void Error_Handler(void);
 
 #define PUMPS_DAC hdac
 #define PUMPS_DAC_CHANNEL DAC_CHANNEL_1
-
-#endif
 
 
 /* USER CODE END Private defines */
