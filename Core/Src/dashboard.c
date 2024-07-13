@@ -187,7 +187,7 @@ void InitDashBoard()
     HAL_GPIO_WritePin(TS_OFF_LED_CMD_GPIO_OUT_GPIO_Port, TS_OFF_LED_CMD_GPIO_OUT_Pin, GPIO_PIN_SET);
     HAL_GPIO_WritePin(AMS_ERR_LED_nCMD_GPIO_OUT_GPIO_Port, AMS_ERR_LED_nCMD_GPIO_OUT_Pin, GPIO_PIN_RESET);
     HAL_GPIO_WritePin(IMD_ERR_LED_nCMD_GPIO_OUT_GPIO_Port, IMD_ERR_LED_nCMD_GPIO_OUT_Pin, GPIO_PIN_RESET);
-    //HAL_GPIO_WritePin(RTD_LED_CMD_GPIO_Port, RTD_LED_CMD_Pin, GPIO_PIN_SET);
+    HAL_GPIO_WritePin(RTD_LED_GPIO_Port, RTD_LED_Pin, GPIO_PIN_SET);
 
     // Disable The SDC relay and wait later for closing it
     HAL_GPIO_WritePin(SDC_RLY_CMD_GPIO_OUT_GPIO_Port, SDC_RLY_CMD_GPIO_OUT_Pin, GPIO_PIN_SET);
@@ -219,7 +219,7 @@ void UpdateCockpitLed(uint32_t delay_100us)
 
     if (delay_fun(&delay_100us_last, delay_100us))
     {
-        HAL_GPIO_WritePin(SDC_RLY_CMD_GPIO_OUT_GPIO_Port, SDC_RLY_CMD_GPIO_OUT_Pin, SD_CLOSED);
+        //HAL_GPIO_WritePin(RTD_LED_GPIO_Port, RTD_LED_Pin, SD_CLOSED);
 
         if (boards_timeouts & (1 << WDG_BOARD_TLB))
         {
@@ -307,7 +307,7 @@ void RTD_fsm(uint32_t delay_100us) {
     if(delay_fun(&delay_100us_last, delay_100us)) {
         switch(rtd_fsm_state) {
             case STATE_IDLE:
-                //HAL_GPIO_WritePin(RTD_LED_CMD_GPIO_Port, RTD_LED_CMD_Pin, GPIO_PIN_RESET);
+                HAL_GPIO_WritePin(RTD_LED_GPIO_Port, RTD_LED_Pin, SD_CLOSED);
                 HAL_GPIO_WritePin(SDC_RLY_CMD_GPIO_OUT_GPIO_Port, SDC_RLY_CMD_GPIO_OUT_Pin, GPIO_PIN_RESET);
                 if(dspace_rtd_state == 2)
                     rtd_fsm_state = STATE_TSON;
@@ -315,7 +315,7 @@ void RTD_fsm(uint32_t delay_100us) {
                     rtd_fsm_state = STATE_DISCHARGE;
                 break;
             case STATE_TSON:
-                //LedBlinking(RTD_LED_CMD_GPIO_Port, RTD_LED_CMD_Pin, &blink_delay_last, 2000);
+                LedBlinking(RTD_LED_GPIO_Port, RTD_LED_Pin, &blink_delay_last, 2000);
                 if(dspace_rtd_state == 3 || dspace_rtd_state == 4) {
                     rtd_fsm_state = STATE_RTD_SOUND;
                     time = HAL_GetTick();
@@ -323,7 +323,7 @@ void RTD_fsm(uint32_t delay_100us) {
                     rtd_fsm_state = STATE_DISCHARGE;
                 break;
             case STATE_RTD_SOUND:
-                //HAL_GPIO_WritePin(RTD_LED_CMD_GPIO_Port, RTD_LED_CMD_Pin, GPIO_PIN_SET);
+                HAL_GPIO_WritePin(RTD_LED_GPIO_Port, RTD_LED_Pin, GPIO_PIN_SET);
                 HAL_GPIO_WritePin(BUZZER_CMD_GPIO_OUT_GPIO_Port, BUZZER_CMD_GPIO_OUT_Pin, GPIO_PIN_SET);
                 if(HAL_GetTick() - time > 1000) {
                     HAL_GPIO_WritePin(BUZZER_CMD_GPIO_OUT_GPIO_Port, BUZZER_CMD_GPIO_OUT_Pin, GPIO_PIN_RESET);
@@ -331,12 +331,12 @@ void RTD_fsm(uint32_t delay_100us) {
                 }
                 break;
             case STATE_RTD:
-                //HAL_GPIO_WritePin(RTD_LED_CMD_GPIO_Port, RTD_LED_CMD_Pin, GPIO_PIN_SET);
+                HAL_GPIO_WritePin(RTD_LED_GPIO_Port, RTD_LED_Pin, GPIO_PIN_SET);
                 if(dspace_rtd_state <= 0)
                     rtd_fsm_state = STATE_DISCHARGE;
                 break;
             case STATE_DISCHARGE:
-                //HAL_GPIO_WritePin(RTD_LED_CMD_GPIO_Port, RTD_LED_CMD_Pin, GPIO_PIN_RESET);
+                HAL_GPIO_WritePin(RTD_LED_GPIO_Port, RTD_LED_Pin, GPIO_PIN_RESET);
                 HAL_GPIO_WritePin(SDC_RLY_CMD_GPIO_OUT_GPIO_Port, SDC_RLY_CMD_GPIO_OUT_Pin, GPIO_PIN_SET);
                 if(dspace_rtd_state == 0)
                     rtd_fsm_state = STATE_IDLE;

@@ -111,7 +111,7 @@ int main(void)
   MX_USART1_UART_Init();
   MX_TIM7_Init();
   //MX_IWDG_Init();
-  MX_CAN2_Init();
+  //MX_CAN2_Init();
   MX_DAC_Init();
   MX_I2C1_Init();
   MX_TIM3_Init();
@@ -140,16 +140,16 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    static uint8_t test = 0;
-    static uint32_t cnt = 500;
-    if(HAL_GetTick() > cnt){
-      test++;
-      HAL_DAC_SetValue(&PUMPS_DAC,PUMPS_DAC_CHANNEL,DAC_ALIGN_8B_R,(uint8_t)test);
-      cnt += 500;
-      test % 2 == 0? PCA9555_digitalWrite(&pca9555Handle,0,PCA9555_BIT_SET) : PCA9555_digitalWrite(&pca9555Handle,0,PCA9555_BIT_RESET);
-      test % 2 == 0? PCA9555_digitalWrite(&pca9555Handle,1,PCA9555_BIT_SET) : PCA9555_digitalWrite(&pca9555Handle,1,PCA9555_BIT_RESET);
-      test % 2 == 0? PCA9555_digitalWrite(&pca9555Handle,2,PCA9555_BIT_SET) : PCA9555_digitalWrite(&pca9555Handle,2,PCA9555_BIT_RESET);
-    }
+    //static uint8_t test = 0;
+    //static uint32_t cnt = 500;
+    //if(HAL_GetTick() > cnt){
+    //  test++;
+    //  HAL_DAC_SetValue(&PUMPS_DAC,PUMPS_DAC_CHANNEL,DAC_ALIGN_8B_R,(uint8_t)test);
+    //  cnt += 500;
+    //  test % 2 == 0? PCA9555_digitalWrite(&pca9555Handle,0,PCA9555_BIT_SET) : PCA9555_digitalWrite(&pca9555Handle,0,PCA9555_BIT_RESET);
+    //  test % 2 == 0? PCA9555_digitalWrite(&pca9555Handle,1,PCA9555_BIT_SET) : PCA9555_digitalWrite(&pca9555Handle,1,PCA9555_BIT_RESET);
+    //  test % 2 == 0? PCA9555_digitalWrite(&pca9555Handle,2,PCA9555_BIT_SET) : PCA9555_digitalWrite(&pca9555Handle,2,PCA9555_BIT_RESET);
+    //}
     //HAL_IWDG_Refresh(&hiwdg);  // refresh watchdog ~10ms timeout
   }
 

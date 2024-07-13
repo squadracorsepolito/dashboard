@@ -27,10 +27,11 @@ void button_sample()
     {
         for (uint8_t i = 0; i < BUTTON_COUNT; i++)
         {
+            uint8_t btn_val = (uint8_t)HAL_GPIO_ReadPin((GPIO_TypeDef *)button_gpio[i], button_pin[i]);
             switch (state[i])
             {
             case BUTTON_RELEASED:
-                if ((uint8_t)HAL_GPIO_ReadPin((GPIO_TypeDef *)button_gpio[i], button_pin[i]) == BUTTON_DOWN)
+                if (btn_val == BUTTON_DOWN)
                 {
                     // If button was up and now is down
                     state[i] = BUTTON_PRESSED;
@@ -38,7 +39,7 @@ void button_sample()
                 }
                 break;
             case BUTTON_PRESSED:
-                if ((uint8_t)HAL_GPIO_ReadPin((GPIO_TypeDef *)button_gpio[i], button_pin[i]) == BUTTON_UP)
+                if (btn_val == BUTTON_UP)
                 {
                     // If button was down and now is up
                     if (ReturnTime_100us() - down_time[i] >= BUTTON_SHORT_PRESS_TIME_100us)
@@ -59,7 +60,7 @@ void button_sample()
                 }
                 break;
             case BUTTON_LONGPRESS:
-                if ((uint8_t)HAL_GPIO_ReadPin((GPIO_TypeDef *)button_gpio[i], button_pin[i]) == BUTTON_UP)
+                if (btn_val == BUTTON_UP)
                 {
                     // If button has been down for a while but now is up
                     state[i] = BUTTON_RELEASED;
