@@ -129,7 +129,7 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
         mcb_d_space_rtd_ack_unpack(&msgs.rtd_ack, RxData, MCB_D_SPACE_RTD_ACK_LENGTH);
         dspace_rtd_state = msgs.rtd_ack.rtd_fsm_state;
     }
-    else if ((RxHeader.StdId == MCB_D_SPACE_PERIPHERALS_CTRL_FRAME_ID) && (RxHeader.DLC == MCB_D_SPACE_PERIPHERALS_CTRL_LENGTH))
+    else if ((RxHeader.StdId == 0x201/*MCB_D_SPACE_PERIPHERALS_CTRL_FRAME_ID*/) && (RxHeader.DLC == MCB_D_SPACE_PERIPHERALS_CTRL_LENGTH))
     {
         mcb_d_space_peripherals_ctrl_unpack(&msgs.per_ctrl, RxData, MCB_D_SPACE_PERIPHERALS_CTRL_LENGTH);
 
