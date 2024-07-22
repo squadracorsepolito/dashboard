@@ -21,11 +21,9 @@
 #include "can.h"
 
 /* USER CODE BEGIN 0 */
+#include "bsp.h"
+#include "cmsis_os.h"
 #include "mcb.h"
-#include "stdio.h"
-#include "string.h"
-#include "usart.h"
-#include "utils.h"
 /* USER CODE END 0 */
 
 CAN_HandleTypeDef hcan1;
@@ -43,10 +41,10 @@ void MX_CAN1_Init(void)
 
   /* USER CODE END CAN1_Init 1 */
   hcan1.Instance = CAN1;
-  hcan1.Init.Prescaler = 3;
+  hcan1.Init.Prescaler = 10;
   hcan1.Init.Mode = CAN_MODE_NORMAL;
   hcan1.Init.SyncJumpWidth = CAN_SJW_1TQ;
-  hcan1.Init.TimeSeg1 = CAN_BS1_12TQ;
+  hcan1.Init.TimeSeg1 = CAN_BS1_15TQ;
   hcan1.Init.TimeSeg2 = CAN_BS2_2TQ;
   hcan1.Init.TimeTriggeredMode = DISABLE;
   hcan1.Init.AutoBusOff = ENABLE;
@@ -339,99 +337,217 @@ void HAL_CAN_MspDeInit(CAN_HandleTypeDef* canHandle)
 }
 
 /* USER CODE BEGIN 1 */
-void CAN_Msg_Send(CAN_HandleTypeDef *hcan,
-                  CAN_TxHeaderTypeDef *pHeader,
-                  uint8_t aData[],
-                  uint32_t *pTxMailbox,
-                  uint32_t TimeOut) {
-    static uint32_t can_counter_100us = 0;
-    can_counter_100us                 = ReturnTime_100us();
 
-    while (HAL_CAN_GetTxMailboxesFreeLevel(hcan) < 1) {
-        if (delay_fun(&can_counter_100us, TimeOut)) {
-            // Error_Handler();
-            //HAL_CAN_ResetError(hcan);
-            HAL_CAN_AbortTxRequest(hcan, *pTxMailbox);
-        }
+extern osMessageQueueId_t canTxMsgQueueHandle;
+extern osMessageQueueId_t canRxMsgQueueHandle;
+
+static HAL_StatusTypeDef CAN_TxMsg_wait(CAN_HandleTypeDef *hcan, uint8_t timeout) {
+    uint32_t tick = HAL_GetTick();
+    while (HAL_CAN_GetTxMailboxesFreeLevel(hcan) == 0) {
+        if (HAL_GetTick() - tick > timeout)
+            return HAL_TIMEOUT;
+    }
+    return HAL_OK;
+}
+
+HAL_StatusTypeDef CAN_TxMsg(CAN_HandleTypeDef *hcan, uint8_t *buffer, CAN_TxHeaderTypeDef *header) {
+    if (CAN_TxMsg_wait(hcan, 1) != HAL_OK)
+        return HAL_TIMEOUT;
+    uint32_t mailbox;
+
+    volatile HAL_StatusTypeDef status = HAL_CAN_AddTxMessage(hcan, header, buffer, &mailbox);
+
+    return status;
+}
+
+static void CAN_RxMsg_fromFifo_ISR(CAN_HandleTypeDef *hcan, uint8_t fifo_number) {
+    assert_param(hcan != NULL_PTR);
+    struct CAN_MsgItem rxMsg = {.xType = RxHeader, .xHeader = {}, .hcan = hcan, .payload = {}};
+
+    HAL_StatusTypeDef status = HAL_CAN_GetRxMessage(rxMsg.hcan, fifo_number, &(rxMsg.xHeader.rx), rxMsg.payload);
+    if (status != HAL_OK) {
+        //TODO: deal with error
     }
 
-    if (HAL_CAN_AddTxMessage(hcan, pHeader, aData, pTxMailbox) != HAL_OK) {
-        /* Transmission request Error */
-        // Error_Handler();
-        //HAL_CAN_ResetError(hcan);
-        HAL_CAN_AbortTxRequest(hcan, *pTxMailbox);
+    osStatus_t os_status = osMessageQueuePut(
+        canRxMsgQueueHandle, (const void *)&rxMsg, 0, 0U);  // We are in an interrupt Timeout is not important
+    if(os_status != osOK){
+        //TODO: deal with error, for now ErrorHandler
+        Error_Handler();
     }
 }
 
-void CAN_ErrorHandler(CAN_HandleTypeDef *hcan) {
-    char buf[20];
+/* ***************************************
+ *  Interrupt handling
+ ****************************************/
+
+void HAL_CAN_ErrorCallback(CAN_HandleTypeDef *hcan) {
+#if 0
+    CAN_Error_s* errorStruct = NULL_PTR;
+
+    if (hcan->Instance == CAN1) {
+        errorStruct = &CAN_CAN1_errorStruct;
+    } else {
+        errorStruct = &CAN_CAN0_errorStruct;
+    }
+
     uint32_t error = HAL_CAN_GetError(hcan);
 
-#define tmp_printf(X)                                                                   \
-    do {                                                                                \
-        HAL_UART_Transmit(&huart1, (uint8_t *)(X), strlen(X), HAL_MAX_DELAY);           \
-        HAL_UART_Transmit(&huart1, (uint8_t *)("\r\n"), strlen("\r\n"), HAL_MAX_DELAY); \
-    } while (0)
+        /* Check Error Warning Flag */
+        if ((error & HAL_CAN_ERROR_EWG) != 0) {
+            /* This bit is set by hardware when the warning limit has been
+             * reached (Receive Error Counter or Transmit Error Counter>=96
+             * until error counter 127 write error frames dominant on can bus
+             * increment error occurrence of error warning state */
+            errorStruct->canErrorCounter[0]++;
+        }
 
-    if (error & HAL_CAN_ERROR_EWG)
-        tmp_printf("Protocol Error Warning");
-    if (error & HAL_CAN_ERROR_EPV)
-        tmp_printf("Error Passive");
-    if (error & HAL_CAN_ERROR_BOF)
-        tmp_printf("Bus-off Error");
-    if (error & HAL_CAN_ERROR_STF)
-        tmp_printf("Stuff Error");
-    if (error & HAL_CAN_ERROR_FOR)
-        tmp_printf("Form Error");
-    if (error & HAL_CAN_ERROR_ACK)
-        tmp_printf("ACK Error");
-    if (error & HAL_CAN_ERROR_BR)
-        tmp_printf("Bit Recessive Error");
-    if (error & HAL_CAN_ERROR_BD)
-        tmp_printf("Bit Dominant Error");
-    if (error & HAL_CAN_ERROR_CRC)
-        tmp_printf("CRC Error");
-    if (error & HAL_CAN_ERROR_RX_FOV0)
-        tmp_printf("FIFO0 Overrun");
-    if (error & HAL_CAN_ERROR_RX_FOV1)
-        tmp_printf("FIFO1 Overrun");
-    if (error & HAL_CAN_ERROR_TX_ALST0)
-        tmp_printf("Mailbox 0 TX failure (arbitration lost)");
-    if (error & HAL_CAN_ERROR_TX_TERR0)
-        tmp_printf("Mailbox 0 TX failure (tx error)");
-    if (error & HAL_CAN_ERROR_TX_ALST1)
-        tmp_printf("Mailbox 1 TX failure (arbitration lost)");
-    if (error & HAL_CAN_ERROR_TX_TERR1)
-        tmp_printf("Mailbox 1 TX failure (tx error)");
-    if (error & HAL_CAN_ERROR_TX_ALST2)
-        tmp_printf("Mailbox 2 TX failure (arbitration lost)");
-    if (error & HAL_CAN_ERROR_TX_TERR2)
-        tmp_printf("Mailbox 2 TX failure (tx error)");
-    if (error & HAL_CAN_ERROR_TIMEOUT)
-        tmp_printf("Timeout Error");
-    if (error & HAL_CAN_ERROR_NOT_INITIALIZED)
-        tmp_printf("Peripheral not initialized");
-    if (error & HAL_CAN_ERROR_NOT_READY)
-        tmp_printf("Peripheral not ready");
-    if (error & HAL_CAN_ERROR_NOT_STARTED)
-        tmp_printf("Peripheral not strated");
-    if (error & HAL_CAN_ERROR_PARAM)
-        tmp_printf("Parameter Error");
+        /* Check Error Passive Flag */
+        if ((error & HAL_CAN_ERROR_EPV) != 0) {
+            /* This bit is set by hardware when the Error Passive limit has
+             * been reached (Receive Error Counter or Transmit Error Counter
+             * > 127) write error frames recessive on can bus increment error
+             * occurrence of error passive state */
+            errorStruct->canErrorCounter[1]++;
+        }
+        /* Check Bus-Off Flag */
+        if ((error & HAL_CAN_ERROR_BOF) != 0) {
+            /* This bit is set by hardware when it enters the bus-off state.
+             * The bus-off state is entered on TEC overflow, greater than 255
+             * increment error occurrence of bus-off state */
+            errorStruct->canErrorCounter[2]++;
+        }
+        /* Check stuff error flag */
+        if ((error & HAL_CAN_ERROR_STF) != 0) {
+            /* When five consecutive bits of the same level have been
+             * transmitted by a node, it will add a sixth bit of the opposite
+             * level to the outgoing bit stream. The receivers will remove this
+             * extra bit.This is done to avoid excessive DC components on the
+             * bus, but it also gives the receivers an extra opportunity to
+             * detect errors: if more than five consecutive bits of the same
+             * level occurs on the bus, a Stuff Error is signaled. */
+            errorStruct->canErrorCounter[3]++;
+        }
+        if ((error & HAL_CAN_ERROR_FOR) != 0) {
+            /* FORM ERROR --- Some parts of the CAN message have a fixed format,
+             * i.e. the standard defines exactly what levels must occur and
+             * when. (Those parts are the CRC Delimiter, ACK Delimiter, End of
+             * Frame, and also the Intermission, but there are some extra
+             * special error checking rules for that.) If a CAN controller
+             * detects an invalid value in one of these fixed fields, a Form
+             * Error is signaled. */
+            errorStruct->canErrorCounter[4]++;
+        }
+        if ((error & HAL_CAN_ERROR_ACK) != 0) {
+            /* ACKNOWLEDGMENT ERROR --- All nodes on the bus that correctly
+             * receives a message (regardless of their being interested of its
+             * contents or not) are expected to send a dominant level in the
+             * so-called Acknowledgement Slot in the message. The transmitter
+             * will transmit a recessive level here. If the transmitter can
+             * detect a dominant level in the ACK slot, an Acknowledgement
+             * Error is signaled. */
+            errorStruct->canErrorCounter[5]++;
+        }
+        if ((error & HAL_CAN_ERROR_BR) != 0) {
+            /* BIT RECESSIVE ERROR --- Each transmitter on the CAN bus monitors
+             * (i.e. reads back) the transmitted signal level. If the bit level
+             * actually read differs from the one transmitted, a Bit Error (No
+             * bit error is raised during the arbitration process.) */
+            errorStruct->canErrorCounter[6]++;
+        }
+        if ((error & HAL_CAN_ERROR_BD) != 0) {
+            /* BIT DOMINANT ERROR --- Each transmitter on the CAN bus monitors
+             * (i.e. reads back) the transmitted signal level. If the bit level
+             * actually read differs from the one transmitted, a Bit Error (No
+             *  bit error is raised during the arbitration process.) */
+            errorStruct->canErrorCounter[7]++;
+        }
+        if ((error & HAL_CAN_ERROR_CRC) != 0) {
+            /* CRC ERROR --- Each message features a 15-bit Cyclic Redundancy
+             * Checksum (CRC), and any node that detects a different CRC in the
+             * message than what it has calculated itself will signal an CRC
+             * Error. */
+            errorStruct->canErrorCounter[8]++;
+        }
+        if ((error & HAL_CAN_ERROR_RX_FOV0) != 0) {
+            /* Rx FIFO0 overrun error */
+            errorStruct->canErrorCounter[9]++;
+        }
+        if ((error & HAL_CAN_ERROR_RX_FOV1) != 0) {
+            /* Rx FIFO1 overrun error */
+            errorStruct->canErrorCounter[10]++;
+        }
+        if ((error & HAL_CAN_ERROR_TX_ALST0) != 0) {
+            /* TxMailbox 0 transmit failure due to arbitration lost */
+            errorStruct->canErrorCounter[11]++;
+        }
+        if ((error & HAL_CAN_ERROR_TX_TERR0) != 0) {
+            /* TxMailbox 1 transmit failure due to transmit error */
+            errorStruct->canErrorCounter[12]++;
+        }
+        if ((error & HAL_CAN_ERROR_TX_ALST1) != 0) {
+            /* TxMailbox 0 transmit failure due to arbitration lost */
+            errorStruct->canErrorCounter[13]++;
+        }
+        if ((error & HAL_CAN_ERROR_TX_TERR1) != 0) {
+            /* TxMailbox 1 transmit failure due to transmit error */
+            errorStruct->canErrorCounter[14]++;
+        }
+        if ((error & HAL_CAN_ERROR_TX_ALST2) != 0) {
+            /* TxMailbox 0 transmit failure due to arbitration lost */
+            errorStruct->canErrorCounter[15]++;
+        }
+        if ((error & HAL_CAN_ERROR_TX_TERR2) != 0) {
+            /* TxMailbox 1 transmit failure due to transmit error */
+            errorStruct->canErrorCounter[16]++;
+        }
+        if ((error & HAL_CAN_ERROR_TIMEOUT) != 0) {
+            /* Timeout error */
+            errorStruct->canErrorCounter[17]++;
+        }
+        if ((error & HAL_CAN_ERROR_NOT_INITIALIZED) != 0) {
+            /* Peripheral not initialized */
+            errorStruct->canErrorCounter[18]++;
+        }
+        if ((error & HAL_CAN_ERROR_NOT_READY) != 0) {
+            /* Peripheral not ready */
+            errorStruct->canErrorCounter[19]++;
+        }
+        if ((error & HAL_CAN_ERROR_NOT_STARTED) != 0) {
+            /* Peripheral not started */
+            errorStruct->canErrorCounter[20]++;
+        }
+        if ((error & HAL_CAN_ERROR_PARAM) != 0) {
+            /* Parameter error */
+            errorStruct->canErrorCounter[21]++;
+        }
 
     uint16_t rec = (uint16_t)((hcan->Instance->ESR && CAN_ESR_REC_Msk) >> CAN_ESR_REC_Pos);
     uint16_t tec = (uint16_t)((hcan->Instance->ESR && CAN_ESR_TEC_Msk) >> CAN_ESR_TEC_Pos);
 
-    sprintf(buf, "rec %u, tec %u", rec, tec);
-    tmp_printf(buf);
-
     HAL_CAN_ResetError(hcan);
+#endif
 }
 
-void HAL_CAN_ErrorCallback(CAN_HandleTypeDef *hcan) {
-    if (hcan == &hcan1) {
-        //CAN_ErrorHandler(hcan);
-    }else if (hcan == &hcan2) {
-        //CAN_ErrorHandler(hcan);
-    }
+/**
+  * @brief  Rx FIFO 0 message pending callback.
+  * @param  hcan pointer to a CAN_HandleTypeDef structure that contains
+  *         the configuration information for the specified CAN.
+  * @retval None
+  */
+void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
+    /* Call callback function to interpret or save RX message in buffer */
+    CAN_RxMsg_fromFifo_ISR(hcan, CAN_RX_FIFO0);
+}
+
+/**
+  * @brief  Rx FIFO 1 message pending callback.
+  * @param  hcan pointer to a CAN_HandleTypeDef structure that contains
+  *         the configuration information for the specified CAN.
+  * @retval None
+  */
+void HAL_CAN_RxFifo1MsgPendingCallback(CAN_HandleTypeDef *hcan) {
+    /* Call callback function to interpret or save RX message in buffer */
+    CAN_RxMsg_fromFifo_ISR(hcan, CAN_RX_FIFO1);
 }
 /* USER CODE END 1 */

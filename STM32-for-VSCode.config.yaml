@@ -66,6 +66,7 @@ excludes:
   - "**/Example/**"
   - "**/example/**"
   - "**_template.*"
+  - "**/**/dashboard**"
 
 
 # Include directories (directories containing .h or .hpp files)

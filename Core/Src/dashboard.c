@@ -21,8 +21,8 @@ typedef enum
 } state_trig;
 state_trig STATE_CHANGE_TRIG = TRIG_NONE;
 
-CAN_TxHeaderTypeDef TxHeader;
-CAN_RxHeaderTypeDef RxHeader;
+CAN_TxHeaderTypeDef CanTxHeader;
+CAN_RxHeaderTypeDef CanRxHeader;
 uint32_t TxMailbox;
 uint8_t TxData[8] = {0};
 uint8_t RxData[8] = {0};
@@ -76,7 +76,7 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
         struct mcb_tlb_battery_shut_status_t shut_status;
     } msgs;
 
-    if (HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &RxHeader, RxData) != HAL_OK)
+    if (HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &CanRxHeader, RxData) != HAL_OK)
     {
         /* Transmission request Error */
         HAL_CAN_ResetError(hcan);
@@ -85,7 +85,7 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 
     // Reset watchdog
     uint32_t now = ReturnTime_100us();
-    switch (RxHeader.StdId)
+    switch (CanRxHeader.StdId)
     {
     case MCB_D_SPACE_RTD_ACK_FRAME_ID:
     case MCB_D_SPACE_PERIPHERALS_CTRL_FRAME_ID:
@@ -103,7 +103,7 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
     }
 
     /*Reboot Board - Received command byte from CAN*/
-    if ((RxHeader.StdId == 0x9) && (RxHeader.DLC == 2) && (RxData[0] == 0xFF) && (RxData[1] == 0x00))
+    if ((CanRxHeader.StdId == 0x9) && (CanRxHeader.DLC == 2) && (RxData[0] == 0xFF) && (RxData[1] == 0x00))
     {
         NVIC_SystemReset();
     }
@@ -113,7 +113,7 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
      * sensFront
      *
      */
-    else if ((RxHeader.StdId == MCB_SENS_FRONT_1_FRAME_ID) && (RxHeader.DLC == MCB_SENS_FRONT_1_LENGTH))
+    else if ((CanRxHeader.StdId == MCB_SENS_FRONT_1_FRAME_ID) && (CanRxHeader.DLC == MCB_SENS_FRONT_1_LENGTH))
     {
         mcb_sens_front_1_unpack(&msgs.sens_front_1, RxData, MCB_SENS_FRONT_1_LENGTH);
 
@@ -124,12 +124,12 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
      * dSpace
      *
      */
-    else if ((RxHeader.StdId == MCB_D_SPACE_RTD_ACK_FRAME_ID) && (RxHeader.DLC == MCB_D_SPACE_RTD_ACK_LENGTH))
+    else if ((CanRxHeader.StdId == MCB_D_SPACE_RTD_ACK_FRAME_ID) && (CanRxHeader.DLC == MCB_D_SPACE_RTD_ACK_LENGTH))
     {
         mcb_d_space_rtd_ack_unpack(&msgs.rtd_ack, RxData, MCB_D_SPACE_RTD_ACK_LENGTH);
         dspace_rtd_state = msgs.rtd_ack.rtd_fsm_state;
     }
-    else if ((RxHeader.StdId == MCB_D_SPACE_PERIPHERALS_CTRL_FRAME_ID) && (RxHeader.DLC == MCB_D_SPACE_PERIPHERALS_CTRL_LENGTH))
+    else if ((CanRxHeader.StdId == MCB_D_SPACE_PERIPHERALS_CTRL_FRAME_ID) && (CanRxHeader.DLC == MCB_D_SPACE_PERIPHERALS_CTRL_LENGTH))
     {
         mcb_d_space_peripherals_ctrl_unpack(&msgs.per_ctrl, RxData, MCB_D_SPACE_PERIPHERALS_CTRL_LENGTH);
 
@@ -147,27 +147,27 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
      *
      */
     /* Received TLB error byte in order to turn LEDs on or off */
-    // else if ((RxHeader.StdId == MCB_TLB_BATTERY_TSAL_STATUS_FRAME_ID) && (RxHeader.DLC == MCB_TLB_BATTERY_TSAL_STATUS_LENGTH))
+    // else if ((CanRxHeader.StdId == MCB_TLB_BATTERY_TSAL_STATUS_FRAME_ID) && (CanRxHeader.DLC == MCB_TLB_BATTERY_TSAL_STATUS_LENGTH))
     //{
     //     mcb_tlb_battery_tsal_status_unpack(&msgs.tsal_status, RxData, MCB_TLB_BATTERY_TSAL_STATUS_LENGTH);
     //
     //     TSOFF = (bool)msgs.tsal_status.tsal_is_green_on;
     // }
-    // else if ((RxHeader.StdId == MCB_TLB_BATTERY_SHUT_STATUS_FRAME_ID) && (RxHeader.DLC == MCB_TLB_BATTERY_SHUT_STATUS_LENGTH)) {
+    // else if ((CanRxHeader.StdId == MCB_TLB_BATTERY_SHUT_STATUS_FRAME_ID) && (CanRxHeader.DLC == MCB_TLB_BATTERY_SHUT_STATUS_LENGTH)) {
     //     mcb_tlb_battery_shut_status_unpack(&msgs.shut_status, RxData, MCB_TLB_BATTERY_SHUT_STATUS_LENGTH);
     //     BMS_ERR = (bool)msgs.shut_status.is_ams_error_latched;
     //     IMD_ERR = (bool)msgs.shut_status.is_imd_error_latched;
     //     SD_CLOSED = (bool)msgs.shut_status.is_shutdown_closed_pre_tlb_batt_final;
     // }
     //  tsal status
-    else if ((RxHeader.StdId == MCB_TLB_BATTERY_TSAL_STATUS_FRAME_ID) && (RxHeader.DLC == MCB_TLB_BATTERY_TSAL_STATUS_LENGTH))
+    else if ((CanRxHeader.StdId == MCB_TLB_BATTERY_TSAL_STATUS_FRAME_ID) && (CanRxHeader.DLC == MCB_TLB_BATTERY_TSAL_STATUS_LENGTH))
     {
         // TSOFF when tsal green is enabled
         mcb_tlb_battery_tsal_status_unpack(&msgs.tsal_status, RxData, MCB_TLB_BATTERY_TSAL_STATUS_LENGTH);
         TSOFF = msgs.tsal_status.tsal_is_green_on ? GPIO_PIN_SET : GPIO_PIN_RESET;
     }
     // shut status
-    else if ((RxHeader.StdId == MCB_TLB_BATTERY_SHUT_STATUS_FRAME_ID) && (RxHeader.DLC == MCB_TLB_BATTERY_SHUT_STATUS_LENGTH))
+    else if ((CanRxHeader.StdId == MCB_TLB_BATTERY_SHUT_STATUS_FRAME_ID) && (CanRxHeader.DLC == MCB_TLB_BATTERY_SHUT_STATUS_LENGTH))
     {
         mcb_tlb_battery_shut_status_unpack(&msgs.shut_status, RxData, MCB_TLB_BATTERY_SHUT_STATUS_LENGTH);
         SD_CLOSED = msgs.shut_status.is_shutdown_closed_pre_tlb_batt_final ? GPIO_PIN_SET : GPIO_PIN_RESET; // isShutdownClosed_preTLBBattFinal
@@ -290,12 +290,12 @@ void can_send_state(uint32_t delay_100us)
         msgs.rtd.rtd_cmd = button_get(BUTTON_RTD);
         mcb_steering_rtd_pack(TxData, &msgs.rtd, MCB_STEERING_RTD_LENGTH);
 
-        TxHeader.StdId = MCB_STEERING_RTD_FRAME_ID;
-        TxHeader.RTR = CAN_RTR_DATA;
-        TxHeader.IDE = CAN_ID_STD;
-        TxHeader.DLC = MCB_STEERING_RTD_LENGTH;
+        CanTxHeader.StdId = MCB_STEERING_RTD_FRAME_ID;
+        CanTxHeader.RTR = CAN_RTR_DATA;
+        CanTxHeader.IDE = CAN_ID_STD;
+        CanTxHeader.DLC = MCB_STEERING_RTD_LENGTH;
 
-        CAN_Msg_Send(&hcan1, &TxHeader, TxData, &TxMailbox, 300);
+        CAN_Msg_Send(&hcan1, &CanTxHeader, TxData, &TxMailbox, 300);
     }
 }
 

@@ -19,6 +19,8 @@
 /* SHARED ####################################################################*/
 
 /* ---------- Includes -------------------------------------------------------*/
+#include "main.h"
+
 #include "gpio.h"
 
 /* ---------- Exported types -------------------------------------------------*/
@@ -129,6 +131,7 @@ enum ROT_SW_State ROT_SW_getState(enum ROT_SW_Device device);
 
 /* ---------- Exported types -------------------------------------------------*/
 
+enum BTN_State { BTN_NotPressed = 0, BTN_Pressed = 1, BTN_State_NUM };
 /**
  * @brief SDC Sensing Probes
  * @details responds to isOpen / isClosed
@@ -149,6 +152,7 @@ enum BTN_Device {
 /* ---------- Exported macros ------------------------------------------------*/
 
 /* ---------- Exported functions ---------------------------------------------*/
+enum BTN_State BTN_getState(enum BTN_Device device);
 
 /* ---------- Private types --------------------------------------------------*/
 
@@ -198,7 +202,7 @@ enum LED_RGB_Device {
 /* ---------- Exported functions ---------------------------------------------*/
 
 void LED_MONO_setState(enum LED_MONO_Device device,enum LED_State state);
-void LED_MONO_toggleState(enum LED_MONO_Device device,enum LED_State state);
+void LED_MONO_toggleState(enum LED_MONO_Device device);
 enum LED_State LED_MONO_getState(enum LED_MONO_Device device);
 
 /* ---------- Private types --------------------------------------------------*/

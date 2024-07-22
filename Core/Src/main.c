@@ -35,6 +35,10 @@
 #include "dashboard.h"
 #include <stdio.h>
 #include "pca9555.h"
+#include "STM32_ST7032.h"
+#include "lcd_driver.h"
+#include "string.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -75,6 +79,7 @@ void MX_FREERTOS_Init(void);
 #define PCA9555_ADDR_A2 (0U)
 #define PCA9555_ADDR (PCA9555_ADDR_FIXED_PART | (PCA9555_ADDR_A0<<2U) |(PCA9555_ADDR_A0<<1U) | PCA9555_ADDR_A0)
 struct PCA9555_Handle pca9555Handle = {.hi2c=&hi2c1, .addr=PCA9555_ADDR};
+ST7032_InitTypeDef LCD_DisplayHandle = {0};
 /* USER CODE END 0 */
 
 /**
@@ -112,26 +117,28 @@ int main(void)
   MX_SPI3_Init();
   MX_USART1_UART_Init();
   MX_TIM7_Init();
-  MX_IWDG_Init();
-  MX_CAN2_Init();
+  //MX_IWDG_Init();
+ // MX_CAN2_Init();
   MX_DAC_Init();
   MX_I2C1_Init();
   MX_TIM3_Init();
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
+
   // Start the counter
   HAL_TIM_Base_Start_IT(&COUNTER_TIM);
 
-  if(PCA9555_init(&pca9555Handle,&hi2c1,PCA9555_ADDR)!=HAL_OK){
-      Error_Handler();
-  }
-  PCA9555_pinMode(&pca9555Handle,0,PCA9555_PIN_OUTPUT_MODE,PCA9555_POLARITY_NORMAL);
-  PCA9555_pinMode(&pca9555Handle,1,PCA9555_PIN_OUTPUT_MODE,PCA9555_POLARITY_NORMAL);
-  PCA9555_pinMode(&pca9555Handle,2,PCA9555_PIN_OUTPUT_MODE,PCA9555_POLARITY_NORMAL);
+  LCD_DisplayHandle.LCD_hi2c              = &hi2c1;
+  LCD_DisplayHandle.LCD_htim_backlight    = NULL;
+  LCD_DisplayHandle.TIM_channel_backlight = 0;
+  LCD_DisplayHandle.i2cAddr               = 0x78;
+  LCD_DisplayHandle.num_col               = 20;
+  LCD_DisplayHandle.num_lines             = 2;
 
-  SetupDashBoard();
-
-  InitDashBoard();
+  LCD_ST7032_Init(&LCD_DisplayHandle);  // Init LCD
+  LCD_clear();              // clear LCD
+  LCD_home();               // Home The display
+  LCD_contrast(15);         // set contrast to level 15 - MAXIMUM (15 level available)
 
   /* USER CODE END 2 */
 
@@ -150,21 +157,9 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    CoreDashBoard();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    static uint8_t test = 0;
-    static uint32_t cnt = 500;
-    if(HAL_GetTick() > cnt){
-      test++;
-      HAL_DAC_SetValue(&PUMPS_DAC,PUMPS_DAC_CHANNEL,DAC_ALIGN_8B_R,(uint8_t)test);
-      cnt += 500;
-      test % 2 == 0? PCA9555_digitalWrite(&pca9555Handle,0,PCA9555_BIT_SET) : PCA9555_digitalWrite(&pca9555Handle,0,PCA9555_BIT_RESET);
-      test % 2 == 0? PCA9555_digitalWrite(&pca9555Handle,1,PCA9555_BIT_SET) : PCA9555_digitalWrite(&pca9555Handle,1,PCA9555_BIT_RESET);
-      test % 2 == 0? PCA9555_digitalWrite(&pca9555Handle,2,PCA9555_BIT_SET) : PCA9555_digitalWrite(&pca9555Handle,2,PCA9555_BIT_RESET);
-    }
-    //HAL_IWDG_Refresh(&hiwdg);  // refresh watchdog ~10ms timeout
   }
 
   /* USER CODE END 3 */
@@ -187,12 +182,14 @@ void SystemClock_Config(void)
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSI|RCC_OSCILLATORTYPE_HSE;
-  RCC_OscInitStruct.HSEState = RCC_HSE_ON;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI|RCC_OSCILLATORTYPE_LSI;
+  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
+  //RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
+  RCC_OscInitStruct.HSICalibrationValue = 8U;
   RCC_OscInitStruct.LSIState = RCC_LSI_ON;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
-  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
-  RCC_OscInitStruct.PLL.PLLM = 4;
+  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
+  RCC_OscInitStruct.PLL.PLLM = 8;
   RCC_OscInitStruct.PLL.PLLN = 180;
   RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
   RCC_OscInitStruct.PLL.PLLQ = 2;

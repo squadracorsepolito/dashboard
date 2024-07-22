@@ -283,13 +283,13 @@ void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef* tim_baseHandle)
 }
 
 /* USER CODE BEGIN 1 */
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
-{
-    if (htim->Instance == COUNTER_TIM.Instance)
-    {
-        counter++;
-    }
-}
+//void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+//{
+//    if (htim->Instance == COUNTER_TIM.Instance)
+//    {
+//        counter++;
+//    }
+//}
 
 
 /* USER CODE END 1 */
