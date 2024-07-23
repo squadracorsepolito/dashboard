@@ -19,12 +19,15 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "FreeRTOS.h"
+
 #include "task.h"
-#include "main.h"
+
 #include "cmsis_os.h"
+#include "main.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "STM32_ST7032.h"
 #include "bsp.h"
 #include "can.h"
 #include "logger.h"
@@ -32,7 +35,7 @@
 #include "mcb.h"
 #include "stmlibs_status.h"
 #include "usart.h"
-#include "STM32_ST7032.h"
+
 #include <stdio.h>
 
 /* USER CODE END Includes */
@@ -67,13 +70,13 @@ typedef StaticQueue_t osStaticMessageQDef_t;
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
 
-volatile uint8_t SDC_CLOSED =0U;
-volatile uint8_t AMS_ERR=0U;
-volatile uint8_t IMD_ERR=0U;
-volatile uint8_t TS_OFF=0U;
-volatile uint8_t SOC_VAL=99U;
-volatile float INV_TEMP_VAL=35.0f;
-volatile float TSAC_TEMP_VAL=25.2f;
+volatile uint8_t SDC_CLOSED  = 0U;
+volatile uint8_t AMS_ERR     = 0U;
+volatile uint8_t IMD_ERR     = 0U;
+volatile uint8_t TS_OFF      = 0U;
+volatile uint8_t SOC_VAL     = 99U;
+volatile float INV_TEMP_VAL  = 35.0f;
+volatile float TSAC_TEMP_VAL = 25.2f;
 
 volatile uint8_t LOG_InitOk = 0;
 
@@ -85,84 +88,82 @@ LOGGER_HandleTypeDef LOG__LOGGER_handle      = {0};
 /* USER CODE END Variables */
 /* Definitions for TaskSysEngine */
 osThreadId_t TaskSysEngineHandle;
-uint32_t TaskSysEngineBuffer[ 128 ];
+uint32_t TaskSysEngineBuffer[128];
 osStaticThreadDef_t TaskSysEngineControlBlock;
 const osThreadAttr_t TaskSysEngine_attributes = {
-  .name = "TaskSysEngine",
-  .cb_mem = &TaskSysEngineControlBlock,
-  .cb_size = sizeof(TaskSysEngineControlBlock),
-  .stack_mem = &TaskSysEngineBuffer[0],
-  .stack_size = sizeof(TaskSysEngineBuffer),
-  .priority = (osPriority_t) osPriorityRealtime,
+    .name       = "TaskSysEngine",
+    .cb_mem     = &TaskSysEngineControlBlock,
+    .cb_size    = sizeof(TaskSysEngineControlBlock),
+    .stack_mem  = &TaskSysEngineBuffer[0],
+    .stack_size = sizeof(TaskSysEngineBuffer),
+    .priority   = (osPriority_t)osPriorityRealtime,
 };
 /* Definitions for TaskCyclic1ms */
 osThreadId_t TaskCyclic1msHandle;
-uint32_t TaskCyclic1msBuffer[ 128 ];
+uint32_t TaskCyclic1msBuffer[128];
 osStaticThreadDef_t TaskCyclic1msControlBlock;
 const osThreadAttr_t TaskCyclic1ms_attributes = {
-  .name = "TaskCyclic1ms",
-  .cb_mem = &TaskCyclic1msControlBlock,
-  .cb_size = sizeof(TaskCyclic1msControlBlock),
-  .stack_mem = &TaskCyclic1msBuffer[0],
-  .stack_size = sizeof(TaskCyclic1msBuffer),
-  .priority = (osPriority_t) osPriorityHigh,
+    .name       = "TaskCyclic1ms",
+    .cb_mem     = &TaskCyclic1msControlBlock,
+    .cb_size    = sizeof(TaskCyclic1msControlBlock),
+    .stack_mem  = &TaskCyclic1msBuffer[0],
+    .stack_size = sizeof(TaskCyclic1msBuffer),
+    .priority   = (osPriority_t)osPriorityHigh,
 };
 /* Definitions for TaskCyclic10ms */
 osThreadId_t TaskCyclic10msHandle;
-uint32_t TaskCyclic10msBuffer[ 128 ];
+uint32_t TaskCyclic10msBuffer[128];
 osStaticThreadDef_t TaskCyclic10msControlBlock;
 const osThreadAttr_t TaskCyclic10ms_attributes = {
-  .name = "TaskCyclic10ms",
-  .cb_mem = &TaskCyclic10msControlBlock,
-  .cb_size = sizeof(TaskCyclic10msControlBlock),
-  .stack_mem = &TaskCyclic10msBuffer[0],
-  .stack_size = sizeof(TaskCyclic10msBuffer),
-  .priority = (osPriority_t) osPriorityAboveNormal,
+    .name       = "TaskCyclic10ms",
+    .cb_mem     = &TaskCyclic10msControlBlock,
+    .cb_size    = sizeof(TaskCyclic10msControlBlock),
+    .stack_mem  = &TaskCyclic10msBuffer[0],
+    .stack_size = sizeof(TaskCyclic10msBuffer),
+    .priority   = (osPriority_t)osPriorityAboveNormal,
 };
 /* Definitions for TaskCyclic100ms */
 osThreadId_t TaskCyclic100msHandle;
-uint32_t TaskCyclic100msBuffer[ 128 ];
+uint32_t TaskCyclic100msBuffer[128];
 osStaticThreadDef_t TaskCyclic100msControlBlock;
 const osThreadAttr_t TaskCyclic100ms_attributes = {
-  .name = "TaskCyclic100ms",
-  .cb_mem = &TaskCyclic100msControlBlock,
-  .cb_size = sizeof(TaskCyclic100msControlBlock),
-  .stack_mem = &TaskCyclic100msBuffer[0],
-  .stack_size = sizeof(TaskCyclic100msBuffer),
-  .priority = (osPriority_t) osPriorityNormal,
+    .name       = "TaskCyclic100ms",
+    .cb_mem     = &TaskCyclic100msControlBlock,
+    .cb_size    = sizeof(TaskCyclic100msControlBlock),
+    .stack_mem  = &TaskCyclic100msBuffer[0],
+    .stack_size = sizeof(TaskCyclic100msBuffer),
+    .priority   = (osPriority_t)osPriorityNormal,
 };
 /* Definitions for canRxMsgQueue */
 osMessageQueueId_t canRxMsgQueueHandle;
-uint8_t canRxMsgItem[ 50 * sizeof( struct CAN_MsgItem ) ];
+uint8_t canRxMsgItem[50 * sizeof(struct CAN_MsgItem)];
 osStaticMessageQDef_t canRxMsgQueueControlBlock;
-const osMessageQueueAttr_t canRxMsgQueue_attributes = {
-  .name = "canRxMsgQueue",
-  .cb_mem = &canRxMsgQueueControlBlock,
-  .cb_size = sizeof(canRxMsgQueueControlBlock),
-  .mq_mem = &canRxMsgItem,
-  .mq_size = sizeof(canRxMsgItem)
-};
+const osMessageQueueAttr_t canRxMsgQueue_attributes = {.name    = "canRxMsgQueue",
+                                                       .cb_mem  = &canRxMsgQueueControlBlock,
+                                                       .cb_size = sizeof(canRxMsgQueueControlBlock),
+                                                       .mq_mem  = &canRxMsgItem,
+                                                       .mq_size = sizeof(canRxMsgItem)};
 /* Definitions for canTxMsgQueue */
 osMessageQueueId_t canTxMsgQueueHandle;
-uint8_t canTxMsgItem[ 10 * sizeof( struct CAN_MsgItem ) ];
+uint8_t canTxMsgItem[10 * sizeof(struct CAN_MsgItem)];
 osStaticMessageQDef_t canTxMsgQueueControlBlock;
-const osMessageQueueAttr_t canTxMsgQueue_attributes = {
-  .name = "canTxMsgQueue",
-  .cb_mem = &canTxMsgQueueControlBlock,
-  .cb_size = sizeof(canTxMsgQueueControlBlock),
-  .mq_mem = &canTxMsgItem,
-  .mq_size = sizeof(canTxMsgItem)
-};
+const osMessageQueueAttr_t canTxMsgQueue_attributes = {.name    = "canTxMsgQueue",
+                                                       .cb_mem  = &canTxMsgQueueControlBlock,
+                                                       .cb_size = sizeof(canTxMsgQueueControlBlock),
+                                                       .mq_mem  = &canTxMsgItem,
+                                                       .mq_size = sizeof(canTxMsgItem)};
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
 
 void CAN_ReadRxMsgs(void);
+void CAN_SendTxMsgs(void);
 void LOG_Init(void);
 void LOG_Routine(void);
 STMLIBS_StatusTypeDef LOG_flush(char *buffer, uint32_t size);
 void LED_Routine(void);
 void LCD_DisplayUpdateRoutine();
+void BTN_Routine(void);
 
 /* USER CODE END FunctionPrototypes */
 
@@ -179,54 +180,53 @@ void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
   * @retval None
   */
 void MX_FREERTOS_Init(void) {
-  /* USER CODE BEGIN Init */
+    /* USER CODE BEGIN Init */
 
-  /* USER CODE END Init */
+    /* USER CODE END Init */
 
-  /* USER CODE BEGIN RTOS_MUTEX */
+    /* USER CODE BEGIN RTOS_MUTEX */
     /* add mutexes, ... */
-  /* USER CODE END RTOS_MUTEX */
+    /* USER CODE END RTOS_MUTEX */
 
-  /* USER CODE BEGIN RTOS_SEMAPHORES */
+    /* USER CODE BEGIN RTOS_SEMAPHORES */
     /* add semaphores, ... */
-  /* USER CODE END RTOS_SEMAPHORES */
+    /* USER CODE END RTOS_SEMAPHORES */
 
-  /* USER CODE BEGIN RTOS_TIMERS */
+    /* USER CODE BEGIN RTOS_TIMERS */
     /* start timers, add new ones, ... */
-  /* USER CODE END RTOS_TIMERS */
+    /* USER CODE END RTOS_TIMERS */
 
-  /* Create the queue(s) */
-  /* creation of canRxMsgQueue */
-  canRxMsgQueueHandle = osMessageQueueNew (50, sizeof(struct CAN_MsgItem), &canRxMsgQueue_attributes);
+    /* Create the queue(s) */
+    /* creation of canRxMsgQueue */
+    canRxMsgQueueHandle = osMessageQueueNew(50, sizeof(struct CAN_MsgItem), &canRxMsgQueue_attributes);
 
-  /* creation of canTxMsgQueue */
-  canTxMsgQueueHandle = osMessageQueueNew (10, sizeof(struct CAN_MsgItem), &canTxMsgQueue_attributes);
+    /* creation of canTxMsgQueue */
+    canTxMsgQueueHandle = osMessageQueueNew(10, sizeof(struct CAN_MsgItem), &canTxMsgQueue_attributes);
 
-  /* USER CODE BEGIN RTOS_QUEUES */
+    /* USER CODE BEGIN RTOS_QUEUES */
     /* add queues, ... */
-  /* USER CODE END RTOS_QUEUES */
+    /* USER CODE END RTOS_QUEUES */
 
-  /* Create the thread(s) */
-  /* creation of TaskSysEngine */
-  TaskSysEngineHandle = osThreadNew(StartTaskSysEngine, NULL, &TaskSysEngine_attributes);
+    /* Create the thread(s) */
+    /* creation of TaskSysEngine */
+    TaskSysEngineHandle = osThreadNew(StartTaskSysEngine, NULL, &TaskSysEngine_attributes);
 
-  /* creation of TaskCyclic1ms */
-  TaskCyclic1msHandle = osThreadNew(StartTaskCyclic1ms, NULL, &TaskCyclic1ms_attributes);
+    /* creation of TaskCyclic1ms */
+    TaskCyclic1msHandle = osThreadNew(StartTaskCyclic1ms, NULL, &TaskCyclic1ms_attributes);
 
-  /* creation of TaskCyclic10ms */
-  TaskCyclic10msHandle = osThreadNew(StartTaskCyclic10ms, NULL, &TaskCyclic10ms_attributes);
+    /* creation of TaskCyclic10ms */
+    TaskCyclic10msHandle = osThreadNew(StartTaskCyclic10ms, NULL, &TaskCyclic10ms_attributes);
 
-  /* creation of TaskCyclic100ms */
-  TaskCyclic100msHandle = osThreadNew(StartTaskCyclic100ms, NULL, &TaskCyclic100ms_attributes);
+    /* creation of TaskCyclic100ms */
+    TaskCyclic100msHandle = osThreadNew(StartTaskCyclic100ms, NULL, &TaskCyclic100ms_attributes);
 
-  /* USER CODE BEGIN RTOS_THREADS */
+    /* USER CODE BEGIN RTOS_THREADS */
     /* add threads, ... */
-  /* USER CODE END RTOS_THREADS */
+    /* USER CODE END RTOS_THREADS */
 
-  /* USER CODE BEGIN RTOS_EVENTS */
+    /* USER CODE BEGIN RTOS_EVENTS */
     /* add events, ... */
-  /* USER CODE END RTOS_EVENTS */
-
+    /* USER CODE END RTOS_EVENTS */
 }
 
 /* USER CODE BEGIN Header_StartTaskSysEngine */
@@ -236,9 +236,8 @@ void MX_FREERTOS_Init(void) {
   * @retval None
   */
 /* USER CODE END Header_StartTaskSysEngine */
-void StartTaskSysEngine(void *argument)
-{
-  /* USER CODE BEGIN StartTaskSysEngine */
+void StartTaskSysEngine(void *argument) {
+    /* USER CODE BEGIN StartTaskSysEngine */
     LOG_Init();
     LED_MONO_toggleState(LED_AMS_Error);
     LED_MONO_toggleState(LED_IMD_Error);
@@ -252,9 +251,10 @@ void StartTaskSysEngine(void *argument)
     for (;;) {
         //Free running task, executes every possibile tick
         LOG_Routine();
+        CAN_SendTxMsgs();
         osDelay(1U);
     }
-  /* USER CODE END StartTaskSysEngine */
+    /* USER CODE END StartTaskSysEngine */
 }
 
 /* USER CODE BEGIN Header_StartTaskCyclic1ms */
@@ -264,9 +264,8 @@ void StartTaskSysEngine(void *argument)
 * @retval None
 */
 /* USER CODE END Header_StartTaskCyclic1ms */
-void StartTaskCyclic1ms(void *argument)
-{
-  /* USER CODE BEGIN StartTaskCyclic1ms */
+void StartTaskCyclic1ms(void *argument) {
+    /* USER CODE BEGIN StartTaskCyclic1ms */
     while (LOG_InitOk != 1) {
     }
     /* Infinite loop */
@@ -281,7 +280,7 @@ void StartTaskCyclic1ms(void *argument)
         // You need to make sure that timeEntryIntoWait-currentTime >TASK_CYCLIC_1MS_CYCLE_TIME_MS
         osDelayUntil(currentTime + ((TASK_CYCLIC_1MS_CYCLE_TIME_MS * 1000U) / osKernelGetTickFreq()));
     }
-  /* USER CODE END StartTaskCyclic1ms */
+    /* USER CODE END StartTaskCyclic1ms */
 }
 
 /* USER CODE BEGIN Header_StartTaskCyclic10ms */
@@ -291,9 +290,8 @@ void StartTaskCyclic1ms(void *argument)
 * @retval None
 */
 /* USER CODE END Header_StartTaskCyclic10ms */
-void StartTaskCyclic10ms(void *argument)
-{
-  /* USER CODE BEGIN StartTaskCyclic10ms */
+void StartTaskCyclic10ms(void *argument) {
+    /* USER CODE BEGIN StartTaskCyclic10ms */
     uint32_t lcd_refresh_cnt = 0U;
     /* Infinite loop */
     while (LOG_InitOk != 1) {
@@ -302,9 +300,11 @@ void StartTaskCyclic10ms(void *argument)
         uint32_t currentTime = osKernelGetTickCount();
 
         LED_Routine();
+        BTN_Routine();
+
         // Write Display
-        if(osKernelGetTickCount() >= lcd_refresh_cnt){
-          lcd_refresh_cnt = osKernelGetTickCount() + 33U;
+        if (osKernelGetTickCount() >= lcd_refresh_cnt) {
+            lcd_refresh_cnt = osKernelGetTickCount() + 33U;
         }
 #ifdef DEBUG_TASK_STATISTICS
         uint32_t timeEntryIntoWait = osKernelGetTickCount();
@@ -312,7 +312,7 @@ void StartTaskCyclic10ms(void *argument)
         // You need to make sure that timeEntryIntoWait-currentTime >TASK_CYCLIC_10MS_CYCLE_TIME_MS
         osDelayUntil(currentTime + ((TASK_CYCLIC_10MS_CYCLE_TIME_MS * 1000U) / osKernelGetTickFreq()));
     }
-  /* USER CODE END StartTaskCyclic10ms */
+    /* USER CODE END StartTaskCyclic10ms */
 }
 
 /* USER CODE BEGIN Header_StartTaskCyclic100ms */
@@ -322,9 +322,8 @@ void StartTaskCyclic10ms(void *argument)
 * @retval None
 */
 /* USER CODE END Header_StartTaskCyclic100ms */
-void StartTaskCyclic100ms(void *argument)
-{
-  /* USER CODE BEGIN StartTaskCyclic100ms */
+void StartTaskCyclic100ms(void *argument) {
+    /* USER CODE BEGIN StartTaskCyclic100ms */
 
     while (LOG_InitOk != 1) {
     }
@@ -340,11 +339,21 @@ void StartTaskCyclic100ms(void *argument)
         // You need to make sure that timeEntryIntoWait-currentTime >TASK_CYCLIC_100MS_CYCLE_TIME_MS
         osDelayUntil(currentTime + ((TASK_CYCLIC_100MS_CYCLE_TIME_MS * 1000U) / osKernelGetTickFreq()));
     }
-  /* USER CODE END StartTaskCyclic100ms */
+    /* USER CODE END StartTaskCyclic100ms */
 }
 
 /* Private application code --------------------------------------------------*/
 /* USER CODE BEGIN Application */
+void CAN_SendTxMsgs(void) {
+    struct CAN_MsgItem canTxMsgItem = {0};
+    // Wait Max 1ms for getting the data from queue
+    if (osMessageQueueGet(canTxMsgQueueHandle, (void *)&canTxMsgItem, 0U, 1U) == osOK) {
+        HAL_StatusTypeDef status = CAN_TxMsg(canTxMsgItem.hcan, canTxMsgItem.payload, &(canTxMsgItem.xHeader.tx));
+        if (status == HAL_ERROR) {
+            //TODO manage error, probably re-insert data in queue
+        }
+    }
+}
 
 void CAN_ReadRxMsgs(void) {
     union {
@@ -356,7 +365,7 @@ void CAN_ReadRxMsgs(void) {
     } msgs;
 
     struct CAN_MsgItem canRxMsgItem = {0};
-    if(osMessageQueueGet(canRxMsgQueueHandle, (void *)&canRxMsgItem, 0U, 0U) == osOK ){
+    if (osMessageQueueGet(canRxMsgQueueHandle, (void *)&canRxMsgItem, 0U, 0U) == osOK) {
         if ((canRxMsgItem.xHeader.rx.StdId == MCB_TLB_BATTERY_SHUT_STATUS_FRAME_ID) &&
             (canRxMsgItem.xHeader.rx.DLC == MCB_TLB_BATTERY_SHUT_STATUS_LENGTH)) {
             mcb_tlb_battery_shut_status_unpack(
@@ -370,14 +379,13 @@ void CAN_ReadRxMsgs(void) {
             mcb_tlb_battery_tsal_status_unpack(
                 &msgs.tsal_status, canRxMsgItem.payload, MCB_TLB_BATTERY_TSAL_STATUS_LENGTH);
             TS_OFF = msgs.tsal_status.tsal_is_green_on ? 1U : 0U;
-        } // TODO: remove below line just for demo
-        else if(canRxMsgItem.xHeader.rx.StdId == MCB_D_SPACE_RTD_ACK_FRAME_ID) {
-            SOC_VAL = (canRxMsgItem.payload[0]%101);
-            TSAC_TEMP_VAL = (float)(canRxMsgItem.payload[1]%101);
-            INV_TEMP_VAL = (float)(canRxMsgItem.payload[2]%101);
+        }  // TODO: remove below line just for demo
+        else if (canRxMsgItem.xHeader.rx.StdId == MCB_D_SPACE_RTD_ACK_FRAME_ID) {
+            SOC_VAL       = (canRxMsgItem.payload[0] % 101);
+            TSAC_TEMP_VAL = (float)(canRxMsgItem.payload[1] % 101);
+            INV_TEMP_VAL  = (float)(canRxMsgItem.payload[2] % 101);
         }
     }
-
 }
 
 void LOG_Init(void) {
@@ -398,9 +406,9 @@ STMLIBS_StatusTypeDef LOG_flush(char *buffer, uint32_t size) {
 
 void LED_Routine(void) {
     static uint32_t keep_alive_cnt = 0U;
-    // TODO: remove used just for testing on nucleo board
-    #define LED_On 0
-    #define LED_Off 1
+// TODO: remove used just for testing on nucleo board
+#define LED_On  0
+#define LED_Off 1
     if (AMS_ERR) {
         LED_MONO_setState(LED_AMS_Error, LED_On);
     } else {
@@ -411,8 +419,8 @@ void LED_Routine(void) {
     } else {
         LED_MONO_setState(LED_IMD_Error, LED_Off);
     }
-    #undef LED_On
-    #undef LED_Off
+#undef LED_On
+#undef LED_Off
     if (TS_OFF) {
         LED_MONO_setState(LED_TS_Off, LED_On);
     } else {
@@ -423,26 +431,50 @@ void LED_Routine(void) {
     } else {
         LED_MONO_setState(LED_Warn, LED_Off);
     }
-    if( osKernelGetTickCount() >= keep_alive_cnt){
+    if (osKernelGetTickCount() >= keep_alive_cnt) {
         keep_alive_cnt = osKernelGetTickCount() + 500U;
         LED_MONO_toggleState(LED_KeepAlive);
     }
 }
-void LCD_DisplayUpdateRoutine(void){
-  char buffer[20]={};
-  //LCD_clear();
-  LCD_home();
-  sprintf(buffer,"      SOC %3u%%",SOC_VAL);
-  LCD_write(buffer);
-  LCD_setCursor(1,0);
-  sprintf(buffer,"INV %2u",(uint8_t)INV_TEMP_VAL);
-  LCD_write(buffer);
-  LCD_write_byte(0b11011111);
-  LCD_shift(ST7032_CR,5);
-  sprintf(buffer,"TSAC %2u",(uint8_t)TSAC_TEMP_VAL);
-  LCD_write(buffer);
-  LCD_write_byte(0b11011111);
-  LCD_home();
+void LCD_DisplayUpdateRoutine(void) {
+    char buffer[20] = {};
+    //LCD_clear();
+    LCD_home();
+    sprintf(buffer, "      SOC %3u%%", SOC_VAL);
+    LCD_write(buffer);
+    LCD_setCursor(1, 0);
+    sprintf(buffer, "INV %2u", (uint8_t)INV_TEMP_VAL);
+    LCD_write(buffer);
+    LCD_write_byte(0b11011111);
+    LCD_shift(ST7032_CR, 5);
+    sprintf(buffer, "TSAC %2u", (uint8_t)TSAC_TEMP_VAL);
+    LCD_write(buffer);
+    LCD_write_byte(0b11011111);
+    LCD_home();
+}
+void BTN_Routine(void) {
+    enum BTN_State rtd_state = {};
+
+    rtd_state = BTN_getState(BTN_RTD);
+
+    union {
+        struct mcb_steering_rtd_t rtd;
+    } msgs;
+
+    struct CAN_MsgItem canTxMsgItem = {.xType = TxHeader, .xHeader.tx = {0}, .hcan = &hcan1, .payload = {0}};
+
+    msgs.rtd.rtd_cmd = (uint8_t)rtd_state;
+    mcb_steering_rtd_pack(canTxMsgItem.payload, &msgs.rtd, MCB_STEERING_RTD_LENGTH);
+
+    canTxMsgItem.xHeader.tx.StdId = MCB_STEERING_RTD_FRAME_ID;
+    canTxMsgItem.xHeader.tx.RTR   = CAN_RTR_DATA;
+    canTxMsgItem.xHeader.tx.IDE   = CAN_ID_STD;
+    canTxMsgItem.xHeader.tx.DLC   = MCB_STEERING_RTD_LENGTH;
+
+    // Wait mac 1ms to send in the queue
+    osStatus_t os_status = osMessageQueuePut(canTxMsgQueueHandle, (const void *)&canTxMsgItem, 0, 1U);
+    if (os_status != osOK) {
+        //TODO: deal with error, for now ErrorHandler
+    }
 }
 /* USER CODE END Application */
-
