@@ -57,7 +57,6 @@ volatile uint32_t DAC_PUMPS_PERCENTAGE = 0;
 #elif PCBVER == 1
 volatile uint8_t PWM_POWERTRAIN;
 #endif
-volatile float BRAKE_EXT;
 
 /* Button short press flags */
 bool RTD_BUTTON = false;
@@ -69,11 +68,10 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 {
     union
     {
-        struct mcb_d_space_rtd_ack_t rtd_ack;
-        struct mcb_d_space_peripherals_ctrl_t per_ctrl;
-        struct mcb_sens_front_1_t sens_front_1;
-        struct mcb_tlb_battery_tsal_status_t tsal_status;
-        struct mcb_tlb_battery_shut_status_t shut_status;
+        struct mcb_dspace_fsm_states_t rtd_ack;
+        struct mcb_dspace_peripherals_ctrl_t per_ctrl;
+        struct mcb_tlb_bat_signals_status_t tsal_status;
+        struct mcb_tlb_bat_sd_csensing_status_t shut_status;
     } msgs;
 
     if (HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &RxHeader, RxData) != HAL_OK)
@@ -87,18 +85,15 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
     uint32_t now = ReturnTime_100us();
     switch (RxHeader.StdId)
     {
-    case MCB_D_SPACE_RTD_ACK_FRAME_ID:
-    case MCB_D_SPACE_PERIPHERALS_CTRL_FRAME_ID:
+    case MCB_DSPACE_FSM_STATES_FRAME_ID:
+    case MCB_DSPACE_PERIPHERALS_CTRL_FRAME_ID:
         // Reset dSpace timeout after boot
         wdg_timeouts_100us[WDG_BOARD_DSPACE] = 4800;
         wdg_reset(WDG_BOARD_DSPACE, now);
         break;
-    case MCB_TLB_BATTERY_SHUT_STATUS_FRAME_ID:
-    case MCB_TLB_BATTERY_TSAL_STATUS_FRAME_ID:
+    case MCB_TLB_BAT_SD_CSENSING_STATUS_FRAME_ID:
+    case MCB_TLB_BAT_SIGNALS_STATUS_FRAME_ID:
         wdg_reset(WDG_BOARD_TLB, now);
-        break;
-    case MCB_SENS_FRONT_1_FRAME_ID:
-        wdg_reset(WDG_BOARD_SENS_FRONT, now);
         break;
     }
 
@@ -107,37 +102,25 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
     {
         NVIC_SystemReset();
     }
-
-    /*
-     *
-     * sensFront
-     *
-     */
-    else if ((RxHeader.StdId == MCB_SENS_FRONT_1_FRAME_ID) && (RxHeader.DLC == MCB_SENS_FRONT_1_LENGTH))
-    {
-        mcb_sens_front_1_unpack(&msgs.sens_front_1, RxData, MCB_SENS_FRONT_1_LENGTH);
-
-        BRAKE_EXT = mcb_sens_front_1_brake_straingauge_voltage_m_v_decode(msgs.sens_front_1.brake_straingauge_voltage_m_v);
-    }
     /*
      *
      * dSpace
      *
      */
-    else if ((RxHeader.StdId == MCB_D_SPACE_RTD_ACK_FRAME_ID) && (RxHeader.DLC == MCB_D_SPACE_RTD_ACK_LENGTH))
+    else if ((RxHeader.StdId == MCB_DSPACE_FSM_STATES_FRAME_ID) && (RxHeader.DLC == MCB_DSPACE_FSM_STATES_LENGTH))
     {
-        mcb_d_space_rtd_ack_unpack(&msgs.rtd_ack, RxData, MCB_D_SPACE_RTD_ACK_LENGTH);
-        dspace_rtd_state = msgs.rtd_ack.rtd_fsm_state;
+        mcb_dspace_fsm_states_unpack(&msgs.rtd_ack, RxData, MCB_DSPACE_FSM_STATES_LENGTH);
+        dspace_rtd_state = msgs.rtd_ack.dspace_main_fsm_state;
     }
-    else if ((RxHeader.StdId == 0x201/*MCB_D_SPACE_PERIPHERALS_CTRL_FRAME_ID*/) && (RxHeader.DLC == MCB_D_SPACE_PERIPHERALS_CTRL_LENGTH))
+    else if ((RxHeader.StdId == MCB_DSPACE_PERIPHERALS_CTRL_FRAME_ID) && (RxHeader.DLC == MCB_DSPACE_PERIPHERALS_CTRL_LENGTH))
     {
-        mcb_d_space_peripherals_ctrl_unpack(&msgs.per_ctrl, RxData, MCB_D_SPACE_PERIPHERALS_CTRL_LENGTH);
+        mcb_dspace_peripherals_ctrl_unpack(&msgs.per_ctrl, RxData, MCB_DSPACE_PERIPHERALS_CTRL_LENGTH);
 
-        PWM_RADIATOR_FAN = ((msgs.per_ctrl.rad_fan_pwm_ctrl > 100 ? 100 : msgs.per_ctrl.rad_fan_pwm_ctrl) / 100. * __HAL_TIM_GetAutoreload(&RADIATOR_FANS_PWM_TIM));
+        PWM_RADIATOR_FAN = ((msgs.per_ctrl.rad_fan_pwm_duty_cicle_ctrl > 100 ? 100 : msgs.per_ctrl.rad_fan_pwm_duty_cicle_ctrl) / 100. * __HAL_TIM_GetAutoreload(&RADIATOR_FANS_PWM_TIM));
         __HAL_TIM_SET_COMPARE(&RADIATOR_FANS_PWM_TIM, RADIATOR_FANS_PWM_CH, PWM_RADIATOR_FAN);
-        PWM_BAT_FAN = ((msgs.per_ctrl.batt_hv_fan_ctrl > 100 ? 100: msgs.per_ctrl.batt_hv_fan_ctrl) / 100. * __HAL_TIM_GetAutoreload(&BAT_FAN_PWM_TIM));
-        __HAL_TIM_SET_COMPARE(&BAT_FAN_PWM_TIM, BAT_FAN_PWM_CH, PWM_BAT_FAN);
-        DAC_PUMPS_PERCENTAGE = ((msgs.per_ctrl.batt_hv_fan_ctrl > 100 ? 100: msgs.per_ctrl.batt_hv_fan_ctrl)/100.0 * 256U);
+        // PWM_BAT_FAN = ((msgs.per_ctrl.batt_hv_fan_ctrl > 100 ? 100: msgs.per_ctrl.batt_hv_fan_ctrl) / 100. * __HAL_TIM_GetAutoreload(&BAT_FAN_PWM_TIM));
+        // __HAL_TIM_SET_COMPARE(&BAT_FAN_PWM_TIM, BAT_FAN_PWM_CH, PWM_BAT_FAN);
+        DAC_PUMPS_PERCENTAGE = ((msgs.per_ctrl.cool_pumps_speed_ctrl > 100 ? 100: msgs.per_ctrl.cool_pumps_speed_ctrl)/100.0 * 256U);
         //HAL_DAC_SetValue(&PUMPS_DAC,PUMPS_DAC_CHANNEL,DAC_ALIGN_8B_R,(uint8_t)DAC_PUMPS_PERCENTAGE);
     }
 
@@ -147,32 +130,32 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
      *
      */
     /* Received TLB error byte in order to turn LEDs on or off */
-    // else if ((RxHeader.StdId == MCB_TLB_BATTERY_TSAL_STATUS_FRAME_ID) && (RxHeader.DLC == MCB_TLB_BATTERY_TSAL_STATUS_LENGTH))
+    // else if ((RxHeader.StdId == MCB_TLB_BAT_SIGNALS_STATUS_FRAME_ID) && (RxHeader.DLC == MCB_TLB_BATTERY_TSAL_STATUS_LENGTH))
     //{
     //     mcb_tlb_battery_tsal_status_unpack(&msgs.tsal_status, RxData, MCB_TLB_BATTERY_TSAL_STATUS_LENGTH);
     //
     //     TSOFF = (bool)msgs.tsal_status.tsal_is_green_on;
     // }
-    // else if ((RxHeader.StdId == MCB_TLB_BATTERY_SHUT_STATUS_FRAME_ID) && (RxHeader.DLC == MCB_TLB_BATTERY_SHUT_STATUS_LENGTH)) {
+    // else if ((RxHeader.StdId == MCB_TLB_BAT_SD_CSENSING_STATUS_FRAME_ID) && (RxHeader.DLC == MCB_TLB_BATTERY_SHUT_STATUS_LENGTH)) {
     //     mcb_tlb_battery_shut_status_unpack(&msgs.shut_status, RxData, MCB_TLB_BATTERY_SHUT_STATUS_LENGTH);
     //     BMS_ERR = (bool)msgs.shut_status.is_ams_error_latched;
     //     IMD_ERR = (bool)msgs.shut_status.is_imd_error_latched;
     //     SD_CLOSED = (bool)msgs.shut_status.is_shutdown_closed_pre_tlb_batt_final;
     // }
     //  tsal status
-    else if ((RxHeader.StdId == MCB_TLB_BATTERY_TSAL_STATUS_FRAME_ID) && (RxHeader.DLC == MCB_TLB_BATTERY_TSAL_STATUS_LENGTH))
+    else if ((RxHeader.StdId == MCB_TLB_BAT_SIGNALS_STATUS_FRAME_ID) && (RxHeader.DLC == MCB_TLB_BAT_SIGNALS_STATUS_LENGTH))
     {
         // TSOFF when tsal green is enabled
-        mcb_tlb_battery_tsal_status_unpack(&msgs.tsal_status, RxData, MCB_TLB_BATTERY_TSAL_STATUS_LENGTH);
-        TSOFF = msgs.tsal_status.tsal_is_green_on ? GPIO_PIN_SET : GPIO_PIN_RESET;
+        mcb_tlb_bat_signals_status_unpack(&msgs.tsal_status, RxData, MCB_TLB_BAT_SIGNALS_STATUS_LENGTH);
+        TSOFF = msgs.tsal_status.tsal_green_is_active ? GPIO_PIN_SET : GPIO_PIN_RESET;
+        BMS_ERR = msgs.tsal_status.ams_err_is_active ? GPIO_PIN_SET : GPIO_PIN_RESET;
+        IMD_ERR = msgs.tsal_status.imd_err_is_active ? GPIO_PIN_SET : GPIO_PIN_RESET;
     }
     // shut status
-    else if ((RxHeader.StdId == MCB_TLB_BATTERY_SHUT_STATUS_FRAME_ID) && (RxHeader.DLC == MCB_TLB_BATTERY_SHUT_STATUS_LENGTH))
+    else if ((RxHeader.StdId == MCB_TLB_BAT_SD_CSENSING_STATUS_FRAME_ID) && (RxHeader.DLC == MCB_TLB_BAT_SD_CSENSING_STATUS_LENGTH))
     {
-        mcb_tlb_battery_shut_status_unpack(&msgs.shut_status, RxData, MCB_TLB_BATTERY_SHUT_STATUS_LENGTH);
-        SD_CLOSED = msgs.shut_status.is_shutdown_closed_pre_tlb_batt_final ? GPIO_PIN_SET : GPIO_PIN_RESET; // isShutdownClosed_preTLBBattFinal
-        BMS_ERR = msgs.shut_status.is_ams_error_latched ? GPIO_PIN_SET : GPIO_PIN_RESET;
-        IMD_ERR = msgs.shut_status.is_imd_error_latched ? GPIO_PIN_SET : GPIO_PIN_RESET;
+        mcb_tlb_bat_sd_csensing_status_unpack(&msgs.shut_status, RxData, MCB_TLB_BAT_SD_CSENSING_STATUS_LENGTH);
+        SD_CLOSED = msgs.shut_status.sdc_tsac_final_in_is_active ? GPIO_PIN_SET : GPIO_PIN_RESET; // isShutdownClosed_preTLBBattFinal
     }
 }
 
@@ -281,19 +264,19 @@ void can_send_state(uint32_t delay_100us)
 
     union
     {
-        struct mcb_steering_rtd_t rtd;
+        struct mcb_dash_hmi_devices_state_t rtd;
         // struct mcb_dash_motor_control_debug_t motor_ctrl_dbg;
     } msgs;
 
     if (delay_fun(&delay_100us_last, delay_100us))
     {
-        msgs.rtd.rtd_cmd = button_get(BUTTON_RTD);
-        mcb_steering_rtd_pack(TxData, &msgs.rtd, MCB_STEERING_RTD_LENGTH);
+        msgs.rtd.btn_rtd_is_pressed = mcb_dash_hmi_devices_state_btn_rtd_is_pressed_encode(button_get(BUTTON_RTD));
+        mcb_dash_hmi_devices_state_pack(TxData, &msgs.rtd, MCB_DASH_HMI_DEVICES_STATE_LENGTH);
 
-        TxHeader.StdId = MCB_STEERING_RTD_FRAME_ID;
+        TxHeader.StdId = MCB_DASH_HMI_DEVICES_STATE_FRAME_ID;
         TxHeader.RTR = CAN_RTR_DATA;
         TxHeader.IDE = CAN_ID_STD;
-        TxHeader.DLC = MCB_STEERING_RTD_LENGTH;
+        TxHeader.DLC = MCB_DASH_HMI_DEVICES_STATE_LENGTH;
 
         CAN_Msg_Send(&hcan1, &TxHeader, TxData, &TxMailbox, 300);
     }

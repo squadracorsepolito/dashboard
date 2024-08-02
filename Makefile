@@ -92,7 +92,7 @@ Core/Src/utils.c \
 Core/Src/dashboard.c \
 Core/Src/button.c \
 Core/Src/wdg.c \
-Lib/SCan/SC22EVO/artifacts/MCB/c_source/mcb.c \
+Lib/SCan/SC24/artifacts/MCB/c_source/mcb.c \
 Lib/PCA9555/pca9555.c
 
 # ASM sources
@@ -159,7 +159,7 @@ C_INCLUDES =  \
 -IDrivers/STM32F4xx_HAL_Driver/Inc/Legacy \
 -IDrivers/CMSIS/Device/ST/STM32F4xx/Include \
 -IDrivers/CMSIS/Include \
--ILib/SCan/SC22EVO/artifacts/MCB/c_source \
+-ILib/SCan/SC24/artifacts/MCB/c_source \
 -ILib/PCA9555
 
 
