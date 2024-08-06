@@ -65,8 +65,8 @@ void MX_CAN1_Init(void)
     sFilterConfig.FilterBank           = 0;
     sFilterConfig.FilterMode           = CAN_FILTERMODE_IDLIST;
     sFilterConfig.FilterScale          = CAN_FILTERSCALE_16BIT;
-    sFilterConfig.FilterIdHigh         = (MCB_DSPACE_FSM_STATES_FRAME_ID << 5);
-    sFilterConfig.FilterIdLow          = (MCB_DSPACE_FSM_STATES_FRAME_ID << 5);
+    sFilterConfig.FilterIdHigh         = (0x201/*MCB_DSPACE_FSM_STATES_FRAME_ID*/ << 5);
+    sFilterConfig.FilterIdLow          = (0x201/*MCB_DSPACE_FSM_STATES_FRAME_ID*/ << 5);
     sFilterConfig.FilterFIFOAssignment = CAN_RX_FIFO0;
     sFilterConfig.FilterActivation     = ENABLE;
     sFilterConfig.SlaveStartFilterBank = 14;
@@ -121,8 +121,8 @@ void MX_CAN1_Init(void)
     sFilterConfig.FilterBank           = 4;
     sFilterConfig.FilterMode           = CAN_FILTERMODE_IDLIST;
     sFilterConfig.FilterScale          = CAN_FILTERSCALE_16BIT;
-    sFilterConfig.FilterIdHigh         = (MCB_TLB_BAT_SIGNALS_STATUS_LENGTH << 5);
-    sFilterConfig.FilterIdLow          = (MCB_TLB_BAT_SIGNALS_STATUS_LENGTH << 5);
+    sFilterConfig.FilterIdHigh         = (MCB_TLB_BAT_SIGNALS_STATUS_FRAME_ID << 5);
+    sFilterConfig.FilterIdLow          = (MCB_TLB_BAT_SIGNALS_STATUS_FRAME_ID << 5);
     sFilterConfig.FilterFIFOAssignment = CAN_RX_FIFO0;
     sFilterConfig.FilterActivation     = ENABLE;
     sFilterConfig.SlaveStartFilterBank = 14;

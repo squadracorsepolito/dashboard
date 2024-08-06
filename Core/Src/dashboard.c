@@ -107,7 +107,7 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
      * dSpace
      *
      */
-    else if ((RxHeader.StdId == MCB_DSPACE_FSM_STATES_FRAME_ID) && (RxHeader.DLC == MCB_DSPACE_FSM_STATES_LENGTH))
+    else if ((RxHeader.StdId == 0x201/*MCB_DSPACE_FSM_STATES_FRAME_ID*/) && (RxHeader.DLC == MCB_DSPACE_FSM_STATES_LENGTH))
     {
         mcb_dspace_fsm_states_unpack(&msgs.rtd_ack, RxData, MCB_DSPACE_FSM_STATES_LENGTH);
         dspace_rtd_state = msgs.rtd_ack.dspace_main_fsm_state;

@@ -83,7 +83,7 @@ Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_adc.c \
 Lib/PCA9555/pca9555.c \
-Lib/SCan/SC22EVO/artifacts/MCB/c_source/mcb.c
+Lib/SCan/SC24/artifacts/MCB/c_source/mcb.c
 
 
 CPP_SOURCES = \
@@ -161,7 +161,7 @@ C_INCLUDES =  \
 -IDrivers/STM32F4xx_HAL_Driver/Inc \
 -IDrivers/STM32F4xx_HAL_Driver/Inc/Legacy \
 -ILib/PCA9555 \
--ILib/SCan/SC22EVO/artifacts/MCB/c_source
+-ILib/SCan/SC24/artifacts/MCB/c_source
 
 
 
