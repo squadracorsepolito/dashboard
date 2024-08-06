@@ -57,6 +57,8 @@ extern CAN_HandleTypeDef hcan1;
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define BUZZER_CMD_Pin GPIO_PIN_13
+#define BUZZER_CMD_GPIO_Port GPIOC
 
 /* USER CODE BEGIN Private defines */
 
