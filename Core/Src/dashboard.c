@@ -11,6 +11,7 @@
 #include "main.h"
 #include "dac.h"
 #include <stdio.h>
+#include "pca9555.h"
 
 /* State change triggers */
 typedef enum
@@ -32,10 +33,21 @@ error_t error = ERROR_NONE;
 volatile uint8_t boards_timeouts;
 
 /* Cock LEDs flags */
+struct RGB_Led_t{
+    uint8_t R;
+    uint8_t G;
+    uint8_t B;
+};
+
 volatile GPIO_PinState SD_CLOSED;
 volatile GPIO_PinState BMS_ERR;
 volatile GPIO_PinState TSOFF;
 volatile GPIO_PinState IMD_ERR;
+
+volatile struct RGB_Led_t LED1;
+volatile struct RGB_Led_t LED2;
+volatile struct RGB_Led_t LED3;
+volatile struct RGB_Led_t LED4;
 
 /* dSpace ACK flags */
 volatile int8_t dspace_rtd_state;
@@ -72,6 +84,7 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
         struct mcb_dspace_peripherals_ctrl_t per_ctrl;
         struct mcb_tlb_bat_signals_status_t tsal_status;
         struct mcb_tlb_bat_sd_csensing_status_t shut_status;
+        struct mcb_dspace_dash_leds_color_rgb_t rgb_status;
     } msgs;
 
     if (HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &RxHeader, RxData) != HAL_OK)
@@ -107,12 +120,12 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
      * dSpace
      *
      */
-    else if ((RxHeader.StdId == 0x201/*MCB_DSPACE_FSM_STATES_FRAME_ID*/) && (RxHeader.DLC == MCB_DSPACE_FSM_STATES_LENGTH))
+    else if ((RxHeader.StdId == MCB_DSPACE_FSM_STATES_FRAME_ID) && (RxHeader.DLC == MCB_DSPACE_FSM_STATES_LENGTH))
     {
         mcb_dspace_fsm_states_unpack(&msgs.rtd_ack, RxData, MCB_DSPACE_FSM_STATES_LENGTH);
         dspace_rtd_state = msgs.rtd_ack.dspace_main_fsm_state;
     }
-    else if ((RxHeader.StdId == MCB_DSPACE_PERIPHERALS_CTRL_FRAME_ID) && (RxHeader.DLC == MCB_DSPACE_PERIPHERALS_CTRL_LENGTH))
+    else if ((RxHeader.StdId == 0x201/*MCB_DSPACE_PERIPHERALS_CTRL_FRAME_ID*/) && (RxHeader.DLC == MCB_DSPACE_PERIPHERALS_CTRL_LENGTH))
     {
         mcb_dspace_peripherals_ctrl_unpack(&msgs.per_ctrl, RxData, MCB_DSPACE_PERIPHERALS_CTRL_LENGTH);
 
@@ -157,6 +170,24 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
         mcb_tlb_bat_sd_csensing_status_unpack(&msgs.shut_status, RxData, MCB_TLB_BAT_SD_CSENSING_STATUS_LENGTH);
         SD_CLOSED = msgs.shut_status.sdc_tsac_final_in_is_active ? GPIO_PIN_SET : GPIO_PIN_RESET; // isShutdownClosed_preTLBBattFinal
     }
+    else if ((RxHeader.StdId == MCB_DSPACE_DASH_LEDS_COLOR_RGB_FRAME_ID) && (RxHeader.DLC == MCB_DSPACE_DASH_LEDS_COLOR_RGB_LENGTH)){
+        mcb_dspace_dash_leds_color_rgb_unpack(&msgs.rgb_status, RxData, MCB_DSPACE_DASH_LEDS_COLOR_RGB_LENGTH);
+        LED1.R = mcb_dspace_dash_leds_color_rgb_led_1_red_decode(msgs.rgb_status.led_1_red);
+        LED1.G = mcb_dspace_dash_leds_color_rgb_led_1_green_decode(msgs.rgb_status.led_1_green);
+        LED1.B = mcb_dspace_dash_leds_color_rgb_led_1_blue_decode(msgs.rgb_status.led_1_blue);
+
+        LED2.R = mcb_dspace_dash_leds_color_rgb_led_2_red_decode(msgs.rgb_status.led_2_red);
+        LED2.G = mcb_dspace_dash_leds_color_rgb_led_2_green_decode(msgs.rgb_status.led_2_green);
+        LED2.B = mcb_dspace_dash_leds_color_rgb_led_2_blue_decode(msgs.rgb_status.led_2_blue);
+
+        LED3.R = mcb_dspace_dash_leds_color_rgb_led_3_red_decode(msgs.rgb_status.led_3_red);
+        LED3.G = mcb_dspace_dash_leds_color_rgb_led_3_green_decode(msgs.rgb_status.led_3_green);
+        LED3.B = mcb_dspace_dash_leds_color_rgb_led_3_blue_decode(msgs.rgb_status.led_3_blue);
+
+        LED4.R = mcb_dspace_dash_leds_color_rgb_led_4_red_decode(msgs.rgb_status.led_4_red);
+        LED4.G = mcb_dspace_dash_leds_color_rgb_led_4_green_decode(msgs.rgb_status.led_4_green);
+        LED4.B = mcb_dspace_dash_leds_color_rgb_led_4_blue_decode(msgs.rgb_status.led_4_blue);
+    }
 }
 
 void InitDashBoard()
@@ -167,11 +198,11 @@ void InitDashBoard()
     HAL_GPIO_WritePin(IMD_ERR_LED_nCMD_GPIO_OUT_GPIO_Port, IMD_ERR_LED_nCMD_GPIO_OUT_Pin, GPIO_PIN_SET);
 
     // Turn on all LEDs
-    HAL_GPIO_WritePin(TS_OFF_LED_CMD_GPIO_OUT_GPIO_Port, TS_OFF_LED_CMD_GPIO_OUT_Pin, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(TS_OFF_LED_CMD_GPIO_OUT_GPIO_Port, TS_OFF_LED_CMD_GPIO_OUT_Pin, GPIO_PIN_SET);
     HAL_GPIO_WritePin(AMS_ERR_LED_nCMD_GPIO_OUT_GPIO_Port, AMS_ERR_LED_nCMD_GPIO_OUT_Pin, GPIO_PIN_RESET);
     HAL_GPIO_WritePin(IMD_ERR_LED_nCMD_GPIO_OUT_GPIO_Port, IMD_ERR_LED_nCMD_GPIO_OUT_Pin, GPIO_PIN_RESET);
     HAL_GPIO_WritePin(RTD_LED_GPIO_Port, RTD_LED_Pin, GPIO_PIN_SET);
-    HAL_Delay(1000);
+    HAL_Delay(1500);
 
     // Disable The SDC relay and wait later for closing it
     HAL_GPIO_WritePin(SDC_RLY_CMD_GPIO_OUT_GPIO_Port, SDC_RLY_CMD_GPIO_OUT_Pin, GPIO_PIN_SET);
@@ -195,6 +226,7 @@ void cock_callback()
     RTD_BUTTON = true;
 }
 
+extern struct PCA9555_Handle pca9555Handle;
 /*Update Cockpit's LEDs*/
 void UpdateCockpitLed(uint32_t delay_100us)
 {
@@ -217,6 +249,10 @@ void UpdateCockpitLed(uint32_t delay_100us)
             HAL_GPIO_WritePin(AMS_ERR_LED_nCMD_GPIO_OUT_GPIO_Port, AMS_ERR_LED_nCMD_GPIO_OUT_Pin, !BMS_ERR);
             HAL_GPIO_WritePin(TS_OFF_LED_CMD_GPIO_OUT_GPIO_Port, TS_OFF_LED_CMD_GPIO_OUT_Pin, TSOFF);
             HAL_GPIO_WritePin(IMD_ERR_LED_nCMD_GPIO_OUT_GPIO_Port, IMD_ERR_LED_nCMD_GPIO_OUT_Pin, !IMD_ERR);
+        }
+
+        if (boards_timeouts & (1 << WDG_BOARD_DSPACE)) {
+            // PCA9555_digitalWrite(&pca9555Handle, )
         }
     }
 }
@@ -308,7 +344,7 @@ void RTD_fsm(uint32_t delay_100us) {
             case STATE_RTD_SOUND:
                 HAL_GPIO_WritePin(RTD_LED_GPIO_Port, RTD_LED_Pin, GPIO_PIN_SET);
                 HAL_GPIO_WritePin(BUZZER_CMD_GPIO_OUT_GPIO_Port, BUZZER_CMD_GPIO_OUT_Pin, GPIO_PIN_SET);
-                if(HAL_GetTick() - time > 1000) {
+                if(HAL_GetTick() - time > 2000) {
                     HAL_GPIO_WritePin(BUZZER_CMD_GPIO_OUT_GPIO_Port, BUZZER_CMD_GPIO_OUT_Pin, GPIO_PIN_RESET);
                     rtd_fsm_state = STATE_RTD;
                 }
