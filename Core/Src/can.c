@@ -93,8 +93,8 @@ void MX_CAN1_Init(void)
     sFilterConfig.FilterBank           = 2;
     sFilterConfig.FilterMode           = CAN_FILTERMODE_IDLIST;
     sFilterConfig.FilterScale          = CAN_FILTERSCALE_16BIT;
-    sFilterConfig.FilterIdHigh         = (0x9 << 5);
-    sFilterConfig.FilterIdLow          = (0x9 << 5);
+    sFilterConfig.FilterIdHigh         = (MCB_DIAG_TOOL_XCP_TX_DASH_FRAME_ID << 5);
+    sFilterConfig.FilterIdLow          = (MCB_DIAG_TOOL_XCP_TX_DASH_FRAME_ID << 5);
     sFilterConfig.FilterFIFOAssignment = CAN_RX_FIFO0;
     sFilterConfig.FilterActivation     = ENABLE;
     sFilterConfig.SlaveStartFilterBank = 14;

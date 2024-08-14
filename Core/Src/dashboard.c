@@ -98,7 +98,7 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
     }
 
     /*Reboot Board - Received command byte from CAN*/
-    if ((RxHeader.StdId == 0x9) && (RxHeader.DLC == 2) && (RxData[0] == 0xFF) && (RxData[1] == 0x00))
+    if ((RxHeader.StdId == MCB_DIAG_TOOL_XCP_TX_DASH_FRAME_ID) && (RxHeader.DLC == 2) && (RxData[0] == 0xFF) && (RxData[1] == 0x00))
     {
         NVIC_SystemReset();
     }
@@ -167,15 +167,15 @@ void InitDashBoard()
     HAL_GPIO_WritePin(IMD_ERR_LED_nCMD_GPIO_OUT_GPIO_Port, IMD_ERR_LED_nCMD_GPIO_OUT_Pin, GPIO_PIN_SET);
 
     // Turn on all LEDs
-    HAL_GPIO_WritePin(TS_OFF_LED_CMD_GPIO_OUT_GPIO_Port, TS_OFF_LED_CMD_GPIO_OUT_Pin, GPIO_PIN_SET);
+    HAL_GPIO_WritePin(TS_OFF_LED_CMD_GPIO_OUT_GPIO_Port, TS_OFF_LED_CMD_GPIO_OUT_Pin, GPIO_PIN_RESET);
     HAL_GPIO_WritePin(AMS_ERR_LED_nCMD_GPIO_OUT_GPIO_Port, AMS_ERR_LED_nCMD_GPIO_OUT_Pin, GPIO_PIN_RESET);
     HAL_GPIO_WritePin(IMD_ERR_LED_nCMD_GPIO_OUT_GPIO_Port, IMD_ERR_LED_nCMD_GPIO_OUT_Pin, GPIO_PIN_RESET);
     HAL_GPIO_WritePin(RTD_LED_GPIO_Port, RTD_LED_Pin, GPIO_PIN_SET);
+    HAL_Delay(1000);
 
     // Disable The SDC relay and wait later for closing it
     HAL_GPIO_WritePin(SDC_RLY_CMD_GPIO_OUT_GPIO_Port, SDC_RLY_CMD_GPIO_OUT_Pin, GPIO_PIN_SET);
 
-    HAL_Delay(900);
     HAL_GPIO_WritePin(BUZZER_CMD_GPIO_OUT_GPIO_Port, BUZZER_CMD_GPIO_OUT_Pin, GPIO_PIN_SET);
     HAL_Delay(50);
     HAL_GPIO_WritePin(BUZZER_CMD_GPIO_OUT_GPIO_Port, BUZZER_CMD_GPIO_OUT_Pin, GPIO_PIN_RESET);

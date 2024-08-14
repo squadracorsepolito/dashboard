@@ -13,8 +13,8 @@
 ######################################
 # FLASH VIA CANBUS CAN-ids of devices
 ######################################
-CANID_XCP_HOST_TO_TARGET__HEX=009
-CANID_XCP_TARGET_TO_HOST__HEX=183
+CANID_XCP_HOST_TO_TARGET__HEX=296
+CANID_XCP_TARGET_TO_HOST__HEX=465
 
 ######################################
 # target
