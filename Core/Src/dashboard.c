@@ -12,6 +12,7 @@
 #include "dac.h"
 #include <stdio.h>
 #include "pca9555.h"
+#include "hvcb.h"
 
 /* State change triggers */
 typedef enum
@@ -28,6 +29,9 @@ uint32_t TxMailbox;
 uint8_t TxData[8] = {0};
 uint8_t RxData[8] = {0};
 
+CAN_RxHeaderTypeDef RxHeader1;
+uint8_t RxData1[8] = {0};
+
 /* Error Variables */
 error_t error = ERROR_NONE;
 volatile uint8_t boards_timeouts;
@@ -43,6 +47,21 @@ volatile GPIO_PinState SD_CLOSED;
 volatile GPIO_PinState BMS_ERR;
 volatile GPIO_PinState TSOFF;
 volatile GPIO_PinState IMD_ERR;
+
+volatile uint8_t ams_err_tlb;
+
+    volatile uint8_t hvb_diag_bat_vlt_sna;
+    volatile uint8_t  hvb_diag_inv_vlt_sna;
+    volatile uint8_t  hvb_diag_bat_curr_sna;
+    volatile uint8_t  hvb_diag_vcu_can_sna;
+    volatile uint8_t  hvb_diag_cell_sna;
+    volatile uint8_t  hvb_diag_bat_uv;
+    volatile uint8_t  hvb_diag_cell_ov;
+    volatile uint8_t  hvb_diag_cell_uv;
+    volatile uint8_t  hvb_diag_cell_ot;
+    volatile uint8_t  hvb_diag_cell_ut;
+    volatile uint8_t  hvb_diag_inv_vlt_ov;
+    volatile uint8_t  hvb_diag_bat_curr_oc;
 
 volatile struct RGB_Led_t LED1;
 volatile struct RGB_Led_t LED2;
@@ -161,7 +180,7 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
         // TSOFF when tsal green is enabled
         mcb_tlb_bat_signals_status_unpack(&msgs.tsal_status, RxData, MCB_TLB_BAT_SIGNALS_STATUS_LENGTH);
         TSOFF = msgs.tsal_status.tsal_green_is_active ? GPIO_PIN_SET : GPIO_PIN_RESET;
-        BMS_ERR = msgs.tsal_status.ams_err_is_active ? GPIO_PIN_SET : GPIO_PIN_RESET;
+        ams_err_tlb = msgs.tsal_status.ams_err_is_active;
         IMD_ERR = msgs.tsal_status.imd_err_is_active ? GPIO_PIN_SET : GPIO_PIN_RESET;
     }
     // shut status
@@ -188,6 +207,38 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
         LED4.G = mcb_dspace_dash_leds_color_rgb_led_4_green_decode(msgs.rgb_status.led_4_green);
         LED4.B = mcb_dspace_dash_leds_color_rgb_led_4_blue_decode(msgs.rgb_status.led_4_blue);
     }
+}
+
+void HAL_CAN_RxFifo1MsgPendingCallback(CAN_HandleTypeDef *hcan)
+{
+    union
+    {
+        struct hvcb_hvb_rx_diagnosis_t hvb_rx_diagnosis;
+    } msgs;
+
+    if (HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO1, &RxHeader1, RxData1) != HAL_OK)
+    {
+        /* Transmission request Error */
+        HAL_CAN_ResetError(hcan);
+        Error_Handler();
+    }
+    if ((RxHeader1.StdId == HVCB_HVB_RX_DIAGNOSIS_FRAME_ID) && (RxHeader1.DLC == HVCB_HVB_RX_DIAGNOSIS_LENGTH)){
+
+        hvcb_hvb_rx_diagnosis_unpack(&msgs.hvb_rx_diagnosis, RxData1, HVCB_HVB_RX_DIAGNOSIS_LENGTH);
+        hvb_diag_bat_vlt_sna                                = hvcb_hvb_rx_diagnosis_hvb_diag_bat_vlt_sna_decode(      msgs.hvb_rx_diagnosis.hvb_diag_bat_vlt_sna  );
+        hvb_diag_inv_vlt_sna                                = hvcb_hvb_rx_diagnosis_hvb_diag_inv_vlt_sna_decode(      msgs.hvb_rx_diagnosis.hvb_diag_inv_vlt_sna  );
+        hvb_diag_bat_curr_sna                               = hvcb_hvb_rx_diagnosis_hvb_diag_bat_curr_sna_decode(     msgs.hvb_rx_diagnosis.hvb_diag_bat_curr_sna  );
+        hvb_diag_vcu_can_sna                                = hvcb_hvb_rx_diagnosis_hvb_diag_vcu_can_sna_decode(      msgs.hvb_rx_diagnosis.hvb_diag_vcu_can_sna  );
+        hvb_diag_cell_sna                                   = hvcb_hvb_rx_diagnosis_hvb_diag_cell_sna_decode(         msgs.hvb_rx_diagnosis.hvb_diag_cell_sna    );
+        hvb_diag_bat_uv                                     = hvcb_hvb_rx_diagnosis_hvb_diag_bat_uv_decode(           msgs.hvb_rx_diagnosis.hvb_diag_bat_uv      );
+        hvb_diag_cell_ov                                    = hvcb_hvb_rx_diagnosis_hvb_diag_cell_ov_decode(          msgs.hvb_rx_diagnosis.hvb_diag_cell_ov     );
+        hvb_diag_cell_uv                                    = hvcb_hvb_rx_diagnosis_hvb_diag_cell_uv_decode(          msgs.hvb_rx_diagnosis.hvb_diag_cell_uv     );
+        hvb_diag_cell_ot                                    = hvcb_hvb_rx_diagnosis_hvb_diag_cell_ot_decode(          msgs.hvb_rx_diagnosis.hvb_diag_cell_ot     );
+        hvb_diag_cell_ut                                    = hvcb_hvb_rx_diagnosis_hvb_diag_cell_ut_decode(          msgs.hvb_rx_diagnosis.hvb_diag_cell_ut     );
+        hvb_diag_inv_vlt_ov                                 = hvcb_hvb_rx_diagnosis_hvb_diag_inv_vlt_ov_decode(       msgs.hvb_rx_diagnosis.hvb_diag_inv_vlt_ov  );
+        hvb_diag_bat_curr_oc                                = hvcb_hvb_rx_diagnosis_hvb_diag_bat_curr_oc_decode(      msgs.hvb_rx_diagnosis.hvb_diag_bat_curr_oc  );
+    }
+    
 }
 
 void InitDashBoard()
@@ -367,14 +418,57 @@ void RTD_fsm(uint32_t delay_100us) {
     }
 }
 
+uint8_t AMS_detection(
+    uint8_t ams_err_tlb,
+    uint8_t hvb_diag_bat_vlt_sna,
+    uint8_t hvb_diag_inv_vlt_sna,
+    uint8_t hvb_diag_bat_curr_sna,
+    uint8_t hvb_diag_vcu_can_sna,
+    uint8_t hvb_diag_cell_sna,
+    uint8_t hvb_diag_bat_uv,
+    uint8_t hvb_diag_cell_ov,
+    uint8_t hvb_diag_cell_uv,
+    uint8_t hvb_diag_cell_ot,
+    uint8_t hvb_diag_cell_ut,
+    uint8_t hvb_diag_inv_vlt_ov,
+    uint8_t hvb_diag_bat_curr_oc
+   ){
+    static uint8_t ams_err_prev = 0;
+
+    if(ams_err_prev && ams_err_tlb){
+        return ams_err_prev;
+    }
+
+    if(!ams_err_tlb){ // ams_err_prev & 
+        ams_err_prev = 0;
+        return ams_err_prev;
+    }
+
+ams_err_prev =  (hvb_diag_bat_vlt_sna
+    || hvb_diag_inv_vlt_sna
+    || hvb_diag_bat_curr_sna
+    || hvb_diag_vcu_can_sna
+    || hvb_diag_cell_sna
+    || hvb_diag_bat_uv
+    || hvb_diag_cell_ov
+    || hvb_diag_cell_uv
+    || hvb_diag_cell_ot
+    || hvb_diag_cell_ut
+    || hvb_diag_inv_vlt_ov
+    || hvb_diag_bat_curr_oc ) & ams_err_tlb;
+
+    return  ams_err_prev;
+}
+
 /**
- * @brief Dash main loop
+    * @brief Dash main loop
  */
 void CoreDashBoard(void)
 {
     // Blink green led to signal activity
     static uint32_t led_blink = 0;
-    static uint32_t imd_err_blink = 0;
+    static uint32_t cnt10ms = 0;
+    //static uint32_t imd_err_blink = 0;
 
     LedBlinking(STAT1_LED_GPIO_OUT_GPIO_Port, STAT1_LED_GPIO_OUT_Pin, &led_blink, 2000);
 
@@ -384,11 +478,31 @@ void CoreDashBoard(void)
         HAL_GPIO_WritePin(BUZZER_CMD_GPIO_OUT_GPIO_Port, BUZZER_CMD_GPIO_OUT_Pin, GPIO_PIN_RESET);
     }
 
+    // ams_err_check
+    if(HAL_GetTick() >= cnt10ms + 10U ){
+    BMS_ERR = AMS_detection(
+        ams_err_tlb,
+        hvb_diag_bat_vlt_sna,
+        hvb_diag_inv_vlt_sna,
+        hvb_diag_bat_curr_sna,
+        hvb_diag_vcu_can_sna,
+        hvb_diag_cell_sna,
+        hvb_diag_bat_uv,
+        hvb_diag_cell_ov,
+        hvb_diag_cell_uv,
+        hvb_diag_cell_ot,
+        hvb_diag_cell_ut,
+        hvb_diag_inv_vlt_ov,
+        hvb_diag_bat_curr_oc
+        );
+        cnt10ms +=10U;
+    }
     // Update state Cockpit's LEDs
     UpdateCockpitLed(1000);
 
     // Update buttons state
     button_sample();
+
 
     // RUN the ready to drive FSM
     RTD_fsm(500);

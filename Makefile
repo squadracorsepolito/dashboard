@@ -93,6 +93,7 @@ Core/Src/dashboard.c \
 Core/Src/button.c \
 Core/Src/wdg.c \
 Lib/SCan/SC24/artifacts/MCB/c_source/mcb.c \
+Lib/SCan/SC24/artifacts/HVCB/c_source/hvcb.c \
 Lib/PCA9555/pca9555.c
 
 # ASM sources
@@ -160,6 +161,7 @@ C_INCLUDES =  \
 -IDrivers/CMSIS/Device/ST/STM32F4xx/Include \
 -IDrivers/CMSIS/Include \
 -ILib/SCan/SC24/artifacts/MCB/c_source \
+-ILib/SCan/SC24/artifacts/HVCB/c_source \
 -ILib/PCA9555
 
 
@@ -169,7 +171,7 @@ ASFLAGS = $(MCU) $(AS_DEFS) $(AS_INCLUDES) $(OPT)
 CFLAGS += $(MCU) $(C_DEFS) $(C_INCLUDES) $(OPT)
 
 ifeq ($(DEBUG), 1)
-CFLAGS += -g -gdwarf-2
+CFLAGS += -g -gdwarf -ggdb
 endif
 
 # Add additional flags
@@ -188,8 +190,7 @@ LDSCRIPT = STM32F446RETx_FLASH.ld
 
 # libraries
 LIBS = -lc -lm -lnosys 
-LIBDIR = 
-
+LIBDIR = \
 
 # Additional LD Flags from config file
 ADDITIONALLDFLAGS = -specs=nano.specs -u_printf_float
@@ -297,6 +298,7 @@ BOOTCOMMANDER = "$(BOOTCOMMANDER_PATH)/BootCommander"
 else
 BOOTCOMMANDER = "BootCommander"
 endif
+
 #######################################
 # can_flash
 #######################################

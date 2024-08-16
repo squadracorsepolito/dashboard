@@ -22,6 +22,7 @@
 
 /* USER CODE BEGIN 0 */
 #include "mcb.h"
+#include "hvcb.h"
 #include "stdio.h"
 #include "string.h"
 #include "usart.h"
@@ -175,6 +176,26 @@ void MX_CAN2_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN CAN2_Init 2 */
+
+    CAN_FilterTypeDef sFilterConfig;
+
+    sFilterConfig.FilterBank           = 14;
+    sFilterConfig.FilterMode           = CAN_FILTERMODE_IDLIST;
+    sFilterConfig.FilterScale          = CAN_FILTERSCALE_16BIT;
+    sFilterConfig.FilterIdHigh         = (HVCB_HVB_RX_DIAGNOSIS_FRAME_ID << 5);
+    sFilterConfig.FilterIdLow          = (HVCB_HVB_RX_DIAGNOSIS_FRAME_ID << 5);
+    sFilterConfig.FilterFIFOAssignment = CAN_RX_FIFO1;
+    sFilterConfig.FilterActivation     = ENABLE;
+    sFilterConfig.SlaveStartFilterBank = 14;
+
+
+    HAL_CAN_ConfigFilter(&hcan2, &sFilterConfig);
+
+    HAL_CAN_ActivateNotification(&hcan2, CAN_IT_RX_FIFO1_MSG_PENDING);
+
+    //if (HAL_CAN_ActivateNotification(&hcan2,
+    //                                 CAN_IT_BUSOFF | CAN_IT_ERROR | CAN_IT_ERROR_PASSIVE | CAN_IT_ERROR_WARNING |
+    //                                     CAN_IT_RX_FIFO1_MSG_PENDING) != HAL_OK);
 
     if (HAL_CAN_Start(&hcan2) != HAL_OK) {
         /* Start Error */
