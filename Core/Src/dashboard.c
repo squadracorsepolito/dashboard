@@ -378,10 +378,11 @@ void CoreDashBoard(void)
 
     LedBlinking(STAT1_LED_GPIO_OUT_GPIO_Port, STAT1_LED_GPIO_OUT_Pin, &led_blink, 2000);
 
-    if(IMD_ERR)
-        LedBlinking(BUZZER_CMD_GPIO_OUT_GPIO_Port, BUZZER_CMD_GPIO_OUT_Pin, &imd_err_blink, 2500);
-    else if(rtd_fsm_state != STATE_RTD_SOUND)
+    if(IMD_ERR){
+        //LedBlinking(BUZZER_CMD_GPIO_OUT_GPIO_Port, BUZZER_CMD_GPIO_OUT_Pin, &imd_err_blink, 2500);
+    }else if(rtd_fsm_state != STATE_RTD_SOUND){
         HAL_GPIO_WritePin(BUZZER_CMD_GPIO_OUT_GPIO_Port, BUZZER_CMD_GPIO_OUT_Pin, GPIO_PIN_RESET);
+    }
 
     // Update state Cockpit's LEDs
     UpdateCockpitLed(1000);
