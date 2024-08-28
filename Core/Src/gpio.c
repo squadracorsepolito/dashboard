@@ -81,14 +81,14 @@ void MX_GPIO_Init(void)
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
   /*Configure GPIO pins : PCPin PCPin */
-  GPIO_InitStruct.Pin = PUSH_BTN1_IN_GPIO_IN_Pin|PUSH_BTN2_IN_GPIO_IN_Pin;
+  GPIO_InitStruct.Pin = nPUSH_BTN1_IN_GPIO_IN_Pin|nPUSH_BTN2_IN_GPIO_IN_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
   /*Configure GPIO pins : PBPin PBPin PBPin PBPin
                            PBPin */
-  GPIO_InitStruct.Pin = PUSH_BTN3_IN_GPIO_IN_Pin|PUSH_BTN4_IN_GPIO_IN_Pin|nRTD_BTN_IN_GPIO_IN_Pin|PCA9555_nINT_GPIO_IN_Pin
+  GPIO_InitStruct.Pin = nPUSH_BTN3_IN_GPIO_IN_Pin|nPUSH_BTN4_IN_GPIO_IN_Pin|nRTD_BTN_IN_GPIO_IN_Pin|PCA9555_nINT_GPIO_IN_Pin
                           |SDC_IN_3V3_GPIO_IN_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;

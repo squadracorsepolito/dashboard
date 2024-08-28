@@ -25,8 +25,8 @@
 
 /*---------- Private variables --------------.--------------------------------*/
 
-static struct GPIO_Tuple SDC_RLY_Device_GPIO_Tuple_map = {.GPIO_Port = SDC_RLY_CMD_GPIO_OUT_GPIO_Port,
-                                                          .GPIO_Pin  = SDC_RLY_CMD_GPIO_OUT_Pin};
+static struct GPIO_Tuple SDC_RLY_Device_to_GPIO_Tuple_map = {.GPIO_Port = SDC_RLY_CMD_GPIO_OUT_GPIO_Port,
+                                                             .GPIO_Pin  = SDC_RLY_CMD_GPIO_OUT_Pin};
 
 /*---------- Private function prototypes ----.--------------------------------*/
 
@@ -37,15 +37,111 @@ static struct GPIO_Tuple SDC_RLY_Device_GPIO_Tuple_map = {.GPIO_Port = SDC_RLY_C
 void SDC_RLY_setState(enum SDC_RLY_State state) {
     assert_param(state != SDC_RLY_State_NUM);
     GPIO_PinState pinState = state == SDC_RLY_Open ? GPIO_PIN_RESET : GPIO_PIN_SET;
-    HAL_GPIO_WritePin(SDC_RLY_Device_GPIO_Tuple_map.GPIO_Port, SDC_RLY_Device_GPIO_Tuple_map.GPIO_Pin, pinState);
+    HAL_GPIO_WritePin(SDC_RLY_Device_to_GPIO_Tuple_map.GPIO_Port, SDC_RLY_Device_to_GPIO_Tuple_map.GPIO_Pin, pinState);
 }
 void SDC_RLY_toggleState(void) {
-    HAL_GPIO_TogglePin(SDC_RLY_Device_GPIO_Tuple_map.GPIO_Port, SDC_RLY_Device_GPIO_Tuple_map.GPIO_Pin);
+    HAL_GPIO_TogglePin(SDC_RLY_Device_to_GPIO_Tuple_map.GPIO_Port, SDC_RLY_Device_to_GPIO_Tuple_map.GPIO_Pin);
 }
 enum SDC_RLY_State SDC_RLY_getState(void) {
     GPIO_PinState state;
-    state = HAL_GPIO_ReadPin(SDC_RLY_Device_GPIO_Tuple_map.GPIO_Port, SDC_RLY_Device_GPIO_Tuple_map.GPIO_Pin);
+    state = HAL_GPIO_ReadPin(SDC_RLY_Device_to_GPIO_Tuple_map.GPIO_Port, SDC_RLY_Device_to_GPIO_Tuple_map.GPIO_Pin);
     return state == GPIO_PIN_RESET ? SDC_RLY_Open : SDC_RLY_Closed;
+}
+
+/*---------- Private Functions -----------------------------------------------*/
+
+/* BTN (Buttons) #############################################################*/
+
+/*---------- Private define --------------------------------------------------*/
+#define BTN_VALUES_ARR_LEN (BTN_DEVICE_FILTER_WINDOW_SAMPLES)
+
+#define XSTR(x) STR(x)
+#define STR(x) #x
+
+#if BTN_VALUES_ARR_LEN > 10U
+#pragma message("BTN_values = " XSTR(BTN_VALUES_ARR_LEN))
+#error "BTN_values array length > 10. Decrase BTN_DEVICE_FILTER_WINDOW_SAMPLES."
+#endif
+
+#if BTN_VALUES_ARR_LEN < 1
+#pragma  message("BTN_values = " XSTR(BTN_VALUES_ARR_LEN))
+#error "BTN_values is < 1. Increase BTN_DEVICE_FILTER_WINDOW_SAMPLES."
+#endif
+
+#define BTN_VALUES_ARR_LEN_U ((uint8_t)BTN_VALUES_ARR_LEN)
+#define BTN_DEVICE_SAMPLING_PERIOD_MS_U ((uint32_t)BTN_DEVICE_SAMPLING_PERIOD_MS)
+
+#if BTN_Device_NUM <= 8
+#define BTN_Value_t uint8_t
+#elif BTN_Device_NUM <= 16
+#define BTN_Value_t uint16_t
+#else
+#define BTN_Value_t uint32_t
+#endif
+
+/*---------- Private macro ---------------------------------------------------*/
+
+/*---------- Private variables -----------------------------------------------*/
+
+static struct GPIO_Tuple BTN_Device_to_GPIO_Tuple_map[BTN_Device_NUM] = {
+    [BTN_RTD]       = {.GPIO_Port = nRTD_BTN_IN_GPIO_IN_GPIO_Port, .GPIO_Pin = nRTD_BTN_IN_GPIO_IN_Pin},
+    [BTN_Steering1] = {.GPIO_Port = nPUSH_BTN1_IN_GPIO_IN_GPIO_Port, .GPIO_Pin = nPUSH_BTN1_IN_GPIO_IN_Pin},
+    [BTN_Steering2] = {.GPIO_Port = nPUSH_BTN2_IN_GPIO_IN_GPIO_Port, .GPIO_Pin = nPUSH_BTN2_IN_GPIO_IN_Pin},
+    [BTN_Steering3] = {.GPIO_Port = nPUSH_BTN3_IN_GPIO_IN_GPIO_Port, .GPIO_Pin = nPUSH_BTN3_IN_GPIO_IN_Pin},
+    [BTN_Steering4] = {.GPIO_Port = nPUSH_BTN4_IN_GPIO_IN_GPIO_Port, .GPIO_Pin = nPUSH_BTN4_IN_GPIO_IN_Pin}};
+
+static uint8_t BTN_GPIO_invert_vector[BTN_Device_NUM] =
+    {[BTN_RTD] = 1U, [BTN_Steering1] = 1U, [BTN_Steering2] = 1U, [BTN_Steering3] = 1U, [BTN_Steering4] = 1U};
+
+static volatile BTN_Value_t BTN_Device_values[BTN_VALUES_ARR_LEN_U] = {};
+
+/*---------- Private function prototypes -------------------------------------*/
+
+/*---------- Exported Variables ----------------------------------------------*/
+
+/*---------- Exported Functions ----------------------------------------------*/
+
+uint8_t BTN_sampleStatus(enum BTN_Device device) {
+    assert_param(device != BTN_Device_NUM);
+    GPIO_TypeDef *port = BTN_Device_to_GPIO_Tuple_map[device].GPIO_Port;
+    uint16_t pin       = BTN_Device_to_GPIO_Tuple_map[device].GPIO_Pin;
+
+    // Invert reading if values on GPIO are inverted
+    GPIO_PinState compareValue = BTN_GPIO_invert_vector[device] ? GPIO_PIN_RESET : GPIO_PIN_SET;
+    return (HAL_GPIO_ReadPin(port, pin) == compareValue) ? 1 : 0;
+}
+
+uint8_t BTN_getStatus(enum BTN_Device device) {
+    assert_param(probe != BTN_Device_NUM);
+    uint32_t value_cnt = 0;
+
+    // Get value by applying debouncing we are intrested in ones
+    for (uint8_t i = 0; i < BTN_VALUES_ARR_LEN_U; i++) {
+        if ((BTN_Device_values[i] & ((1U) << device))) {
+            value_cnt++;
+        }
+    }
+    if (((double)value_cnt / BTN_VALUES_ARR_LEN_U) >= 0.5)
+        return 1U;
+    else
+        return 0U;
+}
+
+void BTN_Routine(void) {
+    static uint32_t routine_tim = BTN_DEVICE_SAMPLING_PERIOD_MS_U;
+    if (HAL_GetTick() >= routine_tim) {
+        routine_tim = HAL_GetTick() + BTN_DEVICE_SAMPLING_PERIOD_MS_U;
+        // Move old samples ahead
+        for (uint8_t i = 0; i < BTN_VALUES_ARR_LEN_U - 1; i++) {
+            BTN_Device_values[i] = BTN_Device_values[i + 1];
+        }
+        // Push New value back
+        for (uint8_t i = 0; i < BTN_Device_NUM; i++) {
+            uint8_t curr_sample = BTN_sampleStatus(i);
+            BTN_Device_values[BTN_VALUES_ARR_LEN_U - 1] &= ~((BTN_Value_t)((1U) << i));  // reset the value
+            BTN_Device_values[BTN_VALUES_ARR_LEN_U - 1] |= (curr_sample << i);            // set the value
+        }
+    }
 }
 
 /*---------- Private Functions -----------------------------------------------*/
@@ -159,7 +255,7 @@ static const struct GPIO_Tuple LED_MONO_Device_to_GPIO_Tuple_map[LED_MONO_Device
     [LED_Warn]      = {.GPIO_Port = WARN_LED_GPIO_OUT_GPIO_Port, .GPIO_Pin = WARN_LED_GPIO_OUT_Pin},
     [LED_Err]       = {.GPIO_Port = ERR_LED_GPIO_OUT_GPIO_Port, .GPIO_Pin = ERR_LED_GPIO_OUT_Pin}};
 
-static uint8_t LED_MONO_GPIO_invert_matrix[LED_MONO_Device_NUM] = {
+static uint8_t LED_MONO_GPIO_invert_vector[LED_MONO_Device_NUM] = {
     [LED_AMS_Error] = 1U,
     [LED_IMD_Error] = 1U,
     [LED_TS_Off]    = 0U,
@@ -183,7 +279,7 @@ void LED_MONO_setState(enum LED_MONO_Device device, enum LED_MONO_State state) {
     uint16_t pin       = LED_MONO_Device_to_GPIO_Tuple_map[device].GPIO_Pin;
 
     // Invert reading if values on GPIO are inverted
-    GPIO_PinState setValue = LED_MONO_GPIO_invert_matrix[device] ? GPIO_PIN_RESET : GPIO_PIN_SET;
+    GPIO_PinState setValue = LED_MONO_GPIO_invert_vector[device] ? GPIO_PIN_RESET : GPIO_PIN_SET;
     HAL_GPIO_WritePin(port, pin, setValue);
 }
 
@@ -202,7 +298,7 @@ enum LED_MONO_State LED_MONO_getState(enum LED_MONO_Device device) {
     uint16_t pin       = LED_MONO_Device_to_GPIO_Tuple_map[device].GPIO_Pin;
 
     // Invert reading if values on GPIO are inverted
-    GPIO_PinState compareValue = LED_MONO_GPIO_invert_matrix[device] ? GPIO_PIN_RESET : GPIO_PIN_SET;
+    GPIO_PinState compareValue = LED_MONO_GPIO_invert_vector[device] ? GPIO_PIN_RESET : GPIO_PIN_SET;
     return HAL_GPIO_ReadPin(port, pin) == compareValue ? LED_On : LED_Off;
 }
 /*---------- Private Functions -----------------------------------------------*/
@@ -263,13 +359,12 @@ void LED_RGB_setColor(enum LED_RGB_Device device, uint8_t red, uint8_t green, ui
 
 /*---------- Private Functions -----------------------------------------------*/
 
-
 /* Main CAN Bus Comunication #################################################*/
 
+#include "button.h"  //TODO REMOVE
+#include "can.h"
 #include "conf.h"
 #include "mcb.h"
-#include "can.h"
-#include "button.h" //TODO REMOVE
 
 /*---------- Private define --------------------------------------------------*/
 
@@ -285,13 +380,12 @@ void LED_RGB_setColor(enum LED_RGB_Device device, uint8_t red, uint8_t green, ui
 void MCB_send_msg(uint32_t id) {
     uint8_t buffer[8] = {0};
 
-    union
-    {
+    union {
         struct mcb_dash_hello_t hello;
         struct mcb_dash_hmi_devices_state_t hmi_devices_state;
     } msg = {};
 
-    CAN_TxHeaderTypeDef tx_header = {.RTR =CAN_RTR_DATA,.IDE=CAN_ID_STD};
+    CAN_TxHeaderTypeDef tx_header = {.RTR = CAN_RTR_DATA, .IDE = CAN_ID_STD};
 
     tx_header.StdId = id;
 
@@ -311,15 +405,16 @@ void MCB_send_msg(uint32_t id) {
 
             // clang-format off
             msg.hmi_devices_state.btn_rtd_is_pressed = mcb_dash_hmi_devices_state_btn_rtd_is_pressed_encode(button_get(BUTTON_RTD)); // TODO change this button get
-            msg.hmi_devices_state.btn_1_is_pressed = mcb_dash_hmi_devices_state_btn_1_is_pressed_encode(0);
-            msg.hmi_devices_state.btn_2_is_pressed = mcb_dash_hmi_devices_state_btn_2_is_pressed_encode(0);
-            msg.hmi_devices_state.btn_3_is_pressed = mcb_dash_hmi_devices_state_btn_3_is_pressed_encode(0);
-            msg.hmi_devices_state.btn_4_is_pressed = mcb_dash_hmi_devices_state_btn_4_is_pressed_encode(0);
+            msg.hmi_devices_state.btn_1_is_pressed = mcb_dash_hmi_devices_state_btn_1_is_pressed_encode(BTN_getStatus(BTN_Steering1));
+            msg.hmi_devices_state.btn_2_is_pressed = mcb_dash_hmi_devices_state_btn_2_is_pressed_encode(BTN_getStatus(BTN_Steering2));
+            msg.hmi_devices_state.btn_3_is_pressed = mcb_dash_hmi_devices_state_btn_3_is_pressed_encode(BTN_getStatus(BTN_Steering3));
+            msg.hmi_devices_state.btn_4_is_pressed = mcb_dash_hmi_devices_state_btn_4_is_pressed_encode(BTN_getStatus(BTN_Steering4));
             msg.hmi_devices_state.rot_sw_1_state   = mcb_dash_hmi_devices_state_rot_sw_1_state_encode(0);
             msg.hmi_devices_state.rot_sw_2_state   = mcb_dash_hmi_devices_state_rot_sw_2_state_encode(0);
             // clang-format on
 
-            tx_header.DLC = mcb_dash_hmi_devices_state_pack(buffer, &msg.hmi_devices_state, MCB_DASH_HMI_DEVICES_STATE_LENGTH);
+            tx_header.DLC =
+                mcb_dash_hmi_devices_state_pack(buffer, &msg.hmi_devices_state, MCB_DASH_HMI_DEVICES_STATE_LENGTH);
 
             break;
         default:

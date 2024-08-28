@@ -536,6 +536,8 @@ void CoreDashBoard(void) {
     // Update buttons state
     button_sample();
 
+    BTN_Routine();
+
     // RUN the ready to drive FSM
     RTD_fsm(500);
 

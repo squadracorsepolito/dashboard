@@ -78,9 +78,9 @@ enum SDC_RLY_State SDC_RLY_getState(void);
  * @brief Rotary Switch devices
  */
 enum ROT_SW_Device {
-    ROT_SW_Device1, /*!< Rotary Switch Device 1*/
-    ROT_SW_Device2, /*!< Rotary Switch Device 2 */
-    ROT_SW_Device_NUM  /*!< Number of Rotary Switch devices */
+    ROT_SW_Device1,   /*!< Rotary Switch Device 1*/
+    ROT_SW_Device2,   /*!< Rotary Switch Device 2 */
+    ROT_SW_Device_NUM /*!< Number of Rotary Switch devices */
 };
 
 /**
@@ -97,7 +97,7 @@ enum ROT_SW_State {
     ROT_SW_State7,     /*!< Rotary Switch at state/position 7*/
     ROT_SW_State8,     /*!< Rotary Switch at state/position 8*/
     ROT_SW_State9,     /*!< Rotary Switch at state/position 9*/
-    ROT_SW_State_NUM      /*!< Number of Rotary Switch states/positions */
+    ROT_SW_State_NUM   /*!< Number of Rotary Switch states/positions */
 };
 
 /* ---------- Exported constants ---------------------------------------------*/
@@ -127,6 +127,8 @@ enum ROT_SW_State ROT_SW_getState(enum ROT_SW_Device device);
 /* BTN (Buttons) #############################################################*/
 /* ---------- Includes -------------------------------------------------------*/
 
+#include "mcb.h"
+
 /* ---------- Exported types -------------------------------------------------*/
 
 /**
@@ -143,12 +145,19 @@ enum BTN_Device {
 };
 
 /* ---------- Exported constants ---------------------------------------------*/
+#define BTN_DEVICE_SAMPLING_NYQ_COEFF (10U)
+#define BTN_DEVICE_SAMPLING_PERIOD_MS (MCB_DASH_HMI_DEVICES_STATE_CYCLE_TIME_MS / BTN_DEVICE_SAMPLING_NYQ_COEFF)
+
+#define BTN_DEVICE_FILTER_WINDOW_SAMPLES (5U)
 
 /* ---------- Exported variables ---------------------------------------------*/
 
 /* ---------- Exported macros ------------------------------------------------*/
 
 /* ---------- Exported functions ---------------------------------------------*/
+uint8_t BTN_Device_sampleStatus(enum BTN_Device device);
+uint8_t BTN_Device_getStatus(enum BTN_Device device);
+void BTN_Routine(void);
 
 /* ---------- Private types --------------------------------------------------*/
 
@@ -169,7 +178,7 @@ enum LED_MONO_State { LED_Off = 0, LED_On = 1, LED_MONO_State_NUM };
 enum LED_MONO_Device {
     LED_AMS_Error,      /*!< Accumulator Management System Error led*/
     LED_IMD_Error,      /*!< Insulation Monitoring Device Error led*/
-    LED_TS_Off,          /*!< Tractive System Off led */
+    LED_TS_Off,         /*!< Tractive System Off led */
     LED_KeepAlive,      /*!< Keep Alive Led */
     LED_User1,          /*!< Status Led User 1 */
     LED_User2,          /*!< Status Led User 2 */
@@ -186,8 +195,8 @@ enum LED_MONO_Device {
 
 /* ---------- Exported functions ---------------------------------------------*/
 
-void LED_MONO_setState(enum LED_MONO_Device device,enum LED_MONO_State state);
-void LED_MONO_toggleState(enum LED_MONO_Device device,enum LED_MONO_State state);
+void LED_MONO_setState(enum LED_MONO_Device device, enum LED_MONO_State state);
+void LED_MONO_toggleState(enum LED_MONO_Device device, enum LED_MONO_State state);
 enum LED_MONO_State LED_MONO_getState(enum LED_MONO_Device device);
 
 /* ---------- Private types --------------------------------------------------*/
@@ -206,10 +215,10 @@ enum LED_MONO_State LED_MONO_getState(enum LED_MONO_Device device);
  * @brief LED RGB Device
  */
 enum LED_RGB_Device {
-    LED_RGB1, /*!< LED RGB number 1*/
-    LED_RGB2, /*!< LED RGB number 2 */
-    LED_RGB3, /*!< LED RGB number 3 */
-    LED_RGB_DASH, /*!< LED RGB used by Dashboard device */
+    LED_RGB1,      /*!< LED RGB number 1*/
+    LED_RGB2,      /*!< LED RGB number 2 */
+    LED_RGB3,      /*!< LED RGB number 3 */
+    LED_RGB_DASH,  /*!< LED RGB used by Dashboard device */
     LED_Device_NUM /*!< Number of RGB Leds Devices */
 };
 
@@ -228,7 +237,7 @@ extern struct PCA9555_Handle pca9555Handle;
 
 /* ---------- Exported functions ---------------------------------------------*/
 
-void LED_RGB_setColor(enum LED_RGB_Device device,uint8_t red, uint8_t green, uint8_t blue);
+void LED_RGB_setColor(enum LED_RGB_Device device, uint8_t red, uint8_t green, uint8_t blue);
 
 /* ---------- Private types --------------------------------------------------*/
 
