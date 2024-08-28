@@ -37,6 +37,7 @@ BUILD_DIR = build
 # C sources
 C_SOURCES =  \
 Core/Src/adc.c \
+Core/Src/bsp.c \
 Core/Src/button.c \
 Core/Src/can.c \
 Core/Src/dac.c \
@@ -83,6 +84,7 @@ Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_adc.c \
 Lib/PCA9555/pca9555.c \
+Lib/SCan/SC24/artifacts/HVCB/c_source/hvcb.c \
 Lib/SCan/SC24/artifacts/MCB/c_source/mcb.c
 
 
@@ -161,6 +163,7 @@ C_INCLUDES =  \
 -IDrivers/STM32F4xx_HAL_Driver/Inc \
 -IDrivers/STM32F4xx_HAL_Driver/Inc/Legacy \
 -ILib/PCA9555 \
+-ILib/SCan/SC24/artifacts/HVCB/c_source \
 -ILib/SCan/SC24/artifacts/MCB/c_source
 
 
@@ -195,6 +198,13 @@ LDSCRIPT = STM32F446RETx_FLASH.ld
 # libraries
 LIBS = -lc -lm -lnosys 
 LIBDIR = \
+-L# \
+-LAdditional \
+-LFlags \
+-LLD \
+-Lconfig \
+-Lfile \
+-Lfrom
 
 
 # Additional LD Flags from config file

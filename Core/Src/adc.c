@@ -21,6 +21,17 @@
 #include "adc.h"
 
 /* USER CODE BEGIN 0 */
+#include "tim.h"
+
+volatile uint16_t __ADC_adc1_dma_data[ADC_Channel_NUM]      = {0}; /*!< ADC1 DMA raw sampled data */
+volatile uint16_t __ADC_adc1_filt_dma_data[ADC_Channel_NUM] = {0}; /*!< ADC1 filtered DMA raw sampled data */
+
+/**
+ * @brief Array that maps ADC1 channels to ranks
+ * @note ranks start from 1
+ * @note non initialized channels are set to 0 an invalid rank
+ */
+static const uint8_t ADC_ADC1_Channel_to_Rank_map[ADC_Channel_NUM] = {[ADC_Channel0] = 1, [ADC_Channel1] = 2};
 
 /* USER CODE END 0 */
 
@@ -79,6 +90,10 @@ void MX_ADC1_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN ADC1_Init 2 */
+
+    // Start ADC IN DMA MODE
+    HAL_TIM_Base_Start(&TIM_ADC1_HANDLE);
+    HAL_ADC_Start_DMA(&hadc1, (uint32_t *)__ADC_adc1_dma_data, hadc1.Init.NbrOfConversion);
 
   /* USER CODE END ADC1_Init 2 */
 
@@ -164,4 +179,53 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef* adcHandle)
 
 /* USER CODE BEGIN 1 */
 
+int16_t ADC_ADC1_getChannelRaw(enum ADC_Channel channel) {
+    if (!(channel < ADC_Channel_NUM))
+        return -1;  // TODO: change into assertion
+    uint8_t rankNumber = ADC_ADC1_Channel_to_Rank_map[channel];
+    // Check if we got a rank for that channel
+    return rankNumber > 0 ? __ADC_adc1_dma_data[rankNumber - 1] : -1;
+}
+
+int16_t ADC_ADC1_getChannelRawFiltered(enum ADC_Channel channel) {
+    if (!(channel < ADC_Channel_NUM))
+        return -1;  // TODO: change into assertion
+    uint8_t rankNumber = ADC_ADC1_Channel_to_Rank_map[channel];
+    // Check if we got a rank for that channel
+    return rankNumber > 0 ? __ADC_adc1_filt_dma_data[rankNumber - 1] : -1;
+};
+
+/**
+ * @brief Implements a first-order IIR single pole low pass filter 
+ * @long  Y[n] = alpha * X[n] + (1-alpha)Y[n-1]
+ *        Y[n]   = new filtered sample
+ *        Y[n-1] = previous filtered samples (history) 
+ *        X[n]   = current sample
+ * @param alpha smoohting factor
+ * @param X_n currently sampled value
+ * @param Y_n_min1 previous sample already filtered (history)
+ * @return truncated filtered sample (Y[n])
+ * @see https://en.wikipedia.org/wiki/Low-pass_filter#math_Q
+ * @see https://www.youtube.com/watch?v=QRMe02kzVkA
+ */
+static double __ADC_IIR_first_order(double alpha, double X_n, double Y_n_min1) {
+    // Y[n] = alpha * X[n] + (1-alpha)Y[n-1]
+    //      = Y[n-1] + alpha * (X[n]-Y[n-1])
+    return (uint32_t)(Y_n_min1 + alpha * (X_n - Y_n_min1));
+}
+
+/**
+  * @brief  Regular conversion complete callback in non blocking mode 
+  * @param  hadc pointer to a ADC_HandleTypeDef structure that contains
+  *         the configuration information for the specified ADC.
+  * @retval None
+  */
+void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc) {
+    if (hadc == &hadc1) {
+        for (int i = 0; i < hadc1.Init.NbrOfConversion; ++i) {
+            __ADC_adc1_filt_dma_data[i] =
+                __ADC_IIR_first_order(ADC_ADC1_IIR_ALPHA, (double)__ADC_adc1_dma_data[i], (double)__ADC_adc1_filt_dma_data[i]);
+        }
+    }
+}
 /* USER CODE END 1 */

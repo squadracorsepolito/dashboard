@@ -80,8 +80,8 @@ void MX_CAN1_Init(void)
     sFilterConfig.FilterBank           = 1;
     sFilterConfig.FilterMode           = CAN_FILTERMODE_IDLIST;
     sFilterConfig.FilterScale          = CAN_FILTERSCALE_16BIT;
-    sFilterConfig.FilterIdHigh         = (0x201/*MCB_DSPACE_PERIPHERALS_CTRL_FRAME_ID*/ << 5);
-    sFilterConfig.FilterIdLow          = (0x201/*MCB_DSPACE_PERIPHERALS_CTRL_FRAME_ID*/ << 5);
+    sFilterConfig.FilterIdHigh         = (MCB_DSPACE_PERIPHERALS_CTRL_FRAME_ID << 5);
+    sFilterConfig.FilterIdLow          = (MCB_DSPACE_PERIPHERALS_CTRL_FRAME_ID << 5);
     sFilterConfig.FilterFIFOAssignment = CAN_RX_FIFO0;
     sFilterConfig.FilterActivation     = ENABLE;
     sFilterConfig.SlaveStartFilterBank = 14;
@@ -124,6 +124,20 @@ void MX_CAN1_Init(void)
     sFilterConfig.FilterScale          = CAN_FILTERSCALE_16BIT;
     sFilterConfig.FilterIdHigh         = (MCB_TLB_BAT_SIGNALS_STATUS_FRAME_ID << 5);
     sFilterConfig.FilterIdLow          = (MCB_TLB_BAT_SIGNALS_STATUS_FRAME_ID << 5);
+    sFilterConfig.FilterFIFOAssignment = CAN_RX_FIFO0;
+    sFilterConfig.FilterActivation     = ENABLE;
+    sFilterConfig.SlaveStartFilterBank = 14;
+
+    if (HAL_CAN_ConfigFilter(&hcan1, &sFilterConfig) != HAL_OK) {
+        /* Filter configuration Error */
+        Error_Handler();
+    }
+
+    sFilterConfig.FilterBank           = 5;
+    sFilterConfig.FilterMode           = CAN_FILTERMODE_IDLIST;
+    sFilterConfig.FilterScale          = CAN_FILTERSCALE_16BIT;
+    sFilterConfig.FilterIdHigh         = (MCB_DSPACE_DASH_LEDS_COLOR_RGB_FRAME_ID << 5);
+    sFilterConfig.FilterIdLow          = (MCB_DSPACE_DASH_LEDS_COLOR_RGB_FRAME_ID << 5);
     sFilterConfig.FilterFIFOAssignment = CAN_RX_FIFO0;
     sFilterConfig.FilterActivation     = ENABLE;
     sFilterConfig.SlaveStartFilterBank = 14;
@@ -374,6 +388,7 @@ void CAN_ErrorHandler(CAN_HandleTypeDef *hcan) {
     char buf[20];
     uint32_t error = HAL_CAN_GetError(hcan);
 
+#if 0
 #define tmp_printf(X)                                                                   \
     do {                                                                                \
         HAL_UART_Transmit(&huart1, (uint8_t *)(X), strlen(X), HAL_MAX_DELAY);           \
@@ -430,6 +445,7 @@ void CAN_ErrorHandler(CAN_HandleTypeDef *hcan) {
 
     sprintf(buf, "rec %u, tec %u", rec, tec);
     tmp_printf(buf);
+    #endif
 
     HAL_CAN_ResetError(hcan);
 }
@@ -440,5 +456,22 @@ void HAL_CAN_ErrorCallback(CAN_HandleTypeDef *hcan) {
     }else if (hcan == &hcan2) {
         //CAN_ErrorHandler(hcan);
     }
+}
+
+static HAL_StatusTypeDef CAN_wait(CAN_HandleTypeDef *hcan, uint8_t timeout) {
+    uint32_t tick = HAL_GetTick();
+    while (HAL_CAN_GetTxMailboxesFreeLevel(hcan) == 0) {
+        if(HAL_GetTick() - tick > timeout) return HAL_TIMEOUT;
+    }
+    return HAL_OK;
+}
+
+HAL_StatusTypeDef CAN_send(CAN_HandleTypeDef *hcan, uint8_t *buffer, CAN_TxHeaderTypeDef *header) {
+    if(CAN_wait(hcan, 1) != HAL_OK) return HAL_TIMEOUT;
+    uint32_t mailbox;
+
+    HAL_StatusTypeDef status = HAL_CAN_AddTxMessage(hcan, header, buffer, &mailbox);
+
+    return status;
 }
 /* USER CODE END 1 */

@@ -46,6 +46,8 @@ void MX_CAN2_Init(void);
 /* USER CODE BEGIN Prototypes */
 void CAN_Msg_Send(CAN_HandleTypeDef *hcan, CAN_TxHeaderTypeDef *pHeader, uint8_t aData[], uint32_t *pTxMailbox, uint32_t TimeOut);
 
+HAL_StatusTypeDef CAN_send(CAN_HandleTypeDef *hcan, uint8_t *buffer, CAN_TxHeaderTypeDef *header);
+
 /* USER CODE END Prototypes */
 
 #ifdef __cplusplus

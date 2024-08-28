@@ -164,6 +164,8 @@ void Error_Handler(void);
 #define PUMPS_DAC_CHANNEL DAC_CHANNEL_1
 #define RTD_LED_GPIO_Port ERR_LED_GPIO_OUT_GPIO_Port
 #define RTD_LED_Pin ERR_LED_GPIO_OUT_Pin
+#define FSM_DSPACE_LED_RED_PIN 0
+#define FSM_DSPACE_LED_GREEN_PIN 1
 #endif
 
 

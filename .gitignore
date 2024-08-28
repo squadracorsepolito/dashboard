@@ -3,6 +3,7 @@
 *.bin
 *.hex
 *.map
+*.sx
 **/*.mxproject
 
 *tags
