@@ -103,11 +103,17 @@ enum ROT_SW_State {
 /* ---------- Exported constants ---------------------------------------------*/
 
 // clang-format off
-#define ROT_SW_AIN_GAIN (1.0)
-#define ROT_SW_AIN_OFFSET_V (0.0)
-#define ROT_SW_AIN_DYN_RANGE_V (ADC_ADC1_VREF_V)   /*!< Full dynamic range at the ADC/analog input (Volts) of the rotary switch where states are divide from */
-#define ROT_SW_AIN_STATE_STEP_V  (ROT_SW_AIN_DYN_RANGE_V/(double)(ROT_SW_State_NUM -1U))  /*!< Rotary switch step size in volts at the ADC/analog input (-1 because first state is 0V)*/
-#define ROT_SW_AIN_STATE_ERR_MARGIN_V (ROT_SW_AIN_STATE_STEP_V / 2.0) /*!< ADC/analog input error margin (Volts) on a state of the rotary switch to account for noise */
+#define ROW_SW_SIGNAL_CONDITIONING_GAIN (0.6597353497) /*!< Voltage divder constant from input to output */
+
+// (Physical input * volt_divider_const) +- offset -> ADC input
+
+#define ROT_SW_AIN_GAIN (1/ROW_SW_SIGNAL_CONDITIONING_GAIN) /*!< voltage value in ADC Dynamic Range to Physical Dynamic Range conversion constant */
+#define ROT_SW_AIN_OFFSET_V (0.0) /*!< voltage value in ADC Dynamic Range to Physical Dynamic Range conversion offset */
+
+#define ROT_SW_STATE_STEP_V (0.54) /*!< Rotary Switch State step voltage (Physical Value)
+                                        state1 - state2 = state_step_v */
+#define ROT_SW_STATE_ERR_MARGIN_V (ROT_SW_STATE_STEP_V/2.0) /*!< Rotary Switch error margin between states (Physical Value). 
+                                                                 State1 = [State1_v - ErrMargin, State1_v+ErrMargin] */
 // clang-format on
 
 /* ---------- Exported variables ---------------------------------------------*/

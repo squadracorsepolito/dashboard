@@ -160,31 +160,56 @@ static const enum ADC_Channel ROT_SW_Device_to_ADC_Channel_map[ROT_SW_Device_NUM
     {[ROT_SW_Device1] = ADC_Channel0, [ROT_SW_Device2] = ADC_Channel1};
 
 // state to -> Vmin,Vmax of state
+//static float ROT_SW_ain_V_to_state_map[ROT_SW_State_NUM][2U] = {
+//    [ROT_SW_State0] = {(ROT_SW_AIN_STATE_STEP_V * ROT_SW_State0),
+//                       (ROT_SW_AIN_STATE_STEP_V * ROT_SW_State0) + ROT_SW_AIN_STATE_ERR_MARGIN_V},
+//    [ROT_SW_State1] = {(ROT_SW_AIN_STATE_STEP_V * ROT_SW_State1) - ROT_SW_AIN_STATE_ERR_MARGIN_V,
+//                       (ROT_SW_AIN_STATE_STEP_V * ROT_SW_State1) + ROT_SW_AIN_STATE_ERR_MARGIN_V},
+//    [ROT_SW_State2] = {(ROT_SW_AIN_STATE_STEP_V * ROT_SW_State2) - ROT_SW_AIN_STATE_ERR_MARGIN_V,
+//                       (ROT_SW_AIN_STATE_STEP_V * ROT_SW_State2) + ROT_SW_AIN_STATE_ERR_MARGIN_V},
+//    [ROT_SW_State3] = {(ROT_SW_AIN_STATE_STEP_V * ROT_SW_State3) - ROT_SW_AIN_STATE_ERR_MARGIN_V,
+//                       (ROT_SW_AIN_STATE_STEP_V * ROT_SW_State3) + ROT_SW_AIN_STATE_ERR_MARGIN_V},
+//    [ROT_SW_State4] = {(ROT_SW_AIN_STATE_STEP_V * ROT_SW_State4) - ROT_SW_AIN_STATE_ERR_MARGIN_V,
+//                       (ROT_SW_AIN_STATE_STEP_V * ROT_SW_State4) + ROT_SW_AIN_STATE_ERR_MARGIN_V},
+//    [ROT_SW_State5] = {(ROT_SW_AIN_STATE_STEP_V * ROT_SW_State5) - ROT_SW_AIN_STATE_ERR_MARGIN_V,
+//                       (ROT_SW_AIN_STATE_STEP_V * ROT_SW_State5) + ROT_SW_AIN_STATE_ERR_MARGIN_V},
+//    [ROT_SW_State6] = {(ROT_SW_AIN_STATE_STEP_V * ROT_SW_State6) - ROT_SW_AIN_STATE_ERR_MARGIN_V,
+//                       (ROT_SW_AIN_STATE_STEP_V * ROT_SW_State6) + ROT_SW_AIN_STATE_ERR_MARGIN_V},
+//    [ROT_SW_State7] = {(ROT_SW_AIN_STATE_STEP_V * ROT_SW_State7) - ROT_SW_AIN_STATE_ERR_MARGIN_V,
+//                       (ROT_SW_AIN_STATE_STEP_V * ROT_SW_State7) + ROT_SW_AIN_STATE_ERR_MARGIN_V},
+//    [ROT_SW_State8] = {(ROT_SW_AIN_STATE_STEP_V * ROT_SW_State8) - ROT_SW_AIN_STATE_ERR_MARGIN_V,
+//                       (ROT_SW_AIN_STATE_STEP_V * ROT_SW_State8) + ROT_SW_AIN_STATE_ERR_MARGIN_V},
+//    [ROT_SW_State9] = {(ROT_SW_AIN_STATE_STEP_V * ROT_SW_State9) - ROT_SW_AIN_STATE_ERR_MARGIN_V,
+//                       (ROT_SW_AIN_STATE_STEP_V * ROT_SW_State9) + ROT_SW_AIN_STATE_ERR_MARGIN_V},
+//};
+
+
 static float ROT_SW_ain_V_to_state_map[ROT_SW_State_NUM][2U] = {
-    [ROT_SW_State0] = {(ROT_SW_AIN_STATE_STEP_V * ROT_SW_State0),
-                       (ROT_SW_AIN_STATE_STEP_V * ROT_SW_State0) + ROT_SW_AIN_STATE_ERR_MARGIN_V},
-    [ROT_SW_State1] = {(ROT_SW_AIN_STATE_STEP_V * ROT_SW_State1) - ROT_SW_AIN_STATE_ERR_MARGIN_V,
-                       (ROT_SW_AIN_STATE_STEP_V * ROT_SW_State1) + ROT_SW_AIN_STATE_ERR_MARGIN_V},
-    [ROT_SW_State2] = {(ROT_SW_AIN_STATE_STEP_V * ROT_SW_State2) - ROT_SW_AIN_STATE_ERR_MARGIN_V,
-                       (ROT_SW_AIN_STATE_STEP_V * ROT_SW_State2) + ROT_SW_AIN_STATE_ERR_MARGIN_V},
-    [ROT_SW_State3] = {(ROT_SW_AIN_STATE_STEP_V * ROT_SW_State3) - ROT_SW_AIN_STATE_ERR_MARGIN_V,
-                       (ROT_SW_AIN_STATE_STEP_V * ROT_SW_State3) + ROT_SW_AIN_STATE_ERR_MARGIN_V},
-    [ROT_SW_State4] = {(ROT_SW_AIN_STATE_STEP_V * ROT_SW_State4) - ROT_SW_AIN_STATE_ERR_MARGIN_V,
-                       (ROT_SW_AIN_STATE_STEP_V * ROT_SW_State4) + ROT_SW_AIN_STATE_ERR_MARGIN_V},
-    [ROT_SW_State5] = {(ROT_SW_AIN_STATE_STEP_V * ROT_SW_State5) - ROT_SW_AIN_STATE_ERR_MARGIN_V,
-                       (ROT_SW_AIN_STATE_STEP_V * ROT_SW_State5) + ROT_SW_AIN_STATE_ERR_MARGIN_V},
-    [ROT_SW_State6] = {(ROT_SW_AIN_STATE_STEP_V * ROT_SW_State6) - ROT_SW_AIN_STATE_ERR_MARGIN_V,
-                       (ROT_SW_AIN_STATE_STEP_V * ROT_SW_State6) + ROT_SW_AIN_STATE_ERR_MARGIN_V},
-    [ROT_SW_State7] = {(ROT_SW_AIN_STATE_STEP_V * ROT_SW_State7) - ROT_SW_AIN_STATE_ERR_MARGIN_V,
-                       (ROT_SW_AIN_STATE_STEP_V * ROT_SW_State7) + ROT_SW_AIN_STATE_ERR_MARGIN_V},
-    [ROT_SW_State8] = {(ROT_SW_AIN_STATE_STEP_V * ROT_SW_State8) - ROT_SW_AIN_STATE_ERR_MARGIN_V,
-                       (ROT_SW_AIN_STATE_STEP_V * ROT_SW_State8) + ROT_SW_AIN_STATE_ERR_MARGIN_V},
-    [ROT_SW_State9] = {(ROT_SW_AIN_STATE_STEP_V * ROT_SW_State9) - ROT_SW_AIN_STATE_ERR_MARGIN_V,
-                       (ROT_SW_AIN_STATE_STEP_V * ROT_SW_State9) + ROT_SW_AIN_STATE_ERR_MARGIN_V},
+    [ROT_SW_State0] = {(0.0),
+                       (0.0) + ROT_SW_STATE_ERR_MARGIN_V},
+    [ROT_SW_State1] = {(0.54) - ROT_SW_STATE_ERR_MARGIN_V,
+                       (0.54) + ROT_SW_STATE_ERR_MARGIN_V},
+    [ROT_SW_State2] = {(1.10) - ROT_SW_STATE_ERR_MARGIN_V,
+                       (1.10) + ROT_SW_STATE_ERR_MARGIN_V},
+    [ROT_SW_State3] = {(1.63) - ROT_SW_STATE_ERR_MARGIN_V,
+                       (1.63) + ROT_SW_STATE_ERR_MARGIN_V},
+    [ROT_SW_State4] = {(2.17) - ROT_SW_STATE_ERR_MARGIN_V,
+                       (2.17) + ROT_SW_STATE_ERR_MARGIN_V},
+    [ROT_SW_State5] = {(2.71) - ROT_SW_STATE_ERR_MARGIN_V,
+                       (2.71) + ROT_SW_STATE_ERR_MARGIN_V},
+    [ROT_SW_State6] = {(3.26) - ROT_SW_STATE_ERR_MARGIN_V,
+                       (3.26) + ROT_SW_STATE_ERR_MARGIN_V},
+    [ROT_SW_State7] = {(3.81) - ROT_SW_STATE_ERR_MARGIN_V,
+                       (3.81) + ROT_SW_STATE_ERR_MARGIN_V},
+    [ROT_SW_State8] = {(4.35) - ROT_SW_STATE_ERR_MARGIN_V,
+                       (4.35) + ROT_SW_STATE_ERR_MARGIN_V},
+    [ROT_SW_State9] = {(4.89) - ROT_SW_STATE_ERR_MARGIN_V,
+                       (4.89) + ROT_SW_STATE_ERR_MARGIN_V},
 };
 /*---------- Private Functions -----------------------------------------------*/
 enum ROT_SW_State __ROT_SW_analogV_to_state(float analogV) {
     if (analogV < 0) {
+        // Error condition
         return ROT_SW_State_NUM;
     } else if (analogV >= ROT_SW_ain_V_to_state_map[ROT_SW_State0][0] &&
                analogV < ROT_SW_ain_V_to_state_map[ROT_SW_State0][1]) {
@@ -409,8 +434,8 @@ void MCB_send_msg(uint32_t id) {
             msg.hmi_devices_state.btn_2_is_pressed = mcb_dash_hmi_devices_state_btn_2_is_pressed_encode(BTN_getStatus(BTN_Steering2));
             msg.hmi_devices_state.btn_3_is_pressed = mcb_dash_hmi_devices_state_btn_3_is_pressed_encode(BTN_getStatus(BTN_Steering3));
             msg.hmi_devices_state.btn_4_is_pressed = mcb_dash_hmi_devices_state_btn_4_is_pressed_encode(BTN_getStatus(BTN_Steering4));
-            msg.hmi_devices_state.rot_sw_1_state   = mcb_dash_hmi_devices_state_rot_sw_1_state_encode(0);
-            msg.hmi_devices_state.rot_sw_2_state   = mcb_dash_hmi_devices_state_rot_sw_2_state_encode(0);
+            msg.hmi_devices_state.rot_sw_1_state   = mcb_dash_hmi_devices_state_rot_sw_1_state_encode(ROT_SW_getState(ROT_SW_Device1));
+            msg.hmi_devices_state.rot_sw_2_state   = mcb_dash_hmi_devices_state_rot_sw_2_state_encode(ROT_SW_getState(ROT_SW_Device2));
             // clang-format on
 
             tx_header.DLC =
