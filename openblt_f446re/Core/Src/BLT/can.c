@@ -187,7 +187,7 @@ void CanInit(void)
   /* set the CAN controller configuration. */
   canHandle.Instance = CAN_CHANNEL;
   canHandle.Init.TimeTriggeredMode = DISABLE;
-  canHandle.Init.AutoBusOff = DISABLE;
+  canHandle.Init.AutoBusOff = ENABLE;
   canHandle.Init.AutoWakeUp = DISABLE;
   canHandle.Init.AutoRetransmission = ENABLE;
   canHandle.Init.ReceiveFifoLocked = DISABLE;
