@@ -207,11 +207,7 @@ static float ROT_SW_ain_V_to_state_map[ROT_SW_State_NUM][2U] = {
                        (4.89) + ROT_SW_STATE_ERR_MARGIN_V},
 };
 /*---------- Private Functions -----------------------------------------------*/
-enum ROT_SW_State __ROT_SW_analogV_to_state(float analogV, enum ROT_SW_Device device) {
-    static enum ROT_SW_State last_state1 = ROT_SW_State_NUM+1;
-    static enum ROT_SW_State last_state2 = ROT_SW_State_NUM+1;
-
-    enum ROT_SW_State *last_state = device == ROT_SW_Device1 ? &last_state1 : &last_state2;
+enum ROT_SW_State __ROT_SW_analogV_to_state(float analogV) {
     enum ROT_SW_State state = ROT_SW_State_NUM+1;
 
     if (analogV >= ROT_SW_ain_V_to_state_map[ROT_SW_State0][0] &&
@@ -245,17 +241,7 @@ enum ROT_SW_State __ROT_SW_analogV_to_state(float analogV, enum ROT_SW_Device de
                analogV < ROT_SW_ain_V_to_state_map[ROT_SW_State9][1]) {
         state = ROT_SW_State9;
     }
-
-    if(*last_state == ROT_SW_State_NUM+1) {
-        *last_state = state;
-    }
-
-    if(state == *last_state || state == (*last_state)+1 || state == (*last_state)-1) {
-        *last_state = state;
-    } else {
-        state = *last_state;
-    }
-
+    
     return state;
 }
 
@@ -273,7 +259,26 @@ float ROT_SW_getAanalog_V(enum ROT_SW_Device device) {
 }
 enum ROT_SW_State ROT_SW_getState(enum ROT_SW_Device device) {
     assert_param(device != ROT_SW_State_NUM);
-    return __ROT_SW_analogV_to_state(ROT_SW_getAanalog_V(device), device);
+
+    static enum ROT_SW_State last_state1 = ROT_SW_State_NUM+1;
+    static enum ROT_SW_State last_state2 = ROT_SW_State_NUM+1;
+
+    enum ROT_SW_State *last_state = device == ROT_SW_Device1 ? &last_state1 : &last_state2;
+    enum ROT_SW_State state = ROT_SW_State_NUM+1;
+
+    state = __ROT_SW_analogV_to_state(ROT_SW_getAanalog_V(device));
+
+    if(*last_state == ROT_SW_State_NUM+1) {
+        *last_state = state;
+    }
+
+    if(state == *last_state || state == (*last_state)+1 || state == (*last_state)-1) {
+        *last_state = state;
+    } else {
+        state = *last_state;
+    }
+
+    return state;
 }
 
 /* LED MONO (Monochrome Leds) ################################################*/
