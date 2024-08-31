@@ -207,43 +207,56 @@ static float ROT_SW_ain_V_to_state_map[ROT_SW_State_NUM][2U] = {
                        (4.89) + ROT_SW_STATE_ERR_MARGIN_V},
 };
 /*---------- Private Functions -----------------------------------------------*/
-enum ROT_SW_State __ROT_SW_analogV_to_state(float analogV) {
-    if (analogV < 0) {
-        // Error condition
-        return ROT_SW_State_NUM;
-    } else if (analogV >= ROT_SW_ain_V_to_state_map[ROT_SW_State0][0] &&
+enum ROT_SW_State __ROT_SW_analogV_to_state(float analogV, enum ROT_SW_Device device) {
+    static enum ROT_SW_State last_state1 = ROT_SW_State_NUM+1;
+    static enum ROT_SW_State last_state2 = ROT_SW_State_NUM+1;
+
+    enum ROT_SW_State *last_state = device == ROT_SW_Device1 ? &last_state1 : &last_state2;
+    enum ROT_SW_State state = ROT_SW_State_NUM+1;
+
+    if (analogV >= ROT_SW_ain_V_to_state_map[ROT_SW_State0][0] &&
                analogV < ROT_SW_ain_V_to_state_map[ROT_SW_State0][1]) {
-        return ROT_SW_State0;
+        state = ROT_SW_State0;
     } else if (analogV >= ROT_SW_ain_V_to_state_map[ROT_SW_State1][0] &&
                analogV < ROT_SW_ain_V_to_state_map[ROT_SW_State1][1]) {
-        return ROT_SW_State1;
+        state = ROT_SW_State1;
     } else if (analogV >= ROT_SW_ain_V_to_state_map[ROT_SW_State2][0] &&
                analogV < ROT_SW_ain_V_to_state_map[ROT_SW_State2][1]) {
-        return ROT_SW_State2;
+        state = ROT_SW_State2;
     } else if (analogV >= ROT_SW_ain_V_to_state_map[ROT_SW_State3][0] &&
                analogV < ROT_SW_ain_V_to_state_map[ROT_SW_State3][1]) {
-        return ROT_SW_State3;
+        state = ROT_SW_State3;
     } else if (analogV >= ROT_SW_ain_V_to_state_map[ROT_SW_State4][0] &&
                analogV < ROT_SW_ain_V_to_state_map[ROT_SW_State4][1]) {
-        return ROT_SW_State4;
+        state = ROT_SW_State4;
     } else if (analogV >= ROT_SW_ain_V_to_state_map[ROT_SW_State5][0] &&
                analogV < ROT_SW_ain_V_to_state_map[ROT_SW_State5][1]) {
-        return ROT_SW_State5;
+        state = ROT_SW_State5;
     } else if (analogV >= ROT_SW_ain_V_to_state_map[ROT_SW_State6][0] &&
                analogV < ROT_SW_ain_V_to_state_map[ROT_SW_State6][1]) {
-        return ROT_SW_State6;
+        state = ROT_SW_State6;
     } else if (analogV >= ROT_SW_ain_V_to_state_map[ROT_SW_State7][0] &&
                analogV < ROT_SW_ain_V_to_state_map[ROT_SW_State7][1]) {
-        return ROT_SW_State7;
+        state = ROT_SW_State7;
     } else if (analogV >= ROT_SW_ain_V_to_state_map[ROT_SW_State8][0] &&
                analogV < ROT_SW_ain_V_to_state_map[ROT_SW_State8][1]) {
-        return ROT_SW_State8;
+        state = ROT_SW_State8;
     } else if (analogV >= ROT_SW_ain_V_to_state_map[ROT_SW_State9][0] &&
                analogV < ROT_SW_ain_V_to_state_map[ROT_SW_State9][1]) {
-        return ROT_SW_State9;
-    } else {
-        return ROT_SW_State_NUM;
+        state = ROT_SW_State9;
     }
+
+    if(*last_state == ROT_SW_State_NUM+1) {
+        *last_state = state;
+    }
+
+    if(state == *last_state || state == (*last_state)+1 || state == (*last_state)-1) {
+        *last_state = state;
+    } else {
+        state = *last_state;
+    }
+
+    return state;
 }
 
 /*---------- Exported Variables ----------------------------------------------*/
@@ -260,7 +273,7 @@ float ROT_SW_getAanalog_V(enum ROT_SW_Device device) {
 }
 enum ROT_SW_State ROT_SW_getState(enum ROT_SW_Device device) {
     assert_param(device != ROT_SW_State_NUM);
-    return __ROT_SW_analogV_to_state(ROT_SW_getAanalog_V(device));
+    return __ROT_SW_analogV_to_state(ROT_SW_getAanalog_V(device), device);
 }
 
 /* LED MONO (Monochrome Leds) ################################################*/
