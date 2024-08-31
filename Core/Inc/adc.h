@@ -74,7 +74,7 @@ void MX_ADC1_Init(void);
 *       = 1ms/(100ms+1ms) = 1/101 = 0.00999 ~ 1*10E-2
 */
 #define ADC_ADC1_IIR_ALPHA \
-    (0.1) /*!< ADC1 Infinite Impulse Response filter (1 order) alpha value (smooth factor)
+    (0.5) /*!< ADC1 Infinite Impulse Response filter (1 order) alpha value (smooth factor)
                                          @NOTE if the sampling changes update this value */
 
 /**

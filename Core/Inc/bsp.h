@@ -112,7 +112,7 @@ enum ROT_SW_State {
 
 #define ROT_SW_STATE_STEP_V (0.54) /*!< Rotary Switch State step voltage (Physical Value)
                                         state1 - state2 = state_step_v */
-#define ROT_SW_STATE_ERR_MARGIN_V (ROT_SW_STATE_STEP_V/2.0) /*!< Rotary Switch error margin between states (Physical Value). 
+#define ROT_SW_STATE_ERR_MARGIN_V (ROT_SW_STATE_STEP_V/4.0) /*!< Rotary Switch error margin between states (Physical Value). 
                                                                  State1 = [State1_v - ErrMargin, State1_v+ErrMargin] */
 // clang-format on
 
