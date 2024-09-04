@@ -14,6 +14,7 @@
 #include "utils.h"
 #include "wdg.h"
 #include "bsp.h"
+#include "STM32_ST7032.h"
 
 #include <stdio.h>
 
@@ -50,6 +51,9 @@ volatile GPIO_PinState BMS_ERR;
 volatile GPIO_PinState TSOFF;
 volatile GPIO_PinState IMD_ERR;
 
+volatile uint8_t HVBAT_SOC = 0;
+volatile double LVBAT_V = 0.0;
+
 volatile uint8_t ams_err_tlb;
 
 volatile uint8_t hvb_diag_bat_vlt_sna;
@@ -69,6 +73,9 @@ volatile struct RGB_Led_t LED1;
 volatile struct RGB_Led_t LED2;
 volatile struct RGB_Led_t LED3;
 volatile struct RGB_Led_t LED4;
+
+
+ST7032_InitTypeDef LCD_DisplayHandle = {0};
 
 /* dSpace ACK flags */
 volatile int8_t dspace_rtd_state;
@@ -95,10 +102,12 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
     union {
         struct mcb_dspace_fsm_states_t rtd_ack;
         struct mcb_dspace_peripherals_ctrl_t per_ctrl;
+        struct mcb_dspace_signals_t dspace_signals;
         struct mcb_tlb_bat_signals_status_t tsal_status;
         struct mcb_tlb_bat_sd_csensing_status_t shut_status;
         struct mcb_dspace_dash_leds_color_rgb_t rgb_status;
-    } msgs;
+        struct mcb_bms_lv_lv_bat_general_t lv_bat_general;
+    } msgs = {};
 
     if (HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &RxHeader, RxData) != HAL_OK) {
         /* Transmission request Error */
@@ -111,6 +120,7 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
     switch (RxHeader.StdId) {
         case MCB_DSPACE_FSM_STATES_FRAME_ID:
         case MCB_DSPACE_PERIPHERALS_CTRL_FRAME_ID:
+        case MCB_DSPACE_SIGNALS_FRAME_ID:
             // Reset dSpace timeout after boot
             wdg_timeouts_100us[WDG_BOARD_DSPACE] = 4800;  //480ms
             wdg_reset(WDG_BOARD_DSPACE, now);
@@ -118,6 +128,9 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
         case MCB_TLB_BAT_SD_CSENSING_STATUS_FRAME_ID:
         case MCB_TLB_BAT_SIGNALS_STATUS_FRAME_ID:
             wdg_reset(WDG_BOARD_TLB, now);
+            break;
+        case MCB_BMS_LV_LV_BAT_GENERAL_FRAME_ID:
+            wdg_reset(WDG_BOARD_BMS_LV, now);
             break;
     }
 
@@ -186,6 +199,14 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
         LED4.R = mcb_dspace_dash_leds_color_rgb_led_4_red_decode(msgs.rgb_status.led_4_red);
         LED4.G = mcb_dspace_dash_leds_color_rgb_led_4_green_decode(msgs.rgb_status.led_4_green);
         LED4.B = mcb_dspace_dash_leds_color_rgb_led_4_blue_decode(msgs.rgb_status.led_4_blue);
+    } else if ((RxHeader.StdId == MCB_DSPACE_SIGNALS_FRAME_ID) &&
+               (RxHeader.DLC == MCB_DSPACE_SIGNALS_LENGTH)) {
+        mcb_dspace_signals_unpack(&msgs.dspace_signals, RxData, MCB_DSPACE_SIGNALS_LENGTH);
+        HVBAT_SOC = msgs.dspace_signals.hvbat_soc;
+    } else if ((RxHeader.StdId == MCB_BMS_LV_LV_BAT_GENERAL_FRAME_ID) &&
+               (RxHeader.DLC == MCB_BMS_LV_LV_BAT_GENERAL_LENGTH)) {
+        mcb_bms_lv_lv_bat_general_unpack(&msgs.lv_bat_general, RxData, MCB_BMS_LV_LV_BAT_GENERAL_LENGTH);
+        LVBAT_V = mcb_bms_lv_lv_bat_general_lv_bat_summed_voltage_decode(msgs.lv_bat_general.lv_bat_summed_voltage);
     }
 }
 
@@ -253,6 +274,15 @@ void InitDashBoard() {
     //     error = ERROR_INIT_BTN;
     //     rtd_fsm = STATE_ERROR;
     // }
+
+    char buffer [20] ={};
+    sprintf(buffer, "SQUADRA CORSE POLITO");
+    LCD_write(buffer);
+    HAL_Delay(800);
+    LCD_setCursor(1, 0);
+    sprintf(buffer, "     ANDROMEDA");
+    LCD_write(buffer);
+    HAL_Delay(800);
 }
 
 void cock_callback() {
@@ -396,6 +426,21 @@ void SetupDashBoard(void) {
     PCA9555_digitalWrite(&pca9555Handle, 14, PCA9555_BIT_RESET);
     PCA9555_digitalWrite(&pca9555Handle, 15, PCA9555_BIT_RESET);
 
+    HAL_GPIO_WritePin(NHD_C0220BIZx_nRST_GPIO_OUT_GPIO_Port,NHD_C0220BIZx_nRST_GPIO_OUT_Pin,GPIO_PIN_SET);
+
+    LCD_DisplayHandle.LCD_hi2c              = &hi2c1;
+    LCD_DisplayHandle.LCD_htim_backlight    = NULL;
+    LCD_DisplayHandle.TIM_channel_backlight = 0;
+    LCD_DisplayHandle.i2cAddr               = 0x78;
+    LCD_DisplayHandle.num_col               = 20;
+    LCD_DisplayHandle.num_lines             = 2;
+
+
+    LCD_ST7032_Init(&LCD_DisplayHandle);  // Init LCD
+    LCD_clear();                          // clear LCD
+    LCD_home();                           // Home The display
+    LCD_contrast(15);                     // set contrast to level 15 - MAXIMUM (15 level available)
+
     char msg[54] = {0};
     sprintf(msg, "Dashboard 2022 Boot - build %s @ %s\r\n", __DATE__, __TIME__);
     HAL_UART_Transmit(&huart1, (uint8_t *)msg, strlen(msg), 20);
@@ -496,6 +541,45 @@ uint8_t AMS_detection(uint8_t ams_err_tlb,
     return ams_err_prev;
 }
 
+void LCD_DisplayUpdateRoutine(void) {
+    static uint8_t cnt100ms = 0;
+    char hv_bat_soc_str [10] = {};
+    char lv_bat_v_str [10] = {};
+
+    if(HAL_GetTick() < cnt100ms)
+        return;
+    cnt100ms = HAL_GetTick() + 100U;
+
+    char buffer[20] = {};
+    //LCD_clear();
+    LCD_home();
+
+    if(boards_timeouts & (1<< WDG_BOARD_DSPACE)){
+        sprintf(hv_bat_soc_str,"Na");
+    }else{
+        sprintf(hv_bat_soc_str,"%3u",HVBAT_SOC);
+    }
+
+    if(boards_timeouts & (1<< WDG_BOARD_BMS_LV)){
+        sprintf(lv_bat_v_str,"Na");
+    }else{
+        sprintf(lv_bat_v_str,"%04.1f",LVBAT_V/1000);
+    }
+    sprintf(buffer, " HV %3s%%   LV %4sV", hv_bat_soc_str,lv_bat_v_str);
+    LCD_write(buffer);
+    LCD_setCursor(1, 0);
+    sprintf(buffer, "     ANDROMEDA");
+    LCD_write(buffer);
+    //sprintf(buffer, "INV %2u", (uint8_t)INV_TEMP_VAL);
+    //LCD_write(buffer);
+    //LCD_write_byte(0b11011111);
+    //LCD_shift(ST7032_CR, 5);
+    //sprintf(buffer, "TSAC %2u", (uint8_t)TSAC_TEMP_VAL);
+    //LCD_write(buffer);
+    //LCD_write_byte(0b11011111);
+    //LCD_home();
+}
+
 /**
     * @brief Dash main loop
  */
@@ -540,6 +624,8 @@ void CoreDashBoard(void) {
 
     // RUN the ready to drive FSM
     RTD_fsm(500);
+
+    LCD_DisplayUpdateRoutine();
 
     // Run the AS FSM
     // mission_run();

@@ -7,6 +7,7 @@
 
 #pragma once
 #include <inttypes.h>
+#include "mcb.h"
 
 /**
  * @brief Watchdog board indexes
@@ -15,6 +16,7 @@ typedef enum
 {
     WDG_BOARD_DSPACE = 0,
     WDG_BOARD_TLB,
+    WDG_BOARD_BMS_LV,
     WDG_NUM_BOARDS
 } wdg_boards;
 
@@ -23,7 +25,9 @@ typedef enum
  */
 static uint32_t wdg_timeouts_100us[WDG_NUM_BOARDS] = {
     [WDG_BOARD_DSPACE] = 100000, // Wait for dSpace to boot
-    [WDG_BOARD_TLB] = 4800};
+    [WDG_BOARD_TLB] = 4800,
+    [WDG_BOARD_BMS_LV] = ((uint32_t)((MCB_BMS_LV_LV_BAT_GENERAL_CYCLE_TIME_MS * 5)/0.1)) //wait to loose 5 messages, 0.1ms -> 100us
+};
 
 /**
  * @brief Resets the timer of a board to the given timestamp

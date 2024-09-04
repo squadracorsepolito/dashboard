@@ -85,7 +85,8 @@ Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_adc.c \
 Lib/PCA9555/pca9555.c \
 Lib/SCan/SC24/artifacts/HVCB/c_source/hvcb.c \
-Lib/SCan/SC24/artifacts/MCB/c_source/mcb.c
+Lib/SCan/SC24/artifacts/MCB/c_source/mcb.c \
+Lib/STM32_HAL_ST7032_LCD_LIBRARY/STM32_ST7032.c
 
 
 CPP_SOURCES = \
@@ -164,7 +165,8 @@ C_INCLUDES =  \
 -IDrivers/STM32F4xx_HAL_Driver/Inc/Legacy \
 -ILib/PCA9555 \
 -ILib/SCan/SC24/artifacts/HVCB/c_source \
--ILib/SCan/SC24/artifacts/MCB/c_source
+-ILib/SCan/SC24/artifacts/MCB/c_source \
+-ILib/STM32_HAL_ST7032_LCD_LIBRARY
 
 
 

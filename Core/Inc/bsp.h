@@ -161,8 +161,8 @@ enum BTN_Device {
 /* ---------- Exported macros ------------------------------------------------*/
 
 /* ---------- Exported functions ---------------------------------------------*/
-uint8_t BTN_Device_sampleStatus(enum BTN_Device device);
-uint8_t BTN_Device_getStatus(enum BTN_Device device);
+uint8_t BTN_sampleStatus(enum BTN_Device device);
+uint8_t BTN_getStatus(enum BTN_Device device);
 void BTN_Routine(void);
 
 /* ---------- Private types --------------------------------------------------*/

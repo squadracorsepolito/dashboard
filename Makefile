@@ -95,7 +95,8 @@ Core/Src/wdg.c \
 Core/Src/bsp.c \
 Lib/SCan/SC24/artifacts/MCB/c_source/mcb.c \
 Lib/SCan/SC24/artifacts/HVCB/c_source/hvcb.c \
-Lib/PCA9555/pca9555.c
+Lib/PCA9555/pca9555.c \
+Lib/STM32_HAL_ST7032_LCD_LIBRARY/STM32_ST7032.c
 
 # ASM sources
 ASM_SOURCES =  \
@@ -163,7 +164,8 @@ C_INCLUDES =  \
 -IDrivers/CMSIS/Include \
 -ILib/SCan/SC24/artifacts/MCB/c_source \
 -ILib/SCan/SC24/artifacts/HVCB/c_source \
--ILib/PCA9555
+-ILib/PCA9555 \
+-ILib/STM32_HAL_ST7032_LCD_LIBRARY
 
 
 # compile gcc flags
