@@ -2,6 +2,8 @@
 
 #include "dashboard.h"
 
+#include "STM32_ST7032.h"
+#include "bsp.h"
 #include "button.h"
 #include "can.h"
 #include "dac.h"
@@ -13,8 +15,6 @@
 #include "usart.h"
 #include "utils.h"
 #include "wdg.h"
-#include "bsp.h"
-#include "STM32_ST7032.h"
 
 #include <stdio.h>
 
@@ -52,9 +52,11 @@ volatile GPIO_PinState TSOFF;
 volatile GPIO_PinState IMD_ERR;
 
 volatile uint8_t HVBAT_SOC = 0;
-volatile double LVBAT_V = 0.0;
+volatile double LVBAT_V    = 0.0;
 
-volatile uint8_t ams_err_tlb;
+volatile uint8_t ams_err_tlb = 0;
+
+volatile uint8_t btn_press_at_start = 0;
 
 volatile uint8_t hvb_diag_bat_vlt_sna;
 volatile uint8_t hvb_diag_inv_vlt_sna;
@@ -73,7 +75,6 @@ volatile struct RGB_Led_t LED1;
 volatile struct RGB_Led_t LED2;
 volatile struct RGB_Led_t LED3;
 volatile struct RGB_Led_t LED4;
-
 
 ST7032_InitTypeDef LCD_DisplayHandle = {0};
 
@@ -199,8 +200,7 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
         LED4.R = mcb_dspace_dash_leds_color_rgb_led_4_red_decode(msgs.rgb_status.led_4_red);
         LED4.G = mcb_dspace_dash_leds_color_rgb_led_4_green_decode(msgs.rgb_status.led_4_green);
         LED4.B = mcb_dspace_dash_leds_color_rgb_led_4_blue_decode(msgs.rgb_status.led_4_blue);
-    } else if ((RxHeader.StdId == MCB_DSPACE_SIGNALS_FRAME_ID) &&
-               (RxHeader.DLC == MCB_DSPACE_SIGNALS_LENGTH)) {
+    } else if ((RxHeader.StdId == MCB_DSPACE_SIGNALS_FRAME_ID) && (RxHeader.DLC == MCB_DSPACE_SIGNALS_LENGTH)) {
         mcb_dspace_signals_unpack(&msgs.dspace_signals, RxData, MCB_DSPACE_SIGNALS_LENGTH);
         HVBAT_SOC = msgs.dspace_signals.hvbat_soc;
     } else if ((RxHeader.StdId == MCB_BMS_LV_LV_BAT_GENERAL_FRAME_ID) &&
@@ -275,14 +275,17 @@ void InitDashBoard() {
     //     rtd_fsm = STATE_ERROR;
     // }
 
-    char buffer [20] ={};
+    char buffer[21] = {};
     sprintf(buffer, "SQUADRA CORSE POLITO");
     LCD_write(buffer);
-    HAL_Delay(800);
+    HAL_Delay(1000);
     LCD_setCursor(1, 0);
     sprintf(buffer, "     ANDROMEDA");
     LCD_write(buffer);
-    HAL_Delay(800);
+    HAL_Delay(1000);
+
+    btn_press_at_start = BTN_sampleStatus(BTN_Steering1);
+
 }
 
 void cock_callback() {
@@ -322,7 +325,7 @@ void UpdateCockpitLed(uint32_t delay_100us) {
         if ((boards_timeouts & (1 << WDG_BOARD_DSPACE)) || (boards_timeouts & (1 << WDG_BOARD_TLB))) {
             // tlb message or dspace message timeout
             LED_RGB_setColor(LED_RGB_DASH, 0U, 0U, 0U);
-        } else if (dspace_rtd_state == (int8_t)MCB_DSPACE_FSM_STATES_DSPACE_MAIN_FSM_STATE_IDLE_CHOICE){
+        } else if (dspace_rtd_state == (int8_t)MCB_DSPACE_FSM_STATES_DSPACE_MAIN_FSM_STATE_IDLE_CHOICE) {
             if (SD_CLOSED) {
                 // DSPACE fsm in IDLE and SDC closed: BLUE led -> we could can go in RTD
                 LED_RGB_setColor(LED_RGB_DASH, 0U, 0U, 255U);
@@ -332,7 +335,7 @@ void UpdateCockpitLed(uint32_t delay_100us) {
             }
 
         } else if (dspace_rtd_state == (int8_t)MCB_DSPACE_FSM_STATES_DSPACE_MAIN_FSM_STATE_PRECHARGE_CHOICE) {
-                LED_RGB_setColor(LED_RGB_DASH, 0U, 0U, toggle_led_value_200ms); //DSPACE precharge: BLUE
+            LED_RGB_setColor(LED_RGB_DASH, 0U, 0U, toggle_led_value_200ms);  //DSPACE precharge: BLUE
         } else if (dspace_rtd_state == (int8_t)MCB_DSPACE_FSM_STATES_DSPACE_MAIN_FSM_STATE_TS_ON_CHOICE) {
             // Blink RED when in TSON (5Hz, 50% duty)
             LED_RGB_setColor(LED_RGB_DASH, toggle_led_value_200ms, 0U, 0U);
@@ -360,7 +363,6 @@ void UpdateCockpitLed(uint32_t delay_100us) {
 
 /*Setup TIMER, CAN*/
 void SetupDashBoard(void) {
-
     HAL_TIM_Base_Start_IT(&COUNTER_TIM);
 
     // start pwm at 0%
@@ -426,7 +428,7 @@ void SetupDashBoard(void) {
     PCA9555_digitalWrite(&pca9555Handle, 14, PCA9555_BIT_RESET);
     PCA9555_digitalWrite(&pca9555Handle, 15, PCA9555_BIT_RESET);
 
-    HAL_GPIO_WritePin(NHD_C0220BIZx_nRST_GPIO_OUT_GPIO_Port,NHD_C0220BIZx_nRST_GPIO_OUT_Pin,GPIO_PIN_SET);
+    HAL_GPIO_WritePin(NHD_C0220BIZx_nRST_GPIO_OUT_GPIO_Port, NHD_C0220BIZx_nRST_GPIO_OUT_Pin, GPIO_PIN_SET);
 
     LCD_DisplayHandle.LCD_hi2c              = &hi2c1;
     LCD_DisplayHandle.LCD_htim_backlight    = NULL;
@@ -434,7 +436,6 @@ void SetupDashBoard(void) {
     LCD_DisplayHandle.i2cAddr               = 0x78;
     LCD_DisplayHandle.num_col               = 20;
     LCD_DisplayHandle.num_lines             = 2;
-
 
     LCD_ST7032_Init(&LCD_DisplayHandle);  // Init LCD
     LCD_clear();                          // clear LCD
@@ -453,7 +454,6 @@ void can_send_state(uint32_t delay_100us) {
     if (delay_fun(&delay_100us_last, delay_100us)) {
         MCB_send_msg(MCB_DASH_HMI_DEVICES_STATE_FRAME_ID);
     }
-
 }
 
 void RTD_fsm(uint32_t delay_100us) {
@@ -541,31 +541,192 @@ uint8_t AMS_detection(uint8_t ams_err_tlb,
     return ams_err_prev;
 }
 
+#define WAIT_FOR(X)                               \
+    do {                                          \
+        if (HAL_GetTick() - last_timestamp > X) { \
+            counter++;                            \
+            last_timestamp = HAL_GetTick();       \
+        }                                         \
+    } while (0)
+
+volatile uint8_t activate_SeeYouAgain = 0;
+volatile uint8_t SeeYouAgain_running = 0;
+
+uint8_t SeeYouAgain_Activator() {
+    static uint32_t _cnt100ms            = 0;
+    static uint32_t long_press_100ms_cnt = 0;
+    static uint8_t btn_prev_state        = 0;
+
+    if (HAL_GetTick() < _cnt100ms)
+        return 0;
+    _cnt100ms = HAL_GetTick() + 100U;
+
+    uint8_t btn_cur_state = BTN_getStatus(BTN_Steering1);
+
+    if (btn_cur_state == btn_prev_state && btn_prev_state == 1) {
+        long_press_100ms_cnt++;
+    } else {
+        long_press_100ms_cnt = 0;
+    }
+
+    btn_prev_state = btn_cur_state;
+
+    // if pressed per 7 seconds
+    if (long_press_100ms_cnt == 70) {
+        return 1;
+    } else {
+        return 0;
+    }
+};
+uint8_t SeeYouAgain_protocol(char *text[2]) {
+    static uint32_t last_timestamp = 0;
+    static uint32_t counter        = 0;
+
+    // First time entering
+    if (HAL_GetTick() > 0 && last_timestamp == 0) {
+        last_timestamp = HAL_GetTick();
+    }
+
+    switch (counter) {
+        case 0:
+            text[0] = "Ciao Ragazzi        ";
+            text[1] = NULL;
+            WAIT_FOR(4000);
+            break;
+        case 1:
+            text[0] = "non sono riuscito   ";
+            text[1] = "a farlo di persona  ";
+            WAIT_FOR(3000);
+            break;
+        case 2:
+            text[0] = "percio' lo faro'    ";
+            text[1] = "a modo mio...       ";
+            WAIT_FOR(3000);
+            break;
+        case 3:
+            text[0] = "  con il FIRMWARE!  ";
+            text[1] = NULL;
+            WAIT_FOR(3500);
+            break;
+        case 4:
+            text[0] = "     Sono stati     ";
+            text[1] = " due anni magnifici!";
+            WAIT_FOR(3000);
+            break;
+        case 5:
+            text[0] = " Li portero' con me'";
+            text[1] = NULL;
+            WAIT_FOR(2500);
+            break;
+        case 6:
+            text[0] = "     per il resto   ";
+            text[1] = "   della mia vita!  ";
+            WAIT_FOR(3500);
+            break;
+        case 7:
+            text[0] = "    Ho conosciuto   ";
+            text[1] = "       persone      ";
+            WAIT_FOR(2500);
+            break;
+        case 8:
+            text[0] = "    appassionate    ";
+            text[1] = NULL;
+            WAIT_FOR(2500);
+            break;
+        case 9:
+            text[0] = "      brillanti    ";
+            text[1] = NULL;
+            WAIT_FOR(2500);
+            break;
+        case 10:
+            text[0] = "    fantastiche    ";
+            text[1] = NULL;
+            WAIT_FOR(2500);
+            break;
+        case 11:
+            text[0] = "insomma.....       ";
+            text[1] = NULL;
+            WAIT_FOR(2500);
+            break;
+        case 12:
+            text[0] = text[0];
+            text[1] = "          sborate! ";
+            WAIT_FOR(3500);
+            break;
+        case 13:
+            text[0] = NULL;
+            text[1] = NULL;
+            WAIT_FOR(1800);
+            break;
+        case 14:
+            text[0] = " Vi ringrazio per ";
+            text[1] = "  questo viaggio! ";
+            WAIT_FOR(3000);
+            break;
+        case 15:
+            text[0] = "   FORZA SQUADRA  ";
+            text[1] = NULL;
+            WAIT_FOR(1500);
+            break;
+        case 16:
+            text[0] = text[0];
+            text[1] = "      SEMPRE!     ";
+            WAIT_FOR(2500);
+            break;
+        case 17:
+            text[0] = NULL;
+            text[1] = NULL;
+            WAIT_FOR(1500);
+            break;
+        case 18:
+            text[0] = "Il vostro         ";
+            text[1] = NULL;
+            WAIT_FOR(1000);
+            break;
+        case 19:
+            text[0] = text[0];
+            text[1] = " Simone Ruffini <3";
+            WAIT_FOR(2500);
+            break;
+        case 20:
+            last_timestamp = 0;
+            counter        = 0;
+            return 0;
+            break;
+        default:
+            last_timestamp = 0;
+            counter        = 0;
+            break;
+    }
+    return 1;
+}
+
 void LCD_DisplayUpdateRoutine(void) {
     static uint8_t cnt100ms = 0;
-    char hv_bat_soc_str [10] = {};
-    char lv_bat_v_str [10] = {};
+    char hv_bat_soc_str[10] = {};
+    char lv_bat_v_str[10]   = {};
 
-    if(HAL_GetTick() < cnt100ms)
+    if (HAL_GetTick() < cnt100ms)
         return;
     cnt100ms = HAL_GetTick() + 100U;
 
     char buffer[20] = {};
     //LCD_clear();
+
+    if (boards_timeouts & (1 << WDG_BOARD_DSPACE)) {
+        sprintf(hv_bat_soc_str, "Na");
+    } else {
+        sprintf(hv_bat_soc_str, "%3u", HVBAT_SOC);
+    }
+
+    if (boards_timeouts & (1 << WDG_BOARD_BMS_LV)) {
+        sprintf(lv_bat_v_str, "Na");
+    } else {
+        sprintf(lv_bat_v_str, "%04.1f", LVBAT_V / 1000);
+    }
+
     LCD_home();
-
-    if(boards_timeouts & (1<< WDG_BOARD_DSPACE)){
-        sprintf(hv_bat_soc_str,"Na");
-    }else{
-        sprintf(hv_bat_soc_str,"%3u",HVBAT_SOC);
-    }
-
-    if(boards_timeouts & (1<< WDG_BOARD_BMS_LV)){
-        sprintf(lv_bat_v_str,"Na");
-    }else{
-        sprintf(lv_bat_v_str,"%04.1f",LVBAT_V/1000);
-    }
-    sprintf(buffer, " HV %3s%%   LV %4sV", hv_bat_soc_str,lv_bat_v_str);
+    sprintf(buffer, " HV %3s%%   LV %4sV", hv_bat_soc_str, lv_bat_v_str);
     LCD_write(buffer);
     LCD_setCursor(1, 0);
     sprintf(buffer, "     ANDROMEDA");
@@ -580,6 +741,7 @@ void LCD_DisplayUpdateRoutine(void) {
     //LCD_home();
 }
 
+char *see_you_again_buf[2];
 /**
     * @brief Dash main loop
  */
@@ -625,7 +787,41 @@ void CoreDashBoard(void) {
     // RUN the ready to drive FSM
     RTD_fsm(500);
 
-    LCD_DisplayUpdateRoutine();
+    activate_SeeYouAgain = SeeYouAgain_Activator();
+    // if we activate SeeYouAgain and pressed the button, start the procedure
+    if(activate_SeeYouAgain && btn_press_at_start == 1 && SeeYouAgain_running == 0) {
+        SeeYouAgain_running = 1;
+        HAL_GPIO_WritePin(BUZZER_CMD_GPIO_OUT_GPIO_Port, BUZZER_CMD_GPIO_OUT_Pin, GPIO_PIN_SET);
+        HAL_Delay(50);
+        HAL_GPIO_WritePin(BUZZER_CMD_GPIO_OUT_GPIO_Port, BUZZER_CMD_GPIO_OUT_Pin, GPIO_PIN_RESET);
+        HAL_Delay(50);
+        HAL_GPIO_WritePin(BUZZER_CMD_GPIO_OUT_GPIO_Port, BUZZER_CMD_GPIO_OUT_Pin, GPIO_PIN_SET);
+        HAL_Delay(50);
+        HAL_GPIO_WritePin(BUZZER_CMD_GPIO_OUT_GPIO_Port, BUZZER_CMD_GPIO_OUT_Pin, GPIO_PIN_RESET);
+        HAL_Delay(50);
+        HAL_GPIO_WritePin(BUZZER_CMD_GPIO_OUT_GPIO_Port, BUZZER_CMD_GPIO_OUT_Pin, GPIO_PIN_SET);
+        HAL_Delay(50);
+        HAL_GPIO_WritePin(BUZZER_CMD_GPIO_OUT_GPIO_Port, BUZZER_CMD_GPIO_OUT_Pin, GPIO_PIN_RESET);
+    }
+
+    if (!SeeYouAgain_running)
+        LCD_DisplayUpdateRoutine();
+    else {
+        SeeYouAgain_running = SeeYouAgain_protocol(see_you_again_buf); // Stop running when protocol stops
+        btn_press_at_start = 0; // never let to reactivate
+        LCD_home();
+        if (see_you_again_buf[0] == NULL) {
+            LCD_write("                    ");
+        } else {
+            LCD_write(see_you_again_buf[0]);
+        }
+        LCD_setCursor(1, 0);
+        if (see_you_again_buf[1] == NULL) {
+            LCD_write("                    ");
+        } else {
+            LCD_write(see_you_again_buf[1]);
+        }
+    }
 
     // Run the AS FSM
     // mission_run();
