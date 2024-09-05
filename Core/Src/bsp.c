@@ -159,6 +159,9 @@ void BTN_Routine(void) {
 static const enum ADC_Channel ROT_SW_Device_to_ADC_Channel_map[ROT_SW_Device_NUM] =
     {[ROT_SW_Device1] = ADC_Channel0, [ROT_SW_Device2] = ADC_Channel1};
 
+static enum ROT_SW_State ROT_SW_Device_LastState[ROT_SW_Device_NUM] =
+    {[ROT_SW_Device1] = ROT_SW_State_NUM, [ROT_SW_Device2] = ROT_SW_State_NUM};
+
 // state to -> Vmin,Vmax of state
 //static float ROT_SW_ain_V_to_state_map[ROT_SW_State_NUM][2U] = {
 //    [ROT_SW_State0] = {(ROT_SW_AIN_STATE_STEP_V * ROT_SW_State0),
@@ -208,7 +211,7 @@ static float ROT_SW_ain_V_to_state_map[ROT_SW_State_NUM][2U] = {
 };
 /*---------- Private Functions -----------------------------------------------*/
 enum ROT_SW_State __ROT_SW_analogV_to_state(float analogV) {
-    enum ROT_SW_State state = ROT_SW_State_NUM+1;
+    enum ROT_SW_State state = ROT_SW_State_NUM;
 
     if (analogV >= ROT_SW_ain_V_to_state_map[ROT_SW_State0][0] &&
                analogV < ROT_SW_ain_V_to_state_map[ROT_SW_State0][1]) {
@@ -241,14 +244,14 @@ enum ROT_SW_State __ROT_SW_analogV_to_state(float analogV) {
                analogV < ROT_SW_ain_V_to_state_map[ROT_SW_State9][1]) {
         state = ROT_SW_State9;
     }
-    
+
     return state;
 }
 
 /*---------- Exported Variables ----------------------------------------------*/
 
 /*---------- Exported Functions ----------------------------------------------*/
-float ROT_SW_getAanalog_V(enum ROT_SW_Device device) {
+float ROT_SW_getAnalog_V(enum ROT_SW_Device device) {
     assert_param(device != ROT_SW_State_NUM);
     enum ADC_Channel chnl = ROT_SW_Device_to_ADC_Channel_map[device];
     float adcVal          = ADC_ADC1_getChannelRawFiltered(chnl);
@@ -258,21 +261,17 @@ float ROT_SW_getAanalog_V(enum ROT_SW_Device device) {
     return (physicalVal * ROT_SW_AIN_GAIN + ROT_SW_AIN_OFFSET_V);
 }
 enum ROT_SW_State ROT_SW_getState(enum ROT_SW_Device device) {
-    assert_param(device != ROT_SW_State_NUM);
+    assert_param(device != ROT_SW_Device_NUM);
 
-    static enum ROT_SW_State last_state1 = ROT_SW_State_NUM+1;
-    static enum ROT_SW_State last_state2 = ROT_SW_State_NUM+1;
+    enum ROT_SW_State *const last_state = &ROT_SW_Device_LastState[device];
 
-    enum ROT_SW_State *last_state = device == ROT_SW_Device1 ? &last_state1 : &last_state2;
-    enum ROT_SW_State state = ROT_SW_State_NUM+1;
+    enum ROT_SW_State state = __ROT_SW_analogV_to_state(ROT_SW_getAnalog_V(device));
 
-    state = __ROT_SW_analogV_to_state(ROT_SW_getAanalog_V(device));
-
-    if(*last_state == ROT_SW_State_NUM+1) {
+    if(*last_state == ROT_SW_State_NUM) {
         *last_state = state;
     }
 
-    if(state == *last_state || state == (*last_state)+1 || state == (*last_state)-1) {
+    if(state != ROT_SW_State_NUM && state >= (*last_state)-1 && state <= (*last_state)+1) {
         *last_state = state;
     } else {
         state = *last_state;

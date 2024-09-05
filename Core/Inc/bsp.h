@@ -121,7 +121,7 @@ enum ROT_SW_State {
 /* ---------- Exported macros ------------------------------------------------*/
 
 /* ---------- Exported functions ---------------------------------------------*/
-float ROT_SW_getAanalog_V(enum ROT_SW_Device device);
+float ROT_SW_getAnalog_V(enum ROT_SW_Device device);
 enum ROT_SW_State ROT_SW_getState(enum ROT_SW_Device device);
 
 /* ---------- Private types --------------------------------------------------*/

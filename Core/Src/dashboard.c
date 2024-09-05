@@ -726,10 +726,10 @@ void LCD_DisplayUpdateRoutine(void) {
     }
 
     LCD_home();
-    sprintf(buffer, " HV %3s%%   LV %4sV", hv_bat_soc_str, lv_bat_v_str);
+    sprintf(buffer, " HV %3s%%    LV %4sV", hv_bat_soc_str, lv_bat_v_str);
     LCD_write(buffer);
     LCD_setCursor(1, 0);
-    sprintf(buffer, "     ANDROMEDA");
+    sprintf(buffer, "%1d    ANDROMEDA     %1d", ROT_SW_getState(ROT_SW_Device2), ROT_SW_getState(ROT_SW_Device1));
     LCD_write(buffer);
     //sprintf(buffer, "INV %2u", (uint8_t)INV_TEMP_VAL);
     //LCD_write(buffer);
@@ -835,6 +835,7 @@ void CoreDashBoard(void) {
         error           = 0;
         boards_timeouts = 0;
     }
+
 
     // Send current state via CAN
     can_send_state(500);
