@@ -103,11 +103,11 @@ enum ROT_SW_State {
 /* ---------- Exported constants ---------------------------------------------*/
 
 // clang-format off
-#define ROW_SW_SIGNAL_CONDITIONING_GAIN (0.6597353497) /*!< Voltage divder constant from input to output */
+#define ROT_SW_SIGNAL_CONDITIONING_GAIN (0.6597353497) /*!< Voltage divder constant from input to output */
 
 // (Physical input * volt_divider_const) +- offset -> ADC input
 
-#define ROT_SW_AIN_GAIN (1/ROW_SW_SIGNAL_CONDITIONING_GAIN) /*!< voltage value in ADC Dynamic Range to Physical Dynamic Range conversion constant */
+#define ROT_SW_AIN_GAIN (1/ROT_SW_SIGNAL_CONDITIONING_GAIN) /*!< voltage value in ADC Dynamic Range to Physical Dynamic Range conversion constant */
 #define ROT_SW_AIN_OFFSET_V (0.0) /*!< voltage value in ADC Dynamic Range to Physical Dynamic Range conversion offset */
 
 #define ROT_SW_STATE_STEP_V (0.54) /*!< Rotary Switch State step voltage (Physical Value)
@@ -116,13 +116,17 @@ enum ROT_SW_State {
                                                                  State1 = [State1_v - ErrMargin, State1_v+ErrMargin] */
 // clang-format on
 
+#define ROT_SW_SAMPLING_PERIOD_MS (50U)
+
 /* ---------- Exported variables ---------------------------------------------*/
 
 /* ---------- Exported macros ------------------------------------------------*/
 
 /* ---------- Exported functions ---------------------------------------------*/
 float ROT_SW_getAnalog_V(enum ROT_SW_Device device);
+enum ROT_SW_State ROT_SW_sampleState(enum ROT_SW_Device device);
 enum ROT_SW_State ROT_SW_getState(enum ROT_SW_Device device);
+void ROT_SW_Routine(void);
 
 /* ---------- Private types --------------------------------------------------*/
 

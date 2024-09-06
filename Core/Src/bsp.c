@@ -164,60 +164,27 @@ static const enum ADC_Channel ROT_SW_Device_to_ADC_Channel_map[ROT_SW_Device_NUM
 
 static enum ROT_SW_State ROT_SW_Device_LastState[ROT_SW_Device_NUM] =
     {[ROT_SW_Device1] = ROT_SW_State_NUM, [ROT_SW_Device2] = ROT_SW_State_NUM};
-
-// state to -> Vmin,Vmax of state
-//static float ROT_SW_ain_V_to_state_map[ROT_SW_State_NUM][2U] = {
-//    [ROT_SW_State0] = {(ROT_SW_AIN_STATE_STEP_V * ROT_SW_State0),
-//                       (ROT_SW_AIN_STATE_STEP_V * ROT_SW_State0) + ROT_SW_AIN_STATE_ERR_MARGIN_V},
-//    [ROT_SW_State1] = {(ROT_SW_AIN_STATE_STEP_V * ROT_SW_State1) - ROT_SW_AIN_STATE_ERR_MARGIN_V,
-//                       (ROT_SW_AIN_STATE_STEP_V * ROT_SW_State1) + ROT_SW_AIN_STATE_ERR_MARGIN_V},
-//    [ROT_SW_State2] = {(ROT_SW_AIN_STATE_STEP_V * ROT_SW_State2) - ROT_SW_AIN_STATE_ERR_MARGIN_V,
-//                       (ROT_SW_AIN_STATE_STEP_V * ROT_SW_State2) + ROT_SW_AIN_STATE_ERR_MARGIN_V},
-//    [ROT_SW_State3] = {(ROT_SW_AIN_STATE_STEP_V * ROT_SW_State3) - ROT_SW_AIN_STATE_ERR_MARGIN_V,
-//                       (ROT_SW_AIN_STATE_STEP_V * ROT_SW_State3) + ROT_SW_AIN_STATE_ERR_MARGIN_V},
-//    [ROT_SW_State4] = {(ROT_SW_AIN_STATE_STEP_V * ROT_SW_State4) - ROT_SW_AIN_STATE_ERR_MARGIN_V,
-//                       (ROT_SW_AIN_STATE_STEP_V * ROT_SW_State4) + ROT_SW_AIN_STATE_ERR_MARGIN_V},
-//    [ROT_SW_State5] = {(ROT_SW_AIN_STATE_STEP_V * ROT_SW_State5) - ROT_SW_AIN_STATE_ERR_MARGIN_V,
-//                       (ROT_SW_AIN_STATE_STEP_V * ROT_SW_State5) + ROT_SW_AIN_STATE_ERR_MARGIN_V},
-//    [ROT_SW_State6] = {(ROT_SW_AIN_STATE_STEP_V * ROT_SW_State6) - ROT_SW_AIN_STATE_ERR_MARGIN_V,
-//                       (ROT_SW_AIN_STATE_STEP_V * ROT_SW_State6) + ROT_SW_AIN_STATE_ERR_MARGIN_V},
-//    [ROT_SW_State7] = {(ROT_SW_AIN_STATE_STEP_V * ROT_SW_State7) - ROT_SW_AIN_STATE_ERR_MARGIN_V,
-//                       (ROT_SW_AIN_STATE_STEP_V * ROT_SW_State7) + ROT_SW_AIN_STATE_ERR_MARGIN_V},
-//    [ROT_SW_State8] = {(ROT_SW_AIN_STATE_STEP_V * ROT_SW_State8) - ROT_SW_AIN_STATE_ERR_MARGIN_V,
-//                       (ROT_SW_AIN_STATE_STEP_V * ROT_SW_State8) + ROT_SW_AIN_STATE_ERR_MARGIN_V},
-//    [ROT_SW_State9] = {(ROT_SW_AIN_STATE_STEP_V * ROT_SW_State9) - ROT_SW_AIN_STATE_ERR_MARGIN_V,
-//                       (ROT_SW_AIN_STATE_STEP_V * ROT_SW_State9) + ROT_SW_AIN_STATE_ERR_MARGIN_V},
-//};
-
+static enum ROT_SW_State ROT_SW_Device_State[ROT_SW_Device_NUM] =
+    {[ROT_SW_Device1] = ROT_SW_State_NUM, [ROT_SW_Device2] = ROT_SW_State_NUM};
 
 static float ROT_SW_ain_V_to_state_map[ROT_SW_State_NUM][2U] = {
-    [ROT_SW_State0] = {(0.0),
-                       (0.0) + ROT_SW_STATE_ERR_MARGIN_V},
-    [ROT_SW_State1] = {(2.71) - ROT_SW_STATE_ERR_MARGIN_V,
-                       (2.71) + ROT_SW_STATE_ERR_MARGIN_V},
-    [ROT_SW_State2] = {(0.54) - ROT_SW_STATE_ERR_MARGIN_V,
-                       (0.54) + ROT_SW_STATE_ERR_MARGIN_V},
-    [ROT_SW_State3] = {(3.26) - ROT_SW_STATE_ERR_MARGIN_V,
-                       (3.26) + ROT_SW_STATE_ERR_MARGIN_V},
-    [ROT_SW_State4] = {(1.10) - ROT_SW_STATE_ERR_MARGIN_V,
-                       (1.10) + ROT_SW_STATE_ERR_MARGIN_V},
-    [ROT_SW_State5] = {(3.81) - ROT_SW_STATE_ERR_MARGIN_V,
-                       (3.81) + ROT_SW_STATE_ERR_MARGIN_V},
-    [ROT_SW_State6] = {(1.63) - ROT_SW_STATE_ERR_MARGIN_V,
-                       (1.63) + ROT_SW_STATE_ERR_MARGIN_V},
-    [ROT_SW_State7] = {(4.35) - ROT_SW_STATE_ERR_MARGIN_V,
-                       (4.35) + ROT_SW_STATE_ERR_MARGIN_V},
-    [ROT_SW_State8] = {(2.17) - ROT_SW_STATE_ERR_MARGIN_V,
-                       (2.17) + ROT_SW_STATE_ERR_MARGIN_V},
-    [ROT_SW_State9] = {(4.89) - ROT_SW_STATE_ERR_MARGIN_V,
-                       (4.89) + ROT_SW_STATE_ERR_MARGIN_V},
+    [ROT_SW_State0] = {(0.0), (0.0) + ROT_SW_STATE_ERR_MARGIN_V},
+    [ROT_SW_State1] = {(2.71) - ROT_SW_STATE_ERR_MARGIN_V, (2.71) + ROT_SW_STATE_ERR_MARGIN_V},
+    [ROT_SW_State2] = {(0.54) - ROT_SW_STATE_ERR_MARGIN_V, (0.54) + ROT_SW_STATE_ERR_MARGIN_V},
+    [ROT_SW_State3] = {(3.26) - ROT_SW_STATE_ERR_MARGIN_V, (3.26) + ROT_SW_STATE_ERR_MARGIN_V},
+    [ROT_SW_State4] = {(1.10) - ROT_SW_STATE_ERR_MARGIN_V, (1.10) + ROT_SW_STATE_ERR_MARGIN_V},
+    [ROT_SW_State5] = {(3.81) - ROT_SW_STATE_ERR_MARGIN_V, (3.81) + ROT_SW_STATE_ERR_MARGIN_V},
+    [ROT_SW_State6] = {(1.63) - ROT_SW_STATE_ERR_MARGIN_V, (1.63) + ROT_SW_STATE_ERR_MARGIN_V},
+    [ROT_SW_State7] = {(4.35) - ROT_SW_STATE_ERR_MARGIN_V, (4.35) + ROT_SW_STATE_ERR_MARGIN_V},
+    [ROT_SW_State8] = {(2.17) - ROT_SW_STATE_ERR_MARGIN_V, (2.17) + ROT_SW_STATE_ERR_MARGIN_V},
+    [ROT_SW_State9] = {(4.89) - ROT_SW_STATE_ERR_MARGIN_V, (4.89) + ROT_SW_STATE_ERR_MARGIN_V},
 };
 /*---------- Private Functions -----------------------------------------------*/
 enum ROT_SW_State __ROT_SW_analogV_to_state(float analogV) {
     enum ROT_SW_State state = ROT_SW_State_NUM;
 
     if (analogV >= ROT_SW_ain_V_to_state_map[ROT_SW_State0][0] &&
-               analogV < ROT_SW_ain_V_to_state_map[ROT_SW_State0][1]) {
+        analogV < ROT_SW_ain_V_to_state_map[ROT_SW_State0][1]) {
         state = ROT_SW_State0;
     } else if (analogV >= ROT_SW_ain_V_to_state_map[ROT_SW_State1][0] &&
                analogV < ROT_SW_ain_V_to_state_map[ROT_SW_State1][1]) {
@@ -263,24 +230,64 @@ float ROT_SW_getAnalog_V(enum ROT_SW_Device device) {
     float physicalVal = ADC_CONV_RAW_TO_V(adcVal, ADC_GET_RESOLUTION_BITS(&ROT_SW_ADC_Handle), ADC_ADC1_VREF_V);
     return (physicalVal * ROT_SW_AIN_GAIN + ROT_SW_AIN_OFFSET_V);
 }
-enum ROT_SW_State ROT_SW_getState(enum ROT_SW_Device device) {
+enum ROT_SW_State __ROT_SW_getState(enum ROT_SW_Device device) {
     assert_param(device != ROT_SW_Device_NUM);
 
     enum ROT_SW_State *const last_state = &ROT_SW_Device_LastState[device];
 
     enum ROT_SW_State state = __ROT_SW_analogV_to_state(ROT_SW_getAnalog_V(device));
 
-    if(*last_state == ROT_SW_State_NUM) {
+    if (*last_state == ROT_SW_State_NUM) {
         *last_state = state;
     }
 
-    if(state != ROT_SW_State_NUM && state >= (*last_state)-1 && state <= (*last_state)+1) {
+    if (state != ROT_SW_State_NUM && state >= (*last_state) - 1 && state <= (*last_state) + 1) {
         *last_state = state;
     } else {
         state = *last_state;
     }
 
     return state;
+}
+
+enum ROT_SW_State ROT_SW_sampleState(enum ROT_SW_Device device) {
+    assert_param(device != ROT_SW_Device_NUM);
+
+    return __ROT_SW_analogV_to_state(ROT_SW_getAnalog_V(device));
+}
+
+enum ROT_SW_State ROT_SW_getState(enum ROT_SW_Device device) {
+    assert_param(device != ROT_SW_Device_NUM);
+
+    return ROT_SW_Device_State[device];
+}
+
+void ROT_SW_Routine(void) {
+    static uint32_t routine_tim = ROT_SW_SAMPLING_PERIOD_MS;
+
+    if (HAL_GetTick() < routine_tim) {
+        return;
+    }
+    routine_tim = HAL_GetTick() + ROT_SW_SAMPLING_PERIOD_MS;
+
+    for (enum ROT_SW_Device i = 0; i < ROT_SW_Device_NUM; i++) {
+        enum ROT_SW_State last_state = ROT_SW_Device_State[i];
+
+        enum ROT_SW_State curr_state = ROT_SW_sampleState(i);
+
+        // If this is the first conversion, init the last state for next computation
+        if (last_state == ROT_SW_State_NUM) {
+            last_state = curr_state;
+        }
+
+        if (curr_state != ROT_SW_State_NUM && curr_state >= (last_state)-1 && curr_state <= (last_state) + 1) {
+            // if no error and the state progressed correctly, update current state
+            ROT_SW_Device_State[i] = curr_state;
+        } else {
+            // if either in error or the step was not in range keep the same state
+            ROT_SW_Device_State[i] = last_state;
+        }
+    }
 }
 
 /* LED MONO (Monochrome Leds) ################################################*/

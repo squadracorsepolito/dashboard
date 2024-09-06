@@ -784,6 +784,8 @@ void CoreDashBoard(void) {
 
     BTN_Routine();
 
+    ROT_SW_Routine();
+
     // RUN the ready to drive FSM
     RTD_fsm(500);
 
