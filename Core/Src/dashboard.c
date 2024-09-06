@@ -614,7 +614,7 @@ uint8_t SeeYouAgain_protocol(char *text[2]) {
             WAIT_FOR(3000);
             break;
         case 5:
-            text[0] = " Li portero' con me'";
+            text[0] = " Li portero' con me ";
             text[1] = NULL;
             WAIT_FOR(2500);
             break;

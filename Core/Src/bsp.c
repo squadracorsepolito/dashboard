@@ -56,7 +56,7 @@ enum SDC_RLY_State SDC_RLY_getState(void) {
 #define BTN_VALUES_ARR_LEN (BTN_DEVICE_FILTER_WINDOW_SAMPLES)
 
 #define XSTR(x) STR(x)
-#define STR(x) #x
+#define STR(x)  #x
 
 #if BTN_VALUES_ARR_LEN > 10U
 #pragma message("BTN_values = " XSTR(BTN_VALUES_ARR_LEN))
@@ -64,11 +64,11 @@ enum SDC_RLY_State SDC_RLY_getState(void) {
 #endif
 
 #if BTN_VALUES_ARR_LEN < 1
-#pragma  message("BTN_values = " XSTR(BTN_VALUES_ARR_LEN))
+#pragma message("BTN_values = " XSTR(BTN_VALUES_ARR_LEN))
 #error "BTN_values is < 1. Increase BTN_DEVICE_FILTER_WINDOW_SAMPLES."
 #endif
 
-#define BTN_VALUES_ARR_LEN_U ((uint8_t)BTN_VALUES_ARR_LEN)
+#define BTN_VALUES_ARR_LEN_U            ((uint8_t)BTN_VALUES_ARR_LEN)
 #define BTN_DEVICE_SAMPLING_PERIOD_MS_U ((uint32_t)BTN_DEVICE_SAMPLING_PERIOD_MS)
 
 #if BTN_Device_NUM <= 8
@@ -129,18 +129,21 @@ uint8_t BTN_getStatus(enum BTN_Device device) {
 
 void BTN_Routine(void) {
     static uint32_t routine_tim = BTN_DEVICE_SAMPLING_PERIOD_MS_U;
-    if (HAL_GetTick() >= routine_tim) {
-        routine_tim = HAL_GetTick() + BTN_DEVICE_SAMPLING_PERIOD_MS_U;
-        // Move old samples ahead
-        for (uint8_t i = 0; i < BTN_VALUES_ARR_LEN_U - 1; i++) {
-            BTN_Device_values[i] = BTN_Device_values[i + 1];
-        }
-        // Push New value back
-        for (uint8_t i = 0; i < BTN_Device_NUM; i++) {
-            uint8_t curr_sample = BTN_sampleStatus(i);
-            BTN_Device_values[BTN_VALUES_ARR_LEN_U - 1] &= ~((BTN_Value_t)((1U) << i));  // reset the value
-            BTN_Device_values[BTN_VALUES_ARR_LEN_U - 1] |= (curr_sample << i);            // set the value
-        }
+
+    if (HAL_GetTick() < routine_tim) {
+        return;
+    }
+    routine_tim = HAL_GetTick() + BTN_DEVICE_SAMPLING_PERIOD_MS_U;
+
+    // Move old samples ahead
+    for (uint8_t i = 0; i < BTN_VALUES_ARR_LEN_U - 1; i++) {
+        BTN_Device_values[i] = BTN_Device_values[i + 1];
+    }
+    // Push New value back
+    for (uint8_t i = 0; i < BTN_Device_NUM; i++) {
+        uint8_t curr_sample = BTN_sampleStatus(i);
+        BTN_Device_values[BTN_VALUES_ARR_LEN_U - 1] &= ~((BTN_Value_t)((1U) << i));  // reset the value
+        BTN_Device_values[BTN_VALUES_ARR_LEN_U - 1] |= (curr_sample << i);           // set the value
     }
 }
 
