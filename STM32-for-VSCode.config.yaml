@@ -89,7 +89,6 @@ sourceFiles:
   - Lib/LVGL/callbacks.c
   - Drivers/ILI9488/ili9488.c
   - EEZ/screen_loader.c 
-  - EEZ/global_vars.c 
   - EEZ/src/ui/ui.c 
   - EEZ/src/ui/images.c 
   - EEZ/src/ui/styles.c 

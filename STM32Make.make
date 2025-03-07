@@ -127,8 +127,6 @@ EEZ/src/ui/images.c \
 EEZ/src/ui/screens.c \
 EEZ/src/ui/styles.c \
 EEZ/src/ui/ui.c \
-Lib/LVGL/callback/callback.c \
-Lib/LVGL/log/log.c \
 Lib/LVGL/lvgl/demos/benchmark/assets/img_benchmark_avatar.c \
 Lib/LVGL/lvgl/demos/benchmark/assets/img_benchmark_lvgl_logo_argb.c \
 Lib/LVGL/lvgl/demos/benchmark/assets/img_benchmark_lvgl_logo_rgb.c \
@@ -882,6 +880,7 @@ Lib/LVGL/lvgl/tests/test_images/stride_align64/UNCOMPRESSED/test_RGB888_NONE_ali
 Lib/LVGL/lvgl/tests/test_images/stride_align64/UNCOMPRESSED/test_XRGB8888_NONE_align64.c \
 Lib/LVGL/lvgl/tests/unity/unity.c \
 Lib/LVGL/lvgl/tests/unity/unity_support.c \
+Lib/LVGL/lvgl_callbacks.c \
 Lib/PCA9555/pca9555.c \
 Lib/SCan/SC24/artifacts/HVCB/c_source/hvcb.c \
 Lib/SCan/SC24/artifacts/MCB/c_source/mcb.c \
@@ -1030,8 +1029,7 @@ C_INCLUDES =  \
 -IDrivers/STM32F4xx_HAL_Driver/Inc/Legacy \
 -IEEZ \
 -IEEZ/src/ui \
--ILib/LVGL/callback \
--ILib/LVGL/log \
+-ILib/LVGL \
 -ILib/LVGL/lvgl \
 -ILib/LVGL/lvgl/src \
 -ILib/PCA9555 \

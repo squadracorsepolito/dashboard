@@ -21,8 +21,8 @@
 /*---------- LVGL DRAW CALLBACK ##############################################*/
 /* ---------- Includes -------------------------------------------------------*/
 /* ---------- Exported types -------------------------------------------------*/
-#define BYTES_PER_PIXEL (LV_COLOR_FORMAT_GET_SIZE(LV_COLOR_FORMAT_RGB888))
-#define BUFFER_SIZE     (VERTICAL_RES * HORIZONTAL_RES * BYTES_PER_PIXEL / 7)
+#define LVGL_BYTES_PER_PIXEL (LV_COLOR_FORMAT_GET_SIZE(LV_COLOR_FORMAT_RGB888))
+#define LVGL_BUFFER_SIZE     (VERTICAL_RES * HORIZONTAL_RES * LVGL_BYTES_PER_PIXEL / 7)
 /* ---------- Exported constants ---------------------------------------------*/
 /* ---------- Exported variables ---------------------------------------------*/
 extern uint8_t buf1[];

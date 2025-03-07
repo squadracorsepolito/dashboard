@@ -18,7 +18,7 @@
 /*---------- Private variables -----------------------------------------------*/
 /*---------- Private function prototypes -------------------------------------*/
 /*---------- Exported Variables ----------------------------------------------*/
-uint8_t buf1[BUFFER_SIZE];
+uint8_t buf1[LVGL_BUFFER_SIZE];
 static volatile uint8_t flush_in_progress = 0; 
 /*---------- Exported Functions ----------------------------------------------*/
 void LVGL_CLB_flush_clb(lv_display_t *display, const lv_area_t *area, uint8_t *px_map) {
@@ -94,7 +94,6 @@ void LVGL_CLB_log_clb(lv_log_level_t level, const char *buf) {
 
     HAL_UART_Transmit(&LCD_TFT_USART_Handle, (uint8_t *)log_msg, strlen(log_msg), HAL_MAX_DELAY);
 }
-
 void LVGL_CLB_mem_usage() {
     lv_mem_monitor_t mem_mon;
     lv_mem_monitor(&mem_mon);

@@ -10,7 +10,6 @@
 #include "hvcb.h"
 #include "main.h"
 #include "mcb.h"
-#include "pca9555.h"
 #include "tim.h"
 #include "usart.h"
 #include "utils.h"
@@ -315,6 +314,7 @@ void UpdateCockpitLed(uint32_t delay_100us) {
             HAL_GPIO_WritePin(IMD_ERR_LED_nCMD_GPIO_OUT_GPIO_Port, IMD_ERR_LED_nCMD_GPIO_OUT_Pin, !IMD_ERR);
         }
 
+        /*
         // Control of Dashboard reserved led
         if ((boards_timeouts & (1 << WDG_BOARD_DSPACE)) || (boards_timeouts & (1 << WDG_BOARD_TLB))) {
             // tlb message or dspace message timeout
@@ -351,7 +351,7 @@ void UpdateCockpitLed(uint32_t delay_100us) {
         //Control of other leds
         LED_RGB_setColor(LED_RGB1, LED1.R, LED1.G, LED1.B);
         LED_RGB_setColor(LED_RGB2, LED2.R, LED2.G, LED2.B);
-        LED_RGB_setColor(LED_RGB3, LED3.R, LED3.G, LED3.B);
+        LED_RGB_setColor(LED_RGB3, LED3.R, LED3.G, LED3.B);*/
     }
 }
 
@@ -388,7 +388,7 @@ void SetupDashBoard(void) {
 
     lv_tick_set_cb(HAL_GetTick);
     lv_display_t *display1 = lv_display_create(HORIZONTAL_RES, VERTICAL_RES);
-    lv_display_set_buffers(display1, buf1, NULL, BUFFER_SIZE, LV_DISPLAY_RENDER_MODE_PARTIAL);
+    lv_display_set_buffers(display1, buf1, NULL, LVGL_BUFFER_SIZE, LV_DISPLAY_RENDER_MODE_PARTIAL);
     lv_display_set_flush_cb(display1, LVGL_CLB_flush_clb);
 
 #if LV_USE_LOG
@@ -525,8 +525,6 @@ void LCD_DisplayUpdateRoutine(void) {
             lv_scr_load(objects.extra);
             break;
     }
-
-    LVGL_CLB_mem_usage();
 }
 
 /**
