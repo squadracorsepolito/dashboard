@@ -1,22 +1,25 @@
 /*INCLUDES*/
 
+#include "bsp.h"
+#include "ili9488.h"
+#include "lvgl_callbacks.h"
+#include "lvgl.h"
 #include "main.h"
+#include "screens.h"
+
 #include <math.h>
 #include <stdbool.h>
 #include <string.h>
-#include "bsp.h"
 
 /*CUSTOM DEFINE*/
 
-#define ON 1
+#define ON  1
 #define OFF 0
 
-typedef enum
-{
-    ERROR_NONE = 0,
-    ERROR_CAN_WDG,
-    ERROR_INIT_BTN
-} error_t;
+// Commenta se non si sta usando lo schermo LCD ILI9488
+#define USE_ILI9488
+
+typedef enum { ERROR_NONE = 0, ERROR_CAN_WDG, ERROR_INIT_BTN } error_t;
 
 /*CUSTOM FUNCTIONS PROTOTYPES*/
 

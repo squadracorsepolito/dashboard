@@ -257,7 +257,7 @@ void InitDashBoard() {
     HAL_GPIO_WritePin(AMS_ERR_LED_nCMD_GPIO_OUT_GPIO_Port, AMS_ERR_LED_nCMD_GPIO_OUT_Pin, GPIO_PIN_RESET);
     HAL_GPIO_WritePin(IMD_ERR_LED_nCMD_GPIO_OUT_GPIO_Port, IMD_ERR_LED_nCMD_GPIO_OUT_Pin, GPIO_PIN_RESET);
     HAL_GPIO_WritePin(RTD_LED_GPIO_Port, RTD_LED_Pin, GPIO_PIN_SET);
-    HAL_Delay(1500);
+    // HAL_Delay(1500);
 
     // Disable The SDC relay and wait later for closing it
     HAL_GPIO_WritePin(SDC_RLY_CMD_GPIO_OUT_GPIO_Port, SDC_RLY_CMD_GPIO_OUT_Pin, GPIO_PIN_SET);
@@ -275,17 +275,11 @@ void InitDashBoard() {
     //     rtd_fsm = STATE_ERROR;
     // }
 
-    char buffer[21] = {};
-    sprintf(buffer, "SQUADRA CORSE POLITO");
-    LCD_write(buffer);
-    HAL_Delay(1000);
-    LCD_setCursor(1, 0);
-    sprintf(buffer, "     ANDROMEDA");
-    LCD_write(buffer);
-    HAL_Delay(1000);
+
+    create_screen_main();
+    lv_scr_load(objects.main);
 
     btn_press_at_start = BTN_sampleStatus(BTN_Steering1);
-
 }
 
 void cock_callback() {
@@ -388,63 +382,20 @@ void SetupDashBoard(void) {
     }
     HAL_DAC_SetValue(&PUMPS_DAC, PUMPS_DAC_CHANNEL, DAC_ALIGN_8B_R, 0);
 
-    if (PCA9555_init(&pca9555Handle, &hi2c1, PCA9555_ADDR) != HAL_OK) {
-        HAL_GPIO_WritePin(WARN_LED_GPIO_OUT_GPIO_Port, WARN_LED_GPIO_OUT_Pin, GPIO_PIN_SET);
-    } else {
-        HAL_GPIO_WritePin(STAT1_LED_GPIO_OUT_GPIO_Port, STAT1_LED_GPIO_OUT_Pin, GPIO_PIN_SET);
-    }
 
-    PCA9555_pinMode(&pca9555Handle, 0, PCA9555_PIN_OUTPUT_MODE, PCA9555_POLARITY_NORMAL);
-    PCA9555_pinMode(&pca9555Handle, 1, PCA9555_PIN_OUTPUT_MODE, PCA9555_POLARITY_NORMAL);
-    PCA9555_pinMode(&pca9555Handle, 2, PCA9555_PIN_OUTPUT_MODE, PCA9555_POLARITY_NORMAL);
-    PCA9555_pinMode(&pca9555Handle, 3, PCA9555_PIN_OUTPUT_MODE, PCA9555_POLARITY_NORMAL);
-    PCA9555_pinMode(&pca9555Handle, 4, PCA9555_PIN_OUTPUT_MODE, PCA9555_POLARITY_NORMAL);
-    PCA9555_pinMode(&pca9555Handle, 5, PCA9555_PIN_OUTPUT_MODE, PCA9555_POLARITY_NORMAL);
-    PCA9555_pinMode(&pca9555Handle, 6, PCA9555_PIN_OUTPUT_MODE, PCA9555_POLARITY_NORMAL);
-    PCA9555_pinMode(&pca9555Handle, 7, PCA9555_PIN_OUTPUT_MODE, PCA9555_POLARITY_NORMAL);
-    PCA9555_pinMode(&pca9555Handle, 8, PCA9555_PIN_OUTPUT_MODE, PCA9555_POLARITY_NORMAL);
-    PCA9555_pinMode(&pca9555Handle, 9, PCA9555_PIN_OUTPUT_MODE, PCA9555_POLARITY_NORMAL);
-    PCA9555_pinMode(&pca9555Handle, 10, PCA9555_PIN_OUTPUT_MODE, PCA9555_POLARITY_NORMAL);
-    PCA9555_pinMode(&pca9555Handle, 11, PCA9555_PIN_OUTPUT_MODE, PCA9555_POLARITY_NORMAL);
-    PCA9555_pinMode(&pca9555Handle, 12, PCA9555_PIN_OUTPUT_MODE, PCA9555_POLARITY_NORMAL);
-    PCA9555_pinMode(&pca9555Handle, 13, PCA9555_PIN_OUTPUT_MODE, PCA9555_POLARITY_NORMAL);
-    PCA9555_pinMode(&pca9555Handle, 14, PCA9555_PIN_OUTPUT_MODE, PCA9555_POLARITY_NORMAL);
-    PCA9555_pinMode(&pca9555Handle, 15, PCA9555_PIN_OUTPUT_MODE, PCA9555_POLARITY_NORMAL);
+    ILI9488_init();
+    lv_init();
 
-    PCA9555_digitalWrite(&pca9555Handle, 0, PCA9555_BIT_RESET);
-    PCA9555_digitalWrite(&pca9555Handle, 1, PCA9555_BIT_RESET);
-    PCA9555_digitalWrite(&pca9555Handle, 2, PCA9555_BIT_RESET);
-    PCA9555_digitalWrite(&pca9555Handle, 3, PCA9555_BIT_RESET);
-    PCA9555_digitalWrite(&pca9555Handle, 4, PCA9555_BIT_RESET);
-    PCA9555_digitalWrite(&pca9555Handle, 5, PCA9555_BIT_RESET);
-    PCA9555_digitalWrite(&pca9555Handle, 6, PCA9555_BIT_RESET);
-    PCA9555_digitalWrite(&pca9555Handle, 7, PCA9555_BIT_RESET);
-    PCA9555_digitalWrite(&pca9555Handle, 8, PCA9555_BIT_RESET);
-    PCA9555_digitalWrite(&pca9555Handle, 9, PCA9555_BIT_RESET);
-    PCA9555_digitalWrite(&pca9555Handle, 10, PCA9555_BIT_RESET);
-    PCA9555_digitalWrite(&pca9555Handle, 11, PCA9555_BIT_RESET);
-    PCA9555_digitalWrite(&pca9555Handle, 12, PCA9555_BIT_RESET);
-    PCA9555_digitalWrite(&pca9555Handle, 13, PCA9555_BIT_RESET);
-    PCA9555_digitalWrite(&pca9555Handle, 14, PCA9555_BIT_RESET);
-    PCA9555_digitalWrite(&pca9555Handle, 15, PCA9555_BIT_RESET);
+    lv_tick_set_cb(HAL_GetTick);
+    lv_display_t *display1 = lv_display_create(HORIZONTAL_RES, VERTICAL_RES);
+    lv_display_set_buffers(display1, buf1, NULL, BUFFER_SIZE, LV_DISPLAY_RENDER_MODE_PARTIAL);
+    lv_display_set_flush_cb(display1, LVGL_CLB_flush_clb);
 
-    HAL_GPIO_WritePin(NHD_C0220BIZx_nRST_GPIO_OUT_GPIO_Port, NHD_C0220BIZx_nRST_GPIO_OUT_Pin, GPIO_PIN_SET);
+#if LV_USE_LOG
+    lv_log_register_print_cb(LVGL_CLB_log_clb);
+#endif
 
-    LCD_DisplayHandle.LCD_hi2c              = &hi2c1;
-    LCD_DisplayHandle.LCD_htim_backlight    = NULL;
-    LCD_DisplayHandle.TIM_channel_backlight = 0;
-    LCD_DisplayHandle.i2cAddr               = 0x78;
-    LCD_DisplayHandle.num_col               = 20;
-    LCD_DisplayHandle.num_lines             = 2;
-
-    LCD_ST7032_Init(&LCD_DisplayHandle);  // Init LCD
-    LCD_clear();                          // clear LCD
-    LCD_home();                           // Home The display
-    LCD_contrast(15);                     // set contrast to level 15 - MAXIMUM (15 level available)
-
-    char msg[54] = {0};
-    sprintf(msg, "Dashboard 2022 Boot - build %s @ %s\r\n", __DATE__, __TIME__);
-    HAL_UART_Transmit(&huart1, (uint8_t *)msg, strlen(msg), 20);
+    custom_ui_init();
 }
 
 /*Send status data to CAN BUS*/
@@ -549,199 +500,35 @@ uint8_t AMS_detection(uint8_t ams_err_tlb,
         }                                         \
     } while (0)
 
-volatile uint8_t activate_SeeYouAgain = 0;
-volatile uint8_t SeeYouAgain_running = 0;
-
-uint8_t SeeYouAgain_Activator() {
-    static uint32_t _cnt100ms            = 0;
-    static uint32_t long_press_100ms_cnt = 0;
-    static uint8_t btn_prev_state        = 0;
-
-    if (HAL_GetTick() < _cnt100ms)
-        return 0;
-    _cnt100ms = HAL_GetTick() + 100U;
-
-    uint8_t btn_cur_state = BTN_getStatus(BTN_Steering1);
-
-    if (btn_cur_state == btn_prev_state && btn_prev_state == 1) {
-        long_press_100ms_cnt++;
-    } else {
-        long_press_100ms_cnt = 0;
+static uint8_t i = 0;
+void LCD_DisplayUpdateRoutine(void) {
+    lv_obj_t *scr_act = lv_scr_act();
+    if (scr_act != NULL) {
+        lv_obj_del(lv_scr_act());
     }
 
-    btn_prev_state = btn_cur_state;
-
-    // if pressed per 7 seconds
-    if (long_press_100ms_cnt == 70) {
-        return 1;
-    } else {
-        return 0;
-    }
-};
-uint8_t SeeYouAgain_protocol(char *text[2]) {
-    static uint32_t last_timestamp = 0;
-    static uint32_t counter        = 0;
-
-    // First time entering
-    if (HAL_GetTick() > 0 && last_timestamp == 0) {
-        last_timestamp = HAL_GetTick();
-    }
-
-    switch (counter) {
+    switch ((i++) % 4) {
         case 0:
-            text[0] = "Ciao Ragazzi        ";
-            text[1] = NULL;
-            WAIT_FOR(4000);
+            create_screen_main();
+            lv_scr_load(objects.main);
             break;
         case 1:
-            text[0] = "non sono riuscito   ";
-            text[1] = "a farlo di persona  ";
-            WAIT_FOR(3000);
+            create_screen_tires();
+            lv_scr_load(objects.tires);
             break;
         case 2:
-            text[0] = "percio' lo faro'    ";
-            text[1] = "a modo mio...       ";
-            WAIT_FOR(3000);
+            create_screen_inverters();
+            lv_scr_load(objects.inverters);
             break;
         case 3:
-            text[0] = "  con il FIRMWARE!  ";
-            text[1] = NULL;
-            WAIT_FOR(3500);
-            break;
-        case 4:
-            text[0] = "     Sono stati     ";
-            text[1] = " due anni magnifici!";
-            WAIT_FOR(3000);
-            break;
-        case 5:
-            text[0] = " Li portero' con me ";
-            text[1] = NULL;
-            WAIT_FOR(2500);
-            break;
-        case 6:
-            text[0] = "     per il resto   ";
-            text[1] = "   della mia vita!  ";
-            WAIT_FOR(3500);
-            break;
-        case 7:
-            text[0] = "    Ho conosciuto   ";
-            text[1] = "       persone      ";
-            WAIT_FOR(2500);
-            break;
-        case 8:
-            text[0] = "    appassionate    ";
-            text[1] = NULL;
-            WAIT_FOR(2500);
-            break;
-        case 9:
-            text[0] = "      brillanti    ";
-            text[1] = NULL;
-            WAIT_FOR(2500);
-            break;
-        case 10:
-            text[0] = "    fantastiche    ";
-            text[1] = NULL;
-            WAIT_FOR(2500);
-            break;
-        case 11:
-            text[0] = "insomma.....       ";
-            text[1] = NULL;
-            WAIT_FOR(2500);
-            break;
-        case 12:
-            text[0] = text[0];
-            text[1] = "          sborate! ";
-            WAIT_FOR(3500);
-            break;
-        case 13:
-            text[0] = NULL;
-            text[1] = NULL;
-            WAIT_FOR(1800);
-            break;
-        case 14:
-            text[0] = " Vi ringrazio per ";
-            text[1] = "  questo viaggio! ";
-            WAIT_FOR(3000);
-            break;
-        case 15:
-            text[0] = "   FORZA SQUADRA  ";
-            text[1] = NULL;
-            WAIT_FOR(1500);
-            break;
-        case 16:
-            text[0] = text[0];
-            text[1] = "      SEMPRE!     ";
-            WAIT_FOR(2500);
-            break;
-        case 17:
-            text[0] = NULL;
-            text[1] = NULL;
-            WAIT_FOR(1500);
-            break;
-        case 18:
-            text[0] = "Il vostro         ";
-            text[1] = NULL;
-            WAIT_FOR(1000);
-            break;
-        case 19:
-            text[0] = text[0];
-            text[1] = " Simone Ruffini <3";
-            WAIT_FOR(2500);
-            break;
-        case 20:
-            last_timestamp = 0;
-            counter        = 0;
-            return 0;
-            break;
-        default:
-            last_timestamp = 0;
-            counter        = 0;
+            create_screen_extra();
+            lv_scr_load(objects.extra);
             break;
     }
-    return 1;
+
+    LVGL_CLB_mem_usage();
 }
 
-void LCD_DisplayUpdateRoutine(void) {
-    static uint8_t cnt100ms = 0;
-    char hv_bat_soc_str[10] = {};
-    char lv_bat_v_str[10]   = {};
-
-    if (HAL_GetTick() < cnt100ms)
-        return;
-    cnt100ms = HAL_GetTick() + 100U;
-
-    char buffer[20] = {};
-    //LCD_clear();
-
-    if (boards_timeouts & (1 << WDG_BOARD_DSPACE)) {
-        sprintf(hv_bat_soc_str, "Na");
-    } else {
-        sprintf(hv_bat_soc_str, "%3u", HVBAT_SOC);
-    }
-
-    if (boards_timeouts & (1 << WDG_BOARD_BMS_LV)) {
-        sprintf(lv_bat_v_str, "Na");
-    } else {
-        sprintf(lv_bat_v_str, "%04.1f", LVBAT_V / 1000);
-    }
-
-    LCD_home();
-    sprintf(buffer, " HV %3s%%    LV %4sV", hv_bat_soc_str, lv_bat_v_str);
-    LCD_write(buffer);
-    LCD_setCursor(1, 0);
-    sprintf(buffer, "%1d    ANDROMEDA     %1d", ROT_SW_getState(ROT_SW_Device2), ROT_SW_getState(ROT_SW_Device1));
-    LCD_write(buffer);
-    //sprintf(buffer, "INV %2u", (uint8_t)INV_TEMP_VAL);
-    //LCD_write(buffer);
-    //LCD_write_byte(0b11011111);
-    //LCD_shift(ST7032_CR, 5);
-    //sprintf(buffer, "TSAC %2u", (uint8_t)TSAC_TEMP_VAL);
-    //LCD_write(buffer);
-    //LCD_write_byte(0b11011111);
-    //LCD_home();
-}
-
-char *see_you_again_buf[2];
 /**
     * @brief Dash main loop
  */
@@ -789,41 +576,7 @@ void CoreDashBoard(void) {
     // RUN the ready to drive FSM
     RTD_fsm(500);
 
-    activate_SeeYouAgain = SeeYouAgain_Activator();
-    // if we activate SeeYouAgain and pressed the button, start the procedure
-    if(activate_SeeYouAgain && btn_press_at_start == 1 && SeeYouAgain_running == 0) {
-        SeeYouAgain_running = 1;
-        HAL_GPIO_WritePin(BUZZER_CMD_GPIO_OUT_GPIO_Port, BUZZER_CMD_GPIO_OUT_Pin, GPIO_PIN_SET);
-        HAL_Delay(50);
-        HAL_GPIO_WritePin(BUZZER_CMD_GPIO_OUT_GPIO_Port, BUZZER_CMD_GPIO_OUT_Pin, GPIO_PIN_RESET);
-        HAL_Delay(50);
-        HAL_GPIO_WritePin(BUZZER_CMD_GPIO_OUT_GPIO_Port, BUZZER_CMD_GPIO_OUT_Pin, GPIO_PIN_SET);
-        HAL_Delay(50);
-        HAL_GPIO_WritePin(BUZZER_CMD_GPIO_OUT_GPIO_Port, BUZZER_CMD_GPIO_OUT_Pin, GPIO_PIN_RESET);
-        HAL_Delay(50);
-        HAL_GPIO_WritePin(BUZZER_CMD_GPIO_OUT_GPIO_Port, BUZZER_CMD_GPIO_OUT_Pin, GPIO_PIN_SET);
-        HAL_Delay(50);
-        HAL_GPIO_WritePin(BUZZER_CMD_GPIO_OUT_GPIO_Port, BUZZER_CMD_GPIO_OUT_Pin, GPIO_PIN_RESET);
-    }
-
-    if (!SeeYouAgain_running)
-        LCD_DisplayUpdateRoutine();
-    else {
-        SeeYouAgain_running = SeeYouAgain_protocol(see_you_again_buf); // Stop running when protocol stops
-        btn_press_at_start = 0; // never let to reactivate
-        LCD_home();
-        if (see_you_again_buf[0] == NULL) {
-            LCD_write("                    ");
-        } else {
-            LCD_write(see_you_again_buf[0]);
-        }
-        LCD_setCursor(1, 0);
-        if (see_you_again_buf[1] == NULL) {
-            LCD_write("                    ");
-        } else {
-            LCD_write(see_you_again_buf[1]);
-        }
-    }
+    LCD_DisplayUpdateRoutine();
 
     // Run the AS FSM
     // mission_run();
@@ -837,7 +590,6 @@ void CoreDashBoard(void) {
         error           = 0;
         boards_timeouts = 0;
     }
-
 
     // Send current state via CAN
     can_send_state(500);

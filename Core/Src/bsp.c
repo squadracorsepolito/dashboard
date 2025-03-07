@@ -477,3 +477,25 @@ void MCB_send_msg(uint32_t id) {
 }
 
 /*---------- Private Functions -----------------------------------------------*/
+
+/* LCD TFT SCREEN ILI9488 ####################################################*/
+
+/*---------- Private define -----------------.--------------------------------*/
+
+/*---------- Private macro ------------------.--------------------------------*/
+
+/*---------- Private variables --------------.--------------------------------*/
+enum LCD_TFT_Device{CS, RST, DC, LCD_TFT_Device_NUM};
+static const struct GPIO_Tuple LCD_TFT_Device_to_GPIO_Tuple_map[LCD_TFT_Device_NUM] = {
+    [CS]  = {.GPIO_Port = LCD_TFT_CS_GPIO_OUT_GPIO_Port, .GPIO_Pin = LCD_TFT_CS_GPIO_OUT_Pin},
+    [DC]  = {.GPIO_Port = LCD_TFT_DC_GPIO_OUT_GPIO_Port, .GPIO_Pin = LCD_TFT_DC_GPIO_OUT_Pin},
+    [RST] = {.GPIO_Port = LCD_TFT_RST_GPIO_OUT_GPIO_Port, .GPIO_Pin = LCD_TFT_RST_GPIO_OUT_Pin},
+};
+
+/*---------- Private function prototypes ----.--------------------------------*/
+
+/*---------- Exported Variables -------------.--------------------------------*/
+
+/*---------- Exported Functions ----------------------------------------------*/
+
+/*---------- Private Functions -----------------------------------------------*/

@@ -59,6 +59,8 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define BUZZER_CMD_GPIO_OUT_Pin GPIO_PIN_13
 #define BUZZER_CMD_GPIO_OUT_GPIO_Port GPIOC
+#define LCD_TFT_RST_GPIO_OUT_Pin GPIO_PIN_0
+#define LCD_TFT_RST_GPIO_OUT_GPIO_Port GPIOC
 #define M95256_D_SPI_MOSI_Pin GPIO_PIN_1
 #define M95256_D_SPI_MOSI_GPIO_Port GPIOC
 #define TS_OFF_LED_CMD_GPIO_OUT_Pin GPIO_PIN_2
@@ -87,6 +89,8 @@ void Error_Handler(void);
 #define nPUSH_BTN4_IN_GPIO_IN_GPIO_Port GPIOB
 #define nRTD_BTN_IN_GPIO_IN_Pin GPIO_PIN_2
 #define nRTD_BTN_IN_GPIO_IN_GPIO_Port GPIOB
+#define LCD_TFT_DC_GPIO_OUT_Pin GPIO_PIN_10
+#define LCD_TFT_DC_GPIO_OUT_GPIO_Port GPIOB
 #define SN65HVD23x_R_CAN2_RX_Pin GPIO_PIN_12
 #define SN65HVD23x_R_CAN2_RX_GPIO_Port GPIOB
 #define SN65HVD23x_D_CAN2_TX_Pin GPIO_PIN_13
@@ -121,6 +125,8 @@ void Error_Handler(void);
 #define SDC_RLY_CMD_GPIO_OUT_GPIO_Port GPIOC
 #define NHD_C0220BIZx_nRST_GPIO_OUT_Pin GPIO_PIN_2
 #define NHD_C0220BIZx_nRST_GPIO_OUT_GPIO_Port GPIOD
+#define LCD_TFT_CS_GPIO_OUT_Pin GPIO_PIN_4
+#define LCD_TFT_CS_GPIO_OUT_GPIO_Port GPIOB
 #define PCA9555_nINT_GPIO_IN_Pin GPIO_PIN_5
 #define PCA9555_nINT_GPIO_IN_GPIO_Port GPIOB
 #define I2C_SCL_Pin GPIO_PIN_6

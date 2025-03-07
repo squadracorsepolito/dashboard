@@ -56,18 +56,26 @@ void MX_GPIO_Init(void)
                           |M95256_nW_GPIO_OUT_Pin|M95256_nS_GPIO_OUT_Pin|WARN_LED_GPIO_OUT_Pin|SDC_RLY_CMD_GPIO_OUT_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(LCD_TFT_RST_GPIO_OUT_GPIO_Port, LCD_TFT_RST_GPIO_OUT_Pin, GPIO_PIN_SET);
+
+  /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOA, AMS_ERR_LED_nCMD_GPIO_OUT_Pin|ERR_LED_GPIO_OUT_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, STAT1_LED_GPIO_OUT_Pin|STAT2_LED_GPIO_OUT_Pin|SDC_OUT_3V3_GPIO_IN_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(LCD_TFT_DC_GPIO_OUT_GPIO_Port, LCD_TFT_DC_GPIO_OUT_Pin, GPIO_PIN_SET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOB, STAT1_LED_GPIO_OUT_Pin|STAT2_LED_GPIO_OUT_Pin|LCD_TFT_CS_GPIO_OUT_Pin|SDC_OUT_3V3_GPIO_IN_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(NHD_C0220BIZx_nRST_GPIO_OUT_GPIO_Port, NHD_C0220BIZx_nRST_GPIO_OUT_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pins : PCPin PCPin PCPin PCPin
-                           PCPin PCPin PCPin PCPin */
-  GPIO_InitStruct.Pin = BUZZER_CMD_GPIO_OUT_Pin|TS_OFF_LED_CMD_GPIO_OUT_Pin|IMD_ERR_LED_nCMD_GPIO_OUT_Pin|STAT3_LED_GPIO_OUT_Pin
-                          |M95256_nW_GPIO_OUT_Pin|M95256_nS_GPIO_OUT_Pin|WARN_LED_GPIO_OUT_Pin|SDC_RLY_CMD_GPIO_OUT_Pin;
+                           PCPin PCPin PCPin PCPin
+                           PCPin */
+  GPIO_InitStruct.Pin = BUZZER_CMD_GPIO_OUT_Pin|LCD_TFT_RST_GPIO_OUT_Pin|TS_OFF_LED_CMD_GPIO_OUT_Pin|IMD_ERR_LED_nCMD_GPIO_OUT_Pin
+                          |STAT3_LED_GPIO_OUT_Pin|M95256_nW_GPIO_OUT_Pin|M95256_nS_GPIO_OUT_Pin|WARN_LED_GPIO_OUT_Pin
+                          |SDC_RLY_CMD_GPIO_OUT_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -92,6 +100,13 @@ void MX_GPIO_Init(void)
                           |SDC_IN_3V3_GPIO_IN_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : PBPin PBPin */
+  GPIO_InitStruct.Pin = LCD_TFT_DC_GPIO_OUT_Pin|LCD_TFT_CS_GPIO_OUT_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
   /*Configure GPIO pins : PBPin PBPin PBPin */
