@@ -84,6 +84,7 @@ Core/Src/dashboard.c \
 Core/Src/dma.c \
 Core/Src/gpio.c \
 Core/Src/i2c.c \
+Core/Src/iwdg.c \
 Core/Src/main.c \
 Core/Src/spi.c \
 Core/Src/stm32f4xx_hal_msp.c \
@@ -112,6 +113,7 @@ Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ramfunc.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c_ex.c \
+Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_iwdg.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr_ex.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.c \
@@ -121,7 +123,6 @@ Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_adc.c \
-EEZ/global_vars.c \
 EEZ/screen_loader.c \
 EEZ/src/ui/images.c \
 EEZ/src/ui/screens.c \
@@ -881,7 +882,6 @@ Lib/LVGL/lvgl/tests/test_images/stride_align64/UNCOMPRESSED/test_XRGB8888_NONE_a
 Lib/LVGL/lvgl/tests/unity/unity.c \
 Lib/LVGL/lvgl/tests/unity/unity_support.c \
 Lib/LVGL/lvgl_callbacks.c \
-Lib/PCA9555/pca9555.c \
 Lib/SCan/SC24/artifacts/HVCB/c_source/hvcb.c \
 Lib/SCan/SC24/artifacts/MCB/c_source/mcb.c \
 Lib/STM32_HAL_ST7032_LCD_LIBRARY/STM32_ST7032.c
@@ -1032,7 +1032,6 @@ C_INCLUDES =  \
 -ILib/LVGL \
 -ILib/LVGL/lvgl \
 -ILib/LVGL/lvgl/src \
--ILib/PCA9555 \
 -ILib/SCan/SC24/artifacts/HVCB/c_source \
 -ILib/SCan/SC24/artifacts/MCB/c_source \
 -ILib/STM32_HAL_ST7032_LCD_LIBRARY
