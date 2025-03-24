@@ -215,6 +215,41 @@ enum LED_MONO_State LED_MONO_getState(enum LED_MONO_Device device);
 
 /* ---------- Private constants ----------------------------------------------*/
 
+/* LED RGB (RGB Leds) ########################################################*/
+
+/* ---------- Includes -------------------------------------------------------*/
+
+/* ---------- Exported types -------------------------------------------------*/
+
+/**
+ * @brief LED RGB Device
+ */
+enum LED_RGB_Device {
+    LED_RGB1,      /*!< LED RGB number 1*/
+    LED_RGB2,      /*!< LED RGB number 2 */
+    LED_RGB3,      /*!< LED RGB number 3 */
+    LED_RGB_DASH,  /*!< LED RGB used by Dashboard device */
+    LED_Device_NUM /*!< Number of RGB Leds Devices */
+};
+
+enum RGB_DEVICE_ColorChnl { RGB_DEVICE_ColorChnl_Red = 0, RGB_DEVICE_ColorChnl_Green, RGB_DEVICE_ColorChnl_Blue, RGB_DEVICE_ColorChnl_NUM };
+
+
+/* ---------- Exported constants ---------------------------------------------*/
+
+/* ---------- Exported variables ---------------------------------------------*/
+
+/* ---------- Exported macros ------------------------------------------------*/
+
+/* ---------- Exported functions ---------------------------------------------*/
+
+void LED_RGB_setColor(enum LED_RGB_Device device, uint8_t red, uint8_t green, uint8_t blue);
+
+/* ---------- Private types --------------------------------------------------*/
+
+/* ---------- Private variables ----------------------------------------------*/
+
+/* ---------- Private constants ----------------------------------------------*/
 
 /* PUMPS ####################################################################*/
 /* ---------- Includes -------------------------------------------------------*/

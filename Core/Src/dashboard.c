@@ -314,7 +314,7 @@ void UpdateCockpitLed(uint32_t delay_100us) {
             HAL_GPIO_WritePin(IMD_ERR_LED_nCMD_GPIO_OUT_GPIO_Port, IMD_ERR_LED_nCMD_GPIO_OUT_Pin, !IMD_ERR);
         }
 
-        /*
+        
         // Control of Dashboard reserved led
         if ((boards_timeouts & (1 << WDG_BOARD_DSPACE)) || (boards_timeouts & (1 << WDG_BOARD_TLB))) {
             // tlb message or dspace message timeout
@@ -351,7 +351,7 @@ void UpdateCockpitLed(uint32_t delay_100us) {
         //Control of other leds
         LED_RGB_setColor(LED_RGB1, LED1.R, LED1.G, LED1.B);
         LED_RGB_setColor(LED_RGB2, LED2.R, LED2.G, LED2.B);
-        LED_RGB_setColor(LED_RGB3, LED3.R, LED3.G, LED3.B);*/
+        LED_RGB_setColor(LED_RGB3, LED3.R, LED3.G, LED3.B);
     }
 }
 

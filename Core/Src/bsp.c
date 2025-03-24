@@ -354,6 +354,68 @@ enum LED_MONO_State LED_MONO_getState(enum LED_MONO_Device device) {
     return HAL_GPIO_ReadPin(port, pin) == compareValue ? LED_On : LED_Off;
 }
 /*---------- Private Functions -----------------------------------------------*/
+/* LED RGB (RGB Leds) ########################################################*/
+#include "main.h"
+#include "gpio.h"
+
+/*---------- Private define --------------------------------------------------*/
+
+/*---------- Private macro ---------------------------------------------------*/
+
+/*---------- Private variables -----------------------------------------------*/
+
+/*
+ * @brief This data structure maps RGB devices color channels to the GPIO
+ */
+static const struct GPIO_Tuple LED_RGB_Device_to_GPIO_Tuples_map[LED_Device_NUM][RGB_DEVICE_ColorChnl_NUM] = {
+    // [LED_RGB1] = {
+    //     [RGB_DEVICE_ColorChnl_Red]={.GPIO_Port=LED_1_R_GPIO...._GPIO_Port, .GPIO_Pin=LED1_R_GPIO...>Pin}, 
+    //     [RGB_DEVICE_ColorChnl_Green]={.GPIO_Port=..., .GPIO_Pin=...},  
+    //     [RGB_DEVICE_ColorChnl_Blue]={.GPIO_Port=..., .GPIO_Pin=...}
+    // },
+    // [LED_RGB2] ={...},
+    [LED_RGB1] = {
+        //TODO
+        [RGB_DEVICE_ColorChnl_Red]={}, 
+        [RGB_DEVICE_ColorChnl_Green]={},  
+        [RGB_DEVICE_ColorChnl_Blue]={}
+    },
+    [LED_RGB2] = {
+        [RGB_DEVICE_ColorChnl_Red]={}, 
+        [RGB_DEVICE_ColorChnl_Green]={},  
+        [RGB_DEVICE_ColorChnl_Blue]={}
+    },
+    [LED_RGB3] = {
+        [RGB_DEVICE_ColorChnl_Red]={}, 
+        [RGB_DEVICE_ColorChnl_Green]={},  
+        [RGB_DEVICE_ColorChnl_Blue]={}
+    },
+    [LED_RGB_DASH] = {
+        [RGB_DEVICE_ColorChnl_Red]={}, 
+        [RGB_DEVICE_ColorChnl_Green]={},  
+        [RGB_DEVICE_ColorChnl_Blue]={}
+    },
+
+};
+
+/*---------- Private function prototypes -------------------------------------*/
+
+/*---------- Exported Variables ----------------------------------------------*/
+
+/*---------- Exported Functions ----------------------------------------------*/
+
+void LED_RGB_setColor(enum LED_RGB_Device device, uint8_t red, uint8_t green, uint8_t blue) {
+    assert_param(device != LED_RGB_Device_NUM);
+
+    struct GPIO_Tuple ColorChnl_GPIO[RGB_DEVICE_ColorChnl_NUM] = {};
+    ColorChnl_GPIO[RGB_DEVICE_ColorChnl_Red] = LED_RGB_Device_to_GPIO_Tuples_map[device][RGB_DEVICE_ColorChnl_Red];
+    ColorChnl_GPIO[RGB_DEVICE_ColorChnl_Green] = LED_RGB_Device_to_GPIO_Tuples_map[device][RGB_DEVICE_ColorChnl_Green];
+    ColorChnl_GPIO[RGB_DEVICE_ColorChnl_Blue] = LED_RGB_Device_to_GPIO_Tuples_map[device][RGB_DEVICE_ColorChnl_Blue];
+
+    HAL_GPIO_WritePin(ColorChnl_GPIO[RGB_DEVICE_ColorChnl_Red].GPIO_Port, ColorChnl_GPIO[RGB_DEVICE_ColorChnl_Red].GPIO_Pin, red > 0 ? GPIO_PIN_SET : GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(ColorChnl_GPIO[RGB_DEVICE_ColorChnl_Green].GPIO_Port, ColorChnl_GPIO[RGB_DEVICE_ColorChnl_Green].GPIO_Pin, green > 0 ? GPIO_PIN_SET : GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(ColorChnl_GPIO[RGB_DEVICE_ColorChnl_Blue].GPIO_Port, ColorChnl_GPIO[RGB_DEVICE_ColorChnl_Blue].GPIO_Pin, blue > 0 ? GPIO_PIN_SET : GPIO_PIN_RESET);
+}
 
 /* Main CAN Bus Comunication #################################################*/
 
