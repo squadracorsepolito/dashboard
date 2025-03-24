@@ -45,6 +45,8 @@ BOOTLOADER_DIR = openblt_f446re
 # source
 ######################################
 # C sources
+LVGL_PATH = ${shell pwd}/Lib/LVGL/lvgl
+
 include $(shell pwd)/Lib/LVGL/lvgl/lvgl.mk
 C_SOURCES = $(CSRCS)
 C_SOURCES += \
