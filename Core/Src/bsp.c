@@ -354,35 +354,47 @@ enum LED_MONO_State LED_MONO_getState(enum LED_MONO_Device device) {
     return HAL_GPIO_ReadPin(port, pin) == compareValue ? LED_On : LED_Off;
 }
 /*---------- Private Functions -----------------------------------------------*/
-
 /* LED RGB (RGB Leds) ########################################################*/
-
-#include "i2c.h"
-#include "pca9555.h"
+#include "main.h"
+#include "gpio.h"
 
 /*---------- Private define --------------------------------------------------*/
-
-enum RGB_DEVICE_TO_PCA955_CHNL_Index { RED_Index = 0, GREEN_Index, BLUE_Index, RGB_DEVICE_TO_PCA955_CHNL_Index_NUM };
 
 /*---------- Private macro ---------------------------------------------------*/
 
 /*---------- Private variables -----------------------------------------------*/
 
-#define PCA9555_ADDR_A0 (0U)
-#define PCA9555_ADDR_A1 (0U)
-#define PCA9555_ADDR_A2 (0U)
-#define PCA9555_ADDR    (PCA9555_ADDR_FIXED_PART | (PCA9555_ADDR_A0 << 2U) | (PCA9555_ADDR_A0 << 1U) | PCA9555_ADDR_A0)
-
-struct PCA9555_Handle pca9555Handle = {.hi2c = &hi2c1, .addr = PCA9555_ADDR};
-
 /*
- * @brief This data structure maps RGB devices color channels to the PCA955 channel
+ * @brief This data structure maps RGB devices color channels to the GPIO
  */
-static const uint8_t LED_RGB_Device_to_PCA9555_Chnl[LED_MONO_Device_NUM][RGB_DEVICE_TO_PCA955_CHNL_Index_NUM] = {
-    [LED_RGB1]     = {[RED_Index] = 7, [GREEN_Index] = 6, [BLUE_Index] = 8},
-    [LED_RGB2]     = {[RED_Index] = 10, [GREEN_Index] = 9, [BLUE_Index] = 11},
-    [LED_RGB3]     = {[RED_Index] = 4, [GREEN_Index] = 3, [BLUE_Index] = 5},
-    [LED_RGB_DASH] = {[RED_Index] = 1, [GREEN_Index] = 0, [BLUE_Index] = 2},
+static const struct GPIO_Tuple LED_RGB_Device_to_GPIO_Tuples_map[LED_Device_NUM][RGB_DEVICE_ColorChnl_NUM] = {
+    // [LED_RGB1] = {
+    //     [RGB_DEVICE_ColorChnl_Red]={.GPIO_Port=LED_1_R_GPIO...._GPIO_Port, .GPIO_Pin=LED1_R_GPIO...>Pin}, 
+    //     [RGB_DEVICE_ColorChnl_Green]={.GPIO_Port=..., .GPIO_Pin=...},  
+    //     [RGB_DEVICE_ColorChnl_Blue]={.GPIO_Port=..., .GPIO_Pin=...}
+    // },
+    // [LED_RGB2] ={...},
+    [LED_RGB1] = {
+        //TODO
+        [RGB_DEVICE_ColorChnl_Red]={}, 
+        [RGB_DEVICE_ColorChnl_Green]={},  
+        [RGB_DEVICE_ColorChnl_Blue]={}
+    },
+    [LED_RGB2] = {
+        [RGB_DEVICE_ColorChnl_Red]={}, 
+        [RGB_DEVICE_ColorChnl_Green]={},  
+        [RGB_DEVICE_ColorChnl_Blue]={}
+    },
+    [LED_RGB3] = {
+        [RGB_DEVICE_ColorChnl_Red]={}, 
+        [RGB_DEVICE_ColorChnl_Green]={},  
+        [RGB_DEVICE_ColorChnl_Blue]={}
+    },
+    [LED_RGB_DASH] = {
+        [RGB_DEVICE_ColorChnl_Red]={}, 
+        [RGB_DEVICE_ColorChnl_Green]={},  
+        [RGB_DEVICE_ColorChnl_Blue]={}
+    },
 
 };
 
@@ -395,21 +407,15 @@ static const uint8_t LED_RGB_Device_to_PCA9555_Chnl[LED_MONO_Device_NUM][RGB_DEV
 void LED_RGB_setColor(enum LED_RGB_Device device, uint8_t red, uint8_t green, uint8_t blue) {
     assert_param(device != LED_RGB_Device_NUM);
 
-    uint8_t PCA9555_chnls[RGB_DEVICE_TO_PCA955_CHNL_Index_NUM] = {};
-    PCA9555_chnls[RED_Index]                                   = LED_RGB_Device_to_PCA9555_Chnl[device][RED_Index];
-    PCA9555_chnls[GREEN_Index]                                 = LED_RGB_Device_to_PCA9555_Chnl[device][GREEN_Index];
-    PCA9555_chnls[BLUE_Index]                                  = LED_RGB_Device_to_PCA9555_Chnl[device][BLUE_Index];
+    struct GPIO_Tuple ColorChnl_GPIO[RGB_DEVICE_ColorChnl_NUM] = {};
+    ColorChnl_GPIO[RGB_DEVICE_ColorChnl_Red] = LED_RGB_Device_to_GPIO_Tuples_map[device][RGB_DEVICE_ColorChnl_Red];
+    ColorChnl_GPIO[RGB_DEVICE_ColorChnl_Green] = LED_RGB_Device_to_GPIO_Tuples_map[device][RGB_DEVICE_ColorChnl_Green];
+    ColorChnl_GPIO[RGB_DEVICE_ColorChnl_Blue] = LED_RGB_Device_to_GPIO_Tuples_map[device][RGB_DEVICE_ColorChnl_Blue];
 
-    uint8_t PCA9555_chnls_val[RGB_DEVICE_TO_PCA955_CHNL_Index_NUM] = {};
-    PCA9555_chnls_val[RED_Index]                                   = red > 0 ? 1U : 0U;
-    PCA9555_chnls_val[GREEN_Index]                                 = green > 0 ? 1U : 0U;
-    PCA9555_chnls_val[BLUE_Index]                                  = blue > 0 ? 1U : 0U;
-
-    // Invert reading if values on GPIO are inverted
-    PCA9555_digitalWrites(&pca9555Handle, RGB_DEVICE_TO_PCA955_CHNL_Index_NUM, PCA9555_chnls, PCA9555_chnls_val);
+    HAL_GPIO_WritePin(ColorChnl_GPIO[RGB_DEVICE_ColorChnl_Red].GPIO_Port, ColorChnl_GPIO[RGB_DEVICE_ColorChnl_Red].GPIO_Pin, red > 0 ? GPIO_PIN_SET : GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(ColorChnl_GPIO[RGB_DEVICE_ColorChnl_Green].GPIO_Port, ColorChnl_GPIO[RGB_DEVICE_ColorChnl_Green].GPIO_Pin, green > 0 ? GPIO_PIN_SET : GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(ColorChnl_GPIO[RGB_DEVICE_ColorChnl_Blue].GPIO_Port, ColorChnl_GPIO[RGB_DEVICE_ColorChnl_Blue].GPIO_Pin, blue > 0 ? GPIO_PIN_SET : GPIO_PIN_RESET);
 }
-
-/*---------- Private Functions -----------------------------------------------*/
 
 /* Main CAN Bus Comunication #################################################*/
 

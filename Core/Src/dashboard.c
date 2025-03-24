@@ -10,7 +10,6 @@
 #include "hvcb.h"
 #include "main.h"
 #include "mcb.h"
-#include "pca9555.h"
 #include "tim.h"
 #include "usart.h"
 #include "utils.h"
@@ -266,7 +265,7 @@ void InitDashBoard() {
     HAL_Delay(50);
     HAL_GPIO_WritePin(BUZZER_CMD_GPIO_OUT_GPIO_Port, BUZZER_CMD_GPIO_OUT_Pin, GPIO_PIN_RESET);
 
-    //HAL_GPIO_WritePin(SDC_RLY_CMD_GPIO_OUT_GPIO_Port, SDC_RLY_CMD_GPIO_OUT_Pin, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(SDC_RLY_CMD_GPIO_OUT_GPIO_Port, SDC_RLY_CMD_GPIO_OUT_Pin, GPIO_PIN_RESET);
 
     // Test inputs
     // if (button_get(BUTTON_RTD))
@@ -315,6 +314,7 @@ void UpdateCockpitLed(uint32_t delay_100us) {
             HAL_GPIO_WritePin(IMD_ERR_LED_nCMD_GPIO_OUT_GPIO_Port, IMD_ERR_LED_nCMD_GPIO_OUT_Pin, !IMD_ERR);
         }
 
+        
         // Control of Dashboard reserved led
         if ((boards_timeouts & (1 << WDG_BOARD_DSPACE)) || (boards_timeouts & (1 << WDG_BOARD_TLB))) {
             // tlb message or dspace message timeout
@@ -388,7 +388,7 @@ void SetupDashBoard(void) {
 
     lv_tick_set_cb(HAL_GetTick);
     lv_display_t *display1 = lv_display_create(HORIZONTAL_RES, VERTICAL_RES);
-    lv_display_set_buffers(display1, buf1, NULL, BUFFER_SIZE, LV_DISPLAY_RENDER_MODE_PARTIAL);
+    lv_display_set_buffers(display1, buf1, NULL, LVGL_BUFFER_SIZE, LV_DISPLAY_RENDER_MODE_PARTIAL);
     lv_display_set_flush_cb(display1, LVGL_CLB_flush_clb);
 
 #if LV_USE_LOG
@@ -434,9 +434,9 @@ void RTD_fsm(uint32_t delay_100us) {
                 break;
             case STATE_RTD_SOUND:
                 HAL_GPIO_WritePin(RTD_LED_GPIO_Port, RTD_LED_Pin, GPIO_PIN_SET);
-                HAL_GPIO_WritePin(BUZZER_CMD_GPIO_OUT_GPIO_Port, BUZZER_CMD_GPIO_OUT_Pin, GPIO_PIN_SET);
+               // HAL_GPIO_WritePin(BUZZER_CMD_GPIO_OUT_GPIO_Port, BUZZER_CMD_GPIO_OUT_Pin, GPIO_PIN_SET);
                 if (HAL_GetTick() - time > 2000) {
-                    HAL_GPIO_WritePin(BUZZER_CMD_GPIO_OUT_GPIO_Port, BUZZER_CMD_GPIO_OUT_Pin, GPIO_PIN_RESET);
+                   // HAL_GPIO_WritePin(BUZZER_CMD_GPIO_OUT_GPIO_Port, BUZZER_CMD_GPIO_OUT_Pin, GPIO_PIN_RESET);
                     rtd_fsm_state = STATE_RTD;
                 }
                 break;
@@ -525,8 +525,6 @@ void LCD_DisplayUpdateRoutine(void) {
             lv_scr_load(objects.extra);
             break;
     }
-
-    LVGL_CLB_mem_usage();
 }
 
 /**
@@ -541,7 +539,7 @@ void CoreDashBoard(void) {
     LedBlinking(STAT1_LED_GPIO_OUT_GPIO_Port, STAT1_LED_GPIO_OUT_Pin, &led_blink, 2000);
 
     if (IMD_ERR) {
-        //LedBlinking(BUZZER_CMD_GPIO_OUT_GPIO_Port, BUZZER_CMD_GPIO_OUT_Pin, &imd_err_blink, 2500);
+       // LedBlinking(BUZZER_CMD_GPIO_OUT_GPIO_Port, BUZZER_CMD_GPIO_OUT_Pin, &imd_err_blink, 2500);
     } else if (rtd_fsm_state != STATE_RTD_SOUND) {
         HAL_GPIO_WritePin(BUZZER_CMD_GPIO_OUT_GPIO_Port, BUZZER_CMD_GPIO_OUT_Pin, GPIO_PIN_RESET);
     }

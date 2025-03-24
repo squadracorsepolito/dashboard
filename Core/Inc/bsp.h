@@ -232,16 +232,12 @@ enum LED_RGB_Device {
     LED_Device_NUM /*!< Number of RGB Leds Devices */
 };
 
+enum RGB_DEVICE_ColorChnl { RGB_DEVICE_ColorChnl_Red = 0, RGB_DEVICE_ColorChnl_Green, RGB_DEVICE_ColorChnl_Blue, RGB_DEVICE_ColorChnl_NUM };
+
+
 /* ---------- Exported constants ---------------------------------------------*/
 
-#define PCA9555_ADDR_A0 (0U)
-#define PCA9555_ADDR_A1 (0U)
-#define PCA9555_ADDR_A2 (0U)
-#define PCA9555_ADDR    (PCA9555_ADDR_FIXED_PART | (PCA9555_ADDR_A0 << 2U) | (PCA9555_ADDR_A0 << 1U) | PCA9555_ADDR_A0)
-
 /* ---------- Exported variables ---------------------------------------------*/
-
-extern struct PCA9555_Handle pca9555Handle;
 
 /* ---------- Exported macros ------------------------------------------------*/
 
