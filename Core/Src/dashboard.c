@@ -2,7 +2,6 @@
 
 #include "dashboard.h"
 
-#include "STM32_ST7032.h"
 #include "bsp.h"
 #include "button.h"
 #include "can.h"
@@ -10,6 +9,7 @@
 #include "hvcb.h"
 #include "main.h"
 #include "mcb.h"
+#include "screen_loader.h"
 #include "tim.h"
 #include "usart.h"
 #include "utils.h"
@@ -75,7 +75,6 @@ volatile struct RGB_Led_t LED2;
 volatile struct RGB_Led_t LED3;
 volatile struct RGB_Led_t LED4;
 
-ST7032_InitTypeDef LCD_DisplayHandle = {0};
 
 /* dSpace ACK flags */
 volatile int8_t dspace_rtd_state;
@@ -256,16 +255,20 @@ void InitDashBoard() {
     HAL_GPIO_WritePin(AMS_ERR_LED_nCMD_GPIO_OUT_GPIO_Port, AMS_ERR_LED_nCMD_GPIO_OUT_Pin, GPIO_PIN_RESET);
     HAL_GPIO_WritePin(IMD_ERR_LED_nCMD_GPIO_OUT_GPIO_Port, IMD_ERR_LED_nCMD_GPIO_OUT_Pin, GPIO_PIN_RESET);
     HAL_GPIO_WritePin(RTD_LED_GPIO_Port, RTD_LED_Pin, GPIO_PIN_SET);
-    // HAL_Delay(1500);
+// HAL_Delay(1500);
 
-    // Disable The SDC relay and wait later for closing it
+// Disable The SDC relay and wait later for closing it
+#if 0
     HAL_GPIO_WritePin(SDC_RLY_CMD_GPIO_OUT_GPIO_Port, SDC_RLY_CMD_GPIO_OUT_Pin, GPIO_PIN_SET);
+#endif
 
     HAL_GPIO_WritePin(BUZZER_CMD_GPIO_OUT_GPIO_Port, BUZZER_CMD_GPIO_OUT_Pin, GPIO_PIN_SET);
     HAL_Delay(50);
     HAL_GPIO_WritePin(BUZZER_CMD_GPIO_OUT_GPIO_Port, BUZZER_CMD_GPIO_OUT_Pin, GPIO_PIN_RESET);
 
+#if 0
     HAL_GPIO_WritePin(SDC_RLY_CMD_GPIO_OUT_GPIO_Port, SDC_RLY_CMD_GPIO_OUT_Pin, GPIO_PIN_RESET);
+#endif
 
     // Test inputs
     // if (button_get(BUTTON_RTD))
@@ -274,11 +277,10 @@ void InitDashBoard() {
     //     rtd_fsm = STATE_ERROR;
     // }
 
-
     create_screen_main();
     lv_scr_load(objects.main);
 
-    btn_press_at_start = BTN_sampleStatus(BTN_Steering1);
+    btn_press_at_start = BTN_sampleStatus(BTN_GENERAL);
 }
 
 void cock_callback() {
@@ -314,7 +316,6 @@ void UpdateCockpitLed(uint32_t delay_100us) {
             HAL_GPIO_WritePin(IMD_ERR_LED_nCMD_GPIO_OUT_GPIO_Port, IMD_ERR_LED_nCMD_GPIO_OUT_Pin, !IMD_ERR);
         }
 
-        
         // Control of Dashboard reserved led
         if ((boards_timeouts & (1 << WDG_BOARD_DSPACE)) || (boards_timeouts & (1 << WDG_BOARD_TLB))) {
             // tlb message or dspace message timeout
@@ -382,7 +383,6 @@ void SetupDashBoard(void) {
     }
     HAL_DAC_SetValue(&PUMPS_DAC, PUMPS_DAC_CHANNEL, DAC_ALIGN_8B_R, 0);
 
-
     ILI9488_init();
     lv_init();
 
@@ -417,7 +417,9 @@ void RTD_fsm(uint32_t delay_100us) {
             case STATE_IDLE:
                 //LED_RGB_setColor(LED_RGB_DASH,0U,0U,255U); // BLUE
                 HAL_GPIO_WritePin(RTD_LED_GPIO_Port, RTD_LED_Pin, SD_CLOSED);
+#if 0
                 HAL_GPIO_WritePin(SDC_RLY_CMD_GPIO_OUT_GPIO_Port, SDC_RLY_CMD_GPIO_OUT_Pin, GPIO_PIN_RESET);
+#endif
                 if (dspace_rtd_state == 2)
                     rtd_fsm_state = STATE_TSON;
                 else if (dspace_rtd_state == 5 || dspace_rtd_state == -1)
@@ -434,9 +436,9 @@ void RTD_fsm(uint32_t delay_100us) {
                 break;
             case STATE_RTD_SOUND:
                 HAL_GPIO_WritePin(RTD_LED_GPIO_Port, RTD_LED_Pin, GPIO_PIN_SET);
-               // HAL_GPIO_WritePin(BUZZER_CMD_GPIO_OUT_GPIO_Port, BUZZER_CMD_GPIO_OUT_Pin, GPIO_PIN_SET);
+                // HAL_GPIO_WritePin(BUZZER_CMD_GPIO_OUT_GPIO_Port, BUZZER_CMD_GPIO_OUT_Pin, GPIO_PIN_SET);
                 if (HAL_GetTick() - time > 2000) {
-                   // HAL_GPIO_WritePin(BUZZER_CMD_GPIO_OUT_GPIO_Port, BUZZER_CMD_GPIO_OUT_Pin, GPIO_PIN_RESET);
+                    // HAL_GPIO_WritePin(BUZZER_CMD_GPIO_OUT_GPIO_Port, BUZZER_CMD_GPIO_OUT_Pin, GPIO_PIN_RESET);
                     rtd_fsm_state = STATE_RTD;
                 }
                 break;
@@ -449,7 +451,9 @@ void RTD_fsm(uint32_t delay_100us) {
             case STATE_DISCHARGE:
                 //LED_RGB_setColor(LED_RGB_DASH,255U,255U,0U); // YELLOW
                 HAL_GPIO_WritePin(RTD_LED_GPIO_Port, RTD_LED_Pin, GPIO_PIN_RESET);
+#if 0
                 HAL_GPIO_WritePin(SDC_RLY_CMD_GPIO_OUT_GPIO_Port, SDC_RLY_CMD_GPIO_OUT_Pin, GPIO_PIN_SET);
+#endif
                 if (dspace_rtd_state == 0)
                     rtd_fsm_state = STATE_IDLE;
                 break;
@@ -539,7 +543,7 @@ void CoreDashBoard(void) {
     LedBlinking(STAT1_LED_GPIO_OUT_GPIO_Port, STAT1_LED_GPIO_OUT_Pin, &led_blink, 2000);
 
     if (IMD_ERR) {
-       // LedBlinking(BUZZER_CMD_GPIO_OUT_GPIO_Port, BUZZER_CMD_GPIO_OUT_Pin, &imd_err_blink, 2500);
+        // LedBlinking(BUZZER_CMD_GPIO_OUT_GPIO_Port, BUZZER_CMD_GPIO_OUT_Pin, &imd_err_blink, 2500);
     } else if (rtd_fsm_state != STATE_RTD_SOUND) {
         HAL_GPIO_WritePin(BUZZER_CMD_GPIO_OUT_GPIO_Port, BUZZER_CMD_GPIO_OUT_Pin, GPIO_PIN_RESET);
     }

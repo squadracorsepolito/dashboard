@@ -78,14 +78,11 @@ void HAL_DAC_MspInit(DAC_HandleTypeDef* dacHandle)
     /**DAC GPIO Configuration
     PA4     ------> DAC_OUT1
     */
-    GPIO_InitStruct.Pin = COOLING_PUMPS_V_DAC_OUT_Pin;
+    GPIO_InitStruct.Pin = DAC_OUT1_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
-    HAL_GPIO_Init(COOLING_PUMPS_V_DAC_OUT_GPIO_Port, &GPIO_InitStruct);
+    HAL_GPIO_Init(DAC_OUT1_GPIO_Port, &GPIO_InitStruct);
 
-    /* DAC interrupt Init */
-    HAL_NVIC_SetPriority(TIM6_DAC_IRQn, 0, 0);
-    HAL_NVIC_EnableIRQ(TIM6_DAC_IRQn);
   /* USER CODE BEGIN DAC_MspInit 1 */
 
   /* USER CODE END DAC_MspInit 1 */
@@ -106,10 +103,8 @@ void HAL_DAC_MspDeInit(DAC_HandleTypeDef* dacHandle)
     /**DAC GPIO Configuration
     PA4     ------> DAC_OUT1
     */
-    HAL_GPIO_DeInit(COOLING_PUMPS_V_DAC_OUT_GPIO_Port, COOLING_PUMPS_V_DAC_OUT_Pin);
+    HAL_GPIO_DeInit(DAC_OUT1_GPIO_Port, DAC_OUT1_Pin);
 
-    /* DAC interrupt Deinit */
-    HAL_NVIC_DisableIRQ(TIM6_DAC_IRQn);
   /* USER CODE BEGIN DAC_MspDeInit 1 */
 
   /* USER CODE END DAC_MspDeInit 1 */

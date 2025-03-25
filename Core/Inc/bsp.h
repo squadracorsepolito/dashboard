@@ -147,10 +147,10 @@ void ROT_SW_Routine(void);
  */
 enum BTN_Device {
     BTN_RTD,       /*!< Ready To Drive Button */
-    BTN_Steering1, /*!< Steering Wheel button 1 */
-    BTN_Steering2, /*!< Steering Wheel button 2 */
-    BTN_Steering3, /*!< Steering Wheel button 3 */
-    BTN_Steering4, /*!< Steering Wheel button 4 */
+    BTN_TV,
+    BTN_TC,
+    BTN_LC,
+    BTN_GENERAL,
     BTN_Device_NUM /*!< Number of Button Devices */
 };
 
@@ -330,7 +330,7 @@ void MCB_send_msg(uint32_t id);
 /* ---------- Exported types -------------------------------------------------*/
 
 /* ---------- Exported constants ---------------------------------------------*/
-#define LCD_TFT_SPI_Handle hspi3
+#define LCD_TFT_SPI_Handle hspi1
 #define LCD_TFT_USART_Handle huart1
 /* ---------- Exported variables ---------------------------------------------*/
 

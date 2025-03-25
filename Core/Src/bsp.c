@@ -17,6 +17,7 @@
 
 #include "bsp.h"
 
+#if 0
 /* SDC_RLY (ShutDown Circuit Relay) ##########################################*/
 
 /*---------- Private define -----------------.--------------------------------*/
@@ -49,6 +50,7 @@ enum SDC_RLY_State SDC_RLY_getState(void) {
 }
 
 /*---------- Private Functions -----------------------------------------------*/
+#endif
 
 /* BTN (Buttons) #############################################################*/
 
@@ -85,13 +87,13 @@ enum SDC_RLY_State SDC_RLY_getState(void) {
 
 static struct GPIO_Tuple BTN_Device_to_GPIO_Tuple_map[BTN_Device_NUM] = {
     [BTN_RTD]       = {.GPIO_Port = nRTD_BTN_IN_GPIO_IN_GPIO_Port, .GPIO_Pin = nRTD_BTN_IN_GPIO_IN_Pin},
-    [BTN_Steering1] = {.GPIO_Port = nPUSH_BTN1_IN_GPIO_IN_GPIO_Port, .GPIO_Pin = nPUSH_BTN1_IN_GPIO_IN_Pin},
-    [BTN_Steering2] = {.GPIO_Port = nPUSH_BTN2_IN_GPIO_IN_GPIO_Port, .GPIO_Pin = nPUSH_BTN2_IN_GPIO_IN_Pin},
-    [BTN_Steering3] = {.GPIO_Port = nPUSH_BTN3_IN_GPIO_IN_GPIO_Port, .GPIO_Pin = nPUSH_BTN3_IN_GPIO_IN_Pin},
-    [BTN_Steering4] = {.GPIO_Port = nPUSH_BTN4_IN_GPIO_IN_GPIO_Port, .GPIO_Pin = nPUSH_BTN4_IN_GPIO_IN_Pin}};
+    [BTN_TC] = {.GPIO_Port = nBTN_TC_IN_GPIO_IN_GPIO_Port, .GPIO_Pin = nBTN_TC_IN_GPIO_IN_Pin},
+    [BTN_TV] = {.GPIO_Port = nBTN_TV_IN_GPIO_IN_GPIO_Port, .GPIO_Pin = nBTN_TV_IN_GPIO_IN_Pin},
+    [BTN_LC] = {.GPIO_Port = nBTN_LC_IN_GPIO_IN_GPIO_Port, .GPIO_Pin = nBTN_LC_IN_GPIO_IN_Pin},
+    [BTN_GENERAL] = {.GPIO_Port = nBTN_GENERAL_IN_GPIO_IN_GPIO_Port, .GPIO_Pin = nBTN_GENERAL_IN_GPIO_IN_Pin}};
 
 static uint8_t BTN_GPIO_invert_vector[BTN_Device_NUM] =
-    {[BTN_RTD] = 1U, [BTN_Steering1] = 1U, [BTN_Steering2] = 1U, [BTN_Steering3] = 1U, [BTN_Steering4] = 1U};
+    {[BTN_RTD] = 1U, [BTN_TC] = 1U, [BTN_TV] = 1U, [BTN_LC] = 1U, [BTN_GENERAL] = 1U};
 
 static volatile BTN_Value_t BTN_Device_values[BTN_VALUES_ARR_LEN_U] = {};
 
@@ -462,11 +464,11 @@ void MCB_send_msg(uint32_t id) {
         case MCB_DASH_HMI_DEVICES_STATE_FRAME_ID:
 
             // clang-format off
-            msg.hmi_devices_state.btn_rtd_is_pressed = mcb_dash_hmi_devices_state_btn_rtd_is_pressed_encode(button_get(BUTTON_RTD)); // TODO change this button get
-            msg.hmi_devices_state.btn_1_is_pressed = mcb_dash_hmi_devices_state_btn_1_is_pressed_encode(BTN_getStatus(BTN_Steering1));
-            msg.hmi_devices_state.btn_2_is_pressed = mcb_dash_hmi_devices_state_btn_2_is_pressed_encode(BTN_getStatus(BTN_Steering2));
-            msg.hmi_devices_state.btn_3_is_pressed = mcb_dash_hmi_devices_state_btn_3_is_pressed_encode(BTN_getStatus(BTN_Steering3));
-            msg.hmi_devices_state.btn_4_is_pressed = mcb_dash_hmi_devices_state_btn_4_is_pressed_encode(BTN_getStatus(BTN_Steering4));
+            msg.hmi_devices_state.btn_rtd_is_pressed = mcb_dash_hmi_devices_state_btn_rtd_is_pressed_encode(button_get(BTN_RTD)); // TODO change this button get
+            msg.hmi_devices_state.btn_1_is_pressed = mcb_dash_hmi_devices_state_btn_1_is_pressed_encode(BTN_getStatus(BTN_TV));
+            msg.hmi_devices_state.btn_2_is_pressed = mcb_dash_hmi_devices_state_btn_2_is_pressed_encode(BTN_getStatus(BTN_TC));
+            msg.hmi_devices_state.btn_3_is_pressed = mcb_dash_hmi_devices_state_btn_3_is_pressed_encode(BTN_getStatus(BTN_LC));
+            msg.hmi_devices_state.btn_4_is_pressed = mcb_dash_hmi_devices_state_btn_4_is_pressed_encode(BTN_getStatus(BTN_GENERAL));
             msg.hmi_devices_state.rot_sw_1_state   = mcb_dash_hmi_devices_state_rot_sw_1_state_encode(ROT_SW_getState(ROT_SW_Device1));
             msg.hmi_devices_state.rot_sw_2_state   = mcb_dash_hmi_devices_state_rot_sw_2_state_encode(ROT_SW_getState(ROT_SW_Device2));
             // clang-format on
