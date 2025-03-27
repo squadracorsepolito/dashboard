@@ -48,6 +48,7 @@ BOOTLOADER_DIR = openblt_f446re
 LVGL_PATH = ${shell pwd}/Lib/LVGL/lvgl
 
 include $(shell pwd)/Lib/LVGL/lvgl/lvgl.mk
+CSRCS := $(filter-out $(wildcard tests/* examples/* demos/*), $(CSRCS))
 C_SOURCES = $(CSRCS)
 C_SOURCES += \
 Core/Src/main.c \

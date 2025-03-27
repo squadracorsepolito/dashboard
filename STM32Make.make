@@ -83,7 +83,6 @@ Core/Src/dac.c \
 Core/Src/dashboard.c \
 Core/Src/dma.c \
 Core/Src/gpio.c \
-Core/Src/i2c.c \
 Core/Src/iwdg.c \
 Core/Src/main.c \
 Core/Src/spi.c \
@@ -111,8 +110,6 @@ Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ex.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ramfunc.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c \
-Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c \
-Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c_ex.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_iwdg.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr_ex.c \
@@ -128,157 +125,6 @@ EEZ/src/ui/images.c \
 EEZ/src/ui/screens.c \
 EEZ/src/ui/styles.c \
 EEZ/src/ui/ui.c \
-Lib/LVGL/lvgl/demos/benchmark/assets/img_benchmark_avatar.c \
-Lib/LVGL/lvgl/demos/benchmark/assets/img_benchmark_lvgl_logo_argb.c \
-Lib/LVGL/lvgl/demos/benchmark/assets/img_benchmark_lvgl_logo_rgb.c \
-Lib/LVGL/lvgl/demos/benchmark/assets/lv_font_benchmark_montserrat_12_compr_az.c.c \
-Lib/LVGL/lvgl/demos/benchmark/assets/lv_font_benchmark_montserrat_16_compr_az.c.c \
-Lib/LVGL/lvgl/demos/benchmark/assets/lv_font_benchmark_montserrat_28_compr_az.c.c \
-Lib/LVGL/lvgl/demos/benchmark/lv_demo_benchmark.c \
-Lib/LVGL/lvgl/demos/ebike/generated/font_ebike_130.c \
-Lib/LVGL/lvgl/demos/ebike/generated/font_ebike_56.c \
-Lib/LVGL/lvgl/demos/ebike/generated/font_ebike_inter_14.c \
-Lib/LVGL/lvgl/demos/ebike/generated/font_ebike_inter_20.c \
-Lib/LVGL/lvgl/demos/ebike/generated/font_ebike_trump_24.c \
-Lib/LVGL/lvgl/demos/ebike/generated/font_ebike_trump_40.c \
-Lib/LVGL/lvgl/demos/ebike/generated/font_ebike_trump_48.c \
-Lib/LVGL/lvgl/demos/ebike/generated/font_ebike_trump_72.c \
-Lib/LVGL/lvgl/demos/ebike/generated/img_ebike_arrow_left.c \
-Lib/LVGL/lvgl/demos/ebike/generated/img_ebike_arrow_left_2.c \
-Lib/LVGL/lvgl/demos/ebike/generated/img_ebike_arrow_right.c \
-Lib/LVGL/lvgl/demos/ebike/generated/img_ebike_arrow_right_2.c \
-Lib/LVGL/lvgl/demos/ebike/generated/img_ebike_bg.c \
-Lib/LVGL/lvgl/demos/ebike/generated/img_ebike_bg_large.c \
-Lib/LVGL/lvgl/demos/ebike/generated/img_ebike_clock.c \
-Lib/LVGL/lvgl/demos/ebike/generated/img_ebike_dropdown_icon.c \
-Lib/LVGL/lvgl/demos/ebike/generated/img_ebike_home.c \
-Lib/LVGL/lvgl/demos/ebike/generated/img_ebike_lamp.c \
-Lib/LVGL/lvgl/demos/ebike/generated/img_ebike_scale.c \
-Lib/LVGL/lvgl/demos/ebike/generated/img_ebike_scale_large.c \
-Lib/LVGL/lvgl/demos/ebike/generated/img_ebike_settings.c \
-Lib/LVGL/lvgl/demos/ebike/generated/img_ebike_settings_large.c \
-Lib/LVGL/lvgl/demos/ebike/generated/img_ebike_stats.c \
-Lib/LVGL/lvgl/demos/ebike/generated/img_ebike_stats_large.c \
-Lib/LVGL/lvgl/demos/ebike/generated/img_ebike_whether.c \
-Lib/LVGL/lvgl/demos/ebike/generated/lottie_ebike_settings.c \
-Lib/LVGL/lvgl/demos/ebike/generated/lottie_ebike_stats.c \
-Lib/LVGL/lvgl/demos/ebike/lv_demo_ebike.c \
-Lib/LVGL/lvgl/demos/ebike/lv_demo_ebike_home.c \
-Lib/LVGL/lvgl/demos/ebike/lv_demo_ebike_settings.c \
-Lib/LVGL/lvgl/demos/ebike/lv_demo_ebike_stats.c \
-Lib/LVGL/lvgl/demos/ebike/translations/lv_i18n.c \
-Lib/LVGL/lvgl/demos/flex_layout/lv_demo_flex_layout_ctrl_pad.c \
-Lib/LVGL/lvgl/demos/flex_layout/lv_demo_flex_layout_flex_loader.c \
-Lib/LVGL/lvgl/demos/flex_layout/lv_demo_flex_layout_main.c \
-Lib/LVGL/lvgl/demos/flex_layout/lv_demo_flex_layout_view.c \
-Lib/LVGL/lvgl/demos/flex_layout/lv_demo_flex_layout_view_child_node.c \
-Lib/LVGL/lvgl/demos/flex_layout/lv_demo_flex_layout_view_ctrl_pad.c \
-Lib/LVGL/lvgl/demos/keypad_encoder/lv_demo_keypad_encoder.c \
-Lib/LVGL/lvgl/demos/lv_demos.c \
-Lib/LVGL/lvgl/demos/multilang/assets/avatars/img_multilang_avatar_1.c \
-Lib/LVGL/lvgl/demos/multilang/assets/avatars/img_multilang_avatar_10.c \
-Lib/LVGL/lvgl/demos/multilang/assets/avatars/img_multilang_avatar_11.c \
-Lib/LVGL/lvgl/demos/multilang/assets/avatars/img_multilang_avatar_12.c \
-Lib/LVGL/lvgl/demos/multilang/assets/avatars/img_multilang_avatar_13.c \
-Lib/LVGL/lvgl/demos/multilang/assets/avatars/img_multilang_avatar_14.c \
-Lib/LVGL/lvgl/demos/multilang/assets/avatars/img_multilang_avatar_15.c \
-Lib/LVGL/lvgl/demos/multilang/assets/avatars/img_multilang_avatar_16.c \
-Lib/LVGL/lvgl/demos/multilang/assets/avatars/img_multilang_avatar_17.c \
-Lib/LVGL/lvgl/demos/multilang/assets/avatars/img_multilang_avatar_18.c \
-Lib/LVGL/lvgl/demos/multilang/assets/avatars/img_multilang_avatar_19.c \
-Lib/LVGL/lvgl/demos/multilang/assets/avatars/img_multilang_avatar_2.c \
-Lib/LVGL/lvgl/demos/multilang/assets/avatars/img_multilang_avatar_22.c \
-Lib/LVGL/lvgl/demos/multilang/assets/avatars/img_multilang_avatar_25.c \
-Lib/LVGL/lvgl/demos/multilang/assets/avatars/img_multilang_avatar_3.c \
-Lib/LVGL/lvgl/demos/multilang/assets/avatars/img_multilang_avatar_4.c \
-Lib/LVGL/lvgl/demos/multilang/assets/avatars/img_multilang_avatar_5.c \
-Lib/LVGL/lvgl/demos/multilang/assets/avatars/img_multilang_avatar_6.c \
-Lib/LVGL/lvgl/demos/multilang/assets/avatars/img_multilang_avatar_7.c \
-Lib/LVGL/lvgl/demos/multilang/assets/avatars/img_multilang_avatar_8.c \
-Lib/LVGL/lvgl/demos/multilang/assets/avatars/img_multilang_avatar_9.c \
-Lib/LVGL/lvgl/demos/multilang/assets/emojis/img_emoji_artist_palette.c \
-Lib/LVGL/lvgl/demos/multilang/assets/emojis/img_emoji_books.c \
-Lib/LVGL/lvgl/demos/multilang/assets/emojis/img_emoji_camera_with_flash.c \
-Lib/LVGL/lvgl/demos/multilang/assets/emojis/img_emoji_cat_face.c \
-Lib/LVGL/lvgl/demos/multilang/assets/emojis/img_emoji_deciduous_tree.c \
-Lib/LVGL/lvgl/demos/multilang/assets/emojis/img_emoji_dog_face.c \
-Lib/LVGL/lvgl/demos/multilang/assets/emojis/img_emoji_earth_globe_europe_africa.c \
-Lib/LVGL/lvgl/demos/multilang/assets/emojis/img_emoji_flexed_biceps.c \
-Lib/LVGL/lvgl/demos/multilang/assets/emojis/img_emoji_movie_camera.c \
-Lib/LVGL/lvgl/demos/multilang/assets/emojis/img_emoji_red_heart.c \
-Lib/LVGL/lvgl/demos/multilang/assets/emojis/img_emoji_rocket.c \
-Lib/LVGL/lvgl/demos/multilang/assets/emojis/img_emoji_soccer_ball.c \
-Lib/LVGL/lvgl/demos/multilang/assets/fonts/font_multilang_large.c \
-Lib/LVGL/lvgl/demos/multilang/assets/fonts/font_multilang_small.c \
-Lib/LVGL/lvgl/demos/multilang/assets/img_multilang_like.c \
-Lib/LVGL/lvgl/demos/multilang/lv_demo_multilang.c \
-Lib/LVGL/lvgl/demos/music/assets/img_lv_demo_music_btn_corner_large.c \
-Lib/LVGL/lvgl/demos/music/assets/img_lv_demo_music_btn_list_pause.c \
-Lib/LVGL/lvgl/demos/music/assets/img_lv_demo_music_btn_list_pause_large.c \
-Lib/LVGL/lvgl/demos/music/assets/img_lv_demo_music_btn_list_play.c \
-Lib/LVGL/lvgl/demos/music/assets/img_lv_demo_music_btn_list_play_large.c \
-Lib/LVGL/lvgl/demos/music/assets/img_lv_demo_music_btn_loop.c \
-Lib/LVGL/lvgl/demos/music/assets/img_lv_demo_music_btn_loop_large.c \
-Lib/LVGL/lvgl/demos/music/assets/img_lv_demo_music_btn_next.c \
-Lib/LVGL/lvgl/demos/music/assets/img_lv_demo_music_btn_next_large.c \
-Lib/LVGL/lvgl/demos/music/assets/img_lv_demo_music_btn_pause.c \
-Lib/LVGL/lvgl/demos/music/assets/img_lv_demo_music_btn_pause_large.c \
-Lib/LVGL/lvgl/demos/music/assets/img_lv_demo_music_btn_play.c \
-Lib/LVGL/lvgl/demos/music/assets/img_lv_demo_music_btn_play_large.c \
-Lib/LVGL/lvgl/demos/music/assets/img_lv_demo_music_btn_prev.c \
-Lib/LVGL/lvgl/demos/music/assets/img_lv_demo_music_btn_prev_large.c \
-Lib/LVGL/lvgl/demos/music/assets/img_lv_demo_music_btn_rnd.c \
-Lib/LVGL/lvgl/demos/music/assets/img_lv_demo_music_btn_rnd_large.c \
-Lib/LVGL/lvgl/demos/music/assets/img_lv_demo_music_corner_left.c \
-Lib/LVGL/lvgl/demos/music/assets/img_lv_demo_music_corner_left_large.c \
-Lib/LVGL/lvgl/demos/music/assets/img_lv_demo_music_corner_right.c \
-Lib/LVGL/lvgl/demos/music/assets/img_lv_demo_music_corner_right_large.c \
-Lib/LVGL/lvgl/demos/music/assets/img_lv_demo_music_cover_1.c \
-Lib/LVGL/lvgl/demos/music/assets/img_lv_demo_music_cover_1_large.c \
-Lib/LVGL/lvgl/demos/music/assets/img_lv_demo_music_cover_2.c \
-Lib/LVGL/lvgl/demos/music/assets/img_lv_demo_music_cover_2_large.c \
-Lib/LVGL/lvgl/demos/music/assets/img_lv_demo_music_cover_3.c \
-Lib/LVGL/lvgl/demos/music/assets/img_lv_demo_music_cover_3_large.c \
-Lib/LVGL/lvgl/demos/music/assets/img_lv_demo_music_icon_1.c \
-Lib/LVGL/lvgl/demos/music/assets/img_lv_demo_music_icon_1_large.c \
-Lib/LVGL/lvgl/demos/music/assets/img_lv_demo_music_icon_2.c \
-Lib/LVGL/lvgl/demos/music/assets/img_lv_demo_music_icon_2_large.c \
-Lib/LVGL/lvgl/demos/music/assets/img_lv_demo_music_icon_3.c \
-Lib/LVGL/lvgl/demos/music/assets/img_lv_demo_music_icon_3_large.c \
-Lib/LVGL/lvgl/demos/music/assets/img_lv_demo_music_icon_4.c \
-Lib/LVGL/lvgl/demos/music/assets/img_lv_demo_music_icon_4_large.c \
-Lib/LVGL/lvgl/demos/music/assets/img_lv_demo_music_list_border.c \
-Lib/LVGL/lvgl/demos/music/assets/img_lv_demo_music_list_border_large.c \
-Lib/LVGL/lvgl/demos/music/assets/img_lv_demo_music_logo.c \
-Lib/LVGL/lvgl/demos/music/assets/img_lv_demo_music_slider_knob.c \
-Lib/LVGL/lvgl/demos/music/assets/img_lv_demo_music_slider_knob_large.c \
-Lib/LVGL/lvgl/demos/music/assets/img_lv_demo_music_wave_bottom.c \
-Lib/LVGL/lvgl/demos/music/assets/img_lv_demo_music_wave_bottom_large.c \
-Lib/LVGL/lvgl/demos/music/assets/img_lv_demo_music_wave_top.c \
-Lib/LVGL/lvgl/demos/music/assets/img_lv_demo_music_wave_top_large.c \
-Lib/LVGL/lvgl/demos/music/lv_demo_music.c \
-Lib/LVGL/lvgl/demos/music/lv_demo_music_list.c \
-Lib/LVGL/lvgl/demos/music/lv_demo_music_main.c \
-Lib/LVGL/lvgl/demos/render/assets/img_render_arc_bg.c \
-Lib/LVGL/lvgl/demos/render/assets/img_render_lvgl_logo_argb8888.c \
-Lib/LVGL/lvgl/demos/render/assets/img_render_lvgl_logo_i1.c \
-Lib/LVGL/lvgl/demos/render/assets/img_render_lvgl_logo_l8.c \
-Lib/LVGL/lvgl/demos/render/assets/img_render_lvgl_logo_rgb565.c \
-Lib/LVGL/lvgl/demos/render/assets/img_render_lvgl_logo_rgb565a8.c \
-Lib/LVGL/lvgl/demos/render/assets/img_render_lvgl_logo_rgb888.c \
-Lib/LVGL/lvgl/demos/render/assets/img_render_lvgl_logo_xrgb8888.c \
-Lib/LVGL/lvgl/demos/render/lv_demo_render.c \
-Lib/LVGL/lvgl/demos/scroll/lv_demo_scroll.c \
-Lib/LVGL/lvgl/demos/stress/lv_demo_stress.c \
-Lib/LVGL/lvgl/demos/transform/assets/img_transform_avatar_15.c \
-Lib/LVGL/lvgl/demos/transform/lv_demo_transform.c \
-Lib/LVGL/lvgl/demos/vector_graphic/assets/img_demo_vector_avatar.c \
-Lib/LVGL/lvgl/demos/vector_graphic/lv_demo_vector_graphic.c \
-Lib/LVGL/lvgl/demos/widgets/assets/img_clothes.c \
-Lib/LVGL/lvgl/demos/widgets/assets/img_demo_widgets_avatar.c \
-Lib/LVGL/lvgl/demos/widgets/assets/img_demo_widgets_needle.c \
-Lib/LVGL/lvgl/demos/widgets/assets/img_lvgl_logo.c \
-Lib/LVGL/lvgl/demos/widgets/lv_demo_widgets.c \
 Lib/LVGL/lvgl/env_support/pikascript/pika_lv_point_t.c \
 Lib/LVGL/lvgl/env_support/pikascript/pika_lv_timer_t.c \
 Lib/LVGL/lvgl/env_support/pikascript/pika_lv_wegit.c \
@@ -648,246 +494,12 @@ Lib/LVGL/lvgl/src/widgets/tabview/lv_tabview.c \
 Lib/LVGL/lvgl/src/widgets/textarea/lv_textarea.c \
 Lib/LVGL/lvgl/src/widgets/tileview/lv_tileview.c \
 Lib/LVGL/lvgl/src/widgets/win/lv_win.c \
-Lib/LVGL/lvgl/tests/makefile/test.c \
-Lib/LVGL/lvgl/tests/makefile_uefi/test.c \
-Lib/LVGL/lvgl/tests/src/lv_test_helpers.c \
-Lib/LVGL/lvgl/tests/src/lv_test_indev.c \
-Lib/LVGL/lvgl/tests/src/lv_test_init.c \
-Lib/LVGL/lvgl/tests/src/test_assets/test_animimg001.c \
-Lib/LVGL/lvgl/tests/src/test_assets/test_animimg002.c \
-Lib/LVGL/lvgl/tests/src/test_assets/test_animimg003.c \
-Lib/LVGL/lvgl/tests/src/test_assets/test_arc_bg.c \
-Lib/LVGL/lvgl/tests/src/test_assets/test_font_1.c \
-Lib/LVGL/lvgl/tests/src/test_assets/test_font_1_bin.c \
-Lib/LVGL/lvgl/tests/src/test_assets/test_font_2.c \
-Lib/LVGL/lvgl/tests/src/test_assets/test_font_2_bin.c \
-Lib/LVGL/lvgl/tests/src/test_assets/test_font_3.c \
-Lib/LVGL/lvgl/tests/src/test_assets/test_font_3_bin.c \
-Lib/LVGL/lvgl/tests/src/test_assets/test_font_montserrat_ascii_1bpp.c \
-Lib/LVGL/lvgl/tests/src/test_assets/test_font_montserrat_ascii_2bpp.c \
-Lib/LVGL/lvgl/tests/src/test_assets/test_font_montserrat_ascii_4bpp.c \
-Lib/LVGL/lvgl/tests/src/test_assets/test_font_montserrat_ascii_4bpp_compressed.c \
-Lib/LVGL/lvgl/tests/src/test_assets/test_imagebutton_left.c \
-Lib/LVGL/lvgl/tests/src/test_assets/test_imagebutton_mid.c \
-Lib/LVGL/lvgl/tests/src/test_assets/test_imagebutton_right.c \
-Lib/LVGL/lvgl/tests/src/test_assets/test_img_caret_down.c \
-Lib/LVGL/lvgl/tests/src/test_assets/test_img_cogwheel_a8.c \
-Lib/LVGL/lvgl/tests/src/test_assets/test_img_cogwheel_argb8888.c \
-Lib/LVGL/lvgl/tests/src/test_assets/test_img_cogwheel_i4.c \
-Lib/LVGL/lvgl/tests/src/test_assets/test_img_cogwheel_rgb565.c \
-Lib/LVGL/lvgl/tests/src/test_assets/test_img_cogwheel_rgb565a8.c \
-Lib/LVGL/lvgl/tests/src/test_assets/test_img_cogwheel_xrgb8888.c \
-Lib/LVGL/lvgl/tests/src/test_assets/test_img_emoji_F617.c \
-Lib/LVGL/lvgl/tests/src/test_assets/test_img_lvgl_logo_jpg.c \
-Lib/LVGL/lvgl/tests/src/test_assets/test_img_lvgl_logo_png.c \
-Lib/LVGL/lvgl/tests/src/test_assets/test_kern_one_otf.c \
-Lib/LVGL/lvgl/tests/src/test_assets/test_lottie_approve.c \
-Lib/LVGL/lvgl/tests/src/test_assets/test_music_button_play.c \
-Lib/LVGL/lvgl/tests/src/test_assets/test_ubuntu_font.c \
-Lib/LVGL/lvgl/tests/src/test_cases/_test_template.c \
-Lib/LVGL/lvgl/tests/src/test_cases/cache/test_cache.c \
-Lib/LVGL/lvgl/tests/src/test_cases/draw/test_bg_image.c \
-Lib/LVGL/lvgl/tests/src/test_cases/draw/test_clip_corner.c \
-Lib/LVGL/lvgl/tests/src/test_cases/draw/test_draw_blend.c \
-Lib/LVGL/lvgl/tests/src/test_cases/draw/test_draw_label.c \
-Lib/LVGL/lvgl/tests/src/test_cases/draw/test_draw_layer.c \
-Lib/LVGL/lvgl/tests/src/test_cases/draw/test_draw_svg.c \
-Lib/LVGL/lvgl/tests/src/test_cases/draw/test_draw_sw_post_process.c \
-Lib/LVGL/lvgl/tests/src/test_cases/draw/test_draw_vector.c \
-Lib/LVGL/lvgl/tests/src/test_cases/draw/test_image_formats.c \
-Lib/LVGL/lvgl/tests/src/test_cases/draw/test_layer_transform.c \
-Lib/LVGL/lvgl/tests/src/test_cases/draw/test_render_to_al88.c \
-Lib/LVGL/lvgl/tests/src/test_cases/draw/test_render_to_argb1555.c \
-Lib/LVGL/lvgl/tests/src/test_cases/draw/test_render_to_argb2222.c \
-Lib/LVGL/lvgl/tests/src/test_cases/draw/test_render_to_argb4444.c \
-Lib/LVGL/lvgl/tests/src/test_cases/draw/test_render_to_argb8888.c \
-Lib/LVGL/lvgl/tests/src/test_cases/draw/test_render_to_i1.c \
-Lib/LVGL/lvgl/tests/src/test_cases/draw/test_render_to_l8.c \
-Lib/LVGL/lvgl/tests/src/test_cases/draw/test_render_to_rgb565.c \
-Lib/LVGL/lvgl/tests/src/test_cases/draw/test_render_to_rgb888.c \
-Lib/LVGL/lvgl/tests/src/test_cases/draw/test_render_to_xrgb8888.c \
-Lib/LVGL/lvgl/tests/src/test_cases/libs/test_barcode.c \
-Lib/LVGL/lvgl/tests/src/test_cases/libs/test_bin_decoder.c \
-Lib/LVGL/lvgl/tests/src/test_cases/libs/test_bmp.c \
-Lib/LVGL/lvgl/tests/src/test_cases/libs/test_font_stress.c \
-Lib/LVGL/lvgl/tests/src/test_cases/libs/test_freetype.c \
-Lib/LVGL/lvgl/tests/src/test_cases/libs/test_libjpeg_turbo.c \
-Lib/LVGL/lvgl/tests/src/test_cases/libs/test_libpng.c \
-Lib/LVGL/lvgl/tests/src/test_cases/libs/test_lodepng.c \
-Lib/LVGL/lvgl/tests/src/test_cases/libs/test_memmove.c \
-Lib/LVGL/lvgl/tests/src/test_cases/libs/test_qrcode.c \
-Lib/LVGL/lvgl/tests/src/test_cases/libs/test_tiny_ttf.c \
-Lib/LVGL/lvgl/tests/src/test_cases/libs/test_tjpgd.c \
-Lib/LVGL/lvgl/tests/src/test_cases/test_align_flex.c \
-Lib/LVGL/lvgl/tests/src/test_cases/test_anim.c \
-Lib/LVGL/lvgl/tests/src/test_cases/test_anim_timeline.c \
-Lib/LVGL/lvgl/tests/src/test_cases/test_area.c \
-Lib/LVGL/lvgl/tests/src/test_cases/test_array.c \
-Lib/LVGL/lvgl/tests/src/test_cases/test_bindings.c \
-Lib/LVGL/lvgl/tests/src/test_cases/test_circle_buf.c \
-Lib/LVGL/lvgl/tests/src/test_cases/test_click.c \
-Lib/LVGL/lvgl/tests/src/test_cases/test_config.c \
-Lib/LVGL/lvgl/tests/src/test_cases/test_demo_stress.c \
-Lib/LVGL/lvgl/tests/src/test_cases/test_demo_widgets.c \
-Lib/LVGL/lvgl/tests/src/test_cases/test_display.c \
-Lib/LVGL/lvgl/tests/src/test_cases/test_draw_buf_stride.c \
-Lib/LVGL/lvgl/tests/src/test_cases/test_event.c \
-Lib/LVGL/lvgl/tests/src/test_cases/test_file_explorer.c \
-Lib/LVGL/lvgl/tests/src/test_cases/test_font_loader.c \
-Lib/LVGL/lvgl/tests/src/test_cases/test_fs.c \
-Lib/LVGL/lvgl/tests/src/test_cases/test_grid.c \
-Lib/LVGL/lvgl/tests/src/test_cases/test_grid_fr.c \
-Lib/LVGL/lvgl/tests/src/test_cases/test_gridnav.c \
-Lib/LVGL/lvgl/tests/src/test_cases/test_group.c \
-Lib/LVGL/lvgl/tests/src/test_cases/test_hover.c \
-Lib/LVGL/lvgl/tests/src/test_cases/test_margin_align.c \
-Lib/LVGL/lvgl/tests/src/test_cases/test_margin_flex.c \
-Lib/LVGL/lvgl/tests/src/test_cases/test_margin_grid.c \
-Lib/LVGL/lvgl/tests/src/test_cases/test_math.c \
-Lib/LVGL/lvgl/tests/src/test_cases/test_mem.c \
-Lib/LVGL/lvgl/tests/src/test_cases/test_observer.c \
-Lib/LVGL/lvgl/tests/src/test_cases/test_profiler.c \
-Lib/LVGL/lvgl/tests/src/test_cases/test_screen_load.c \
-Lib/LVGL/lvgl/tests/src/test_cases/test_snapshot.c \
-Lib/LVGL/lvgl/tests/src/test_cases/test_style.c \
-Lib/LVGL/lvgl/tests/src/test_cases/test_svg.c \
-Lib/LVGL/lvgl/tests/src/test_cases/test_svg_anim.c \
-Lib/LVGL/lvgl/tests/src/test_cases/test_tree.c \
-Lib/LVGL/lvgl/tests/src/test_cases/test_txt.c \
-Lib/LVGL/lvgl/tests/src/test_cases/widgets/test_animimg.c \
-Lib/LVGL/lvgl/tests/src/test_cases/widgets/test_arc.c \
-Lib/LVGL/lvgl/tests/src/test_cases/widgets/test_bar.c \
-Lib/LVGL/lvgl/tests/src/test_cases/widgets/test_btn.c \
-Lib/LVGL/lvgl/tests/src/test_cases/widgets/test_btnmatrix.c \
-Lib/LVGL/lvgl/tests/src/test_cases/widgets/test_calendar.c \
-Lib/LVGL/lvgl/tests/src/test_cases/widgets/test_canvas.c \
-Lib/LVGL/lvgl/tests/src/test_cases/widgets/test_chart.c \
-Lib/LVGL/lvgl/tests/src/test_cases/widgets/test_checkbox.c \
-Lib/LVGL/lvgl/tests/src/test_cases/widgets/test_dropdown.c \
-Lib/LVGL/lvgl/tests/src/test_cases/widgets/test_image.c \
-Lib/LVGL/lvgl/tests/src/test_cases/widgets/test_imagebutton.c \
-Lib/LVGL/lvgl/tests/src/test_cases/widgets/test_imgfont.c \
-Lib/LVGL/lvgl/tests/src/test_cases/widgets/test_keyboard.c \
-Lib/LVGL/lvgl/tests/src/test_cases/widgets/test_label.c \
-Lib/LVGL/lvgl/tests/src/test_cases/widgets/test_led.c \
-Lib/LVGL/lvgl/tests/src/test_cases/widgets/test_line.c \
-Lib/LVGL/lvgl/tests/src/test_cases/widgets/test_list.c \
-Lib/LVGL/lvgl/tests/src/test_cases/widgets/test_lottie.c \
-Lib/LVGL/lvgl/tests/src/test_cases/widgets/test_msgbox.c \
-Lib/LVGL/lvgl/tests/src/test_cases/widgets/test_obj_flags.c \
-Lib/LVGL/lvgl/tests/src/test_cases/widgets/test_obj_pos.c \
-Lib/LVGL/lvgl/tests/src/test_cases/widgets/test_obj_property.c \
-Lib/LVGL/lvgl/tests/src/test_cases/widgets/test_obj_transform.c \
-Lib/LVGL/lvgl/tests/src/test_cases/widgets/test_obj_tree.c \
-Lib/LVGL/lvgl/tests/src/test_cases/widgets/test_objid.c \
-Lib/LVGL/lvgl/tests/src/test_cases/widgets/test_roller.c \
-Lib/LVGL/lvgl/tests/src/test_cases/widgets/test_scale.c \
-Lib/LVGL/lvgl/tests/src/test_cases/widgets/test_slider.c \
-Lib/LVGL/lvgl/tests/src/test_cases/widgets/test_span.c \
-Lib/LVGL/lvgl/tests/src/test_cases/widgets/test_spinbox.c \
-Lib/LVGL/lvgl/tests/src/test_cases/widgets/test_spinner.c \
-Lib/LVGL/lvgl/tests/src/test_cases/widgets/test_switch.c \
-Lib/LVGL/lvgl/tests/src/test_cases/widgets/test_table.c \
-Lib/LVGL/lvgl/tests/src/test_cases/widgets/test_tabview.c \
-Lib/LVGL/lvgl/tests/src/test_cases/widgets/test_textarea.c \
-Lib/LVGL/lvgl/tests/src/test_cases/widgets/test_win.c \
-Lib/LVGL/lvgl/tests/src/test_cases/xml/test_xml_general.c \
-Lib/LVGL/lvgl/tests/src/test_cases/xml/test_xml_slider.c \
-Lib/LVGL/lvgl/tests/src/test_libs/rnd_unicodes/lv_rnd_unicodes.c \
-Lib/LVGL/lvgl/tests/src/test_libs/rnd_unicodes/rnd_unicodes/src/library.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align1/LZ4/test_A1_LZ4_align1.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align1/LZ4/test_A2_LZ4_align1.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align1/LZ4/test_A4_LZ4_align1.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align1/LZ4/test_A8_LZ4_align1.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align1/LZ4/test_ARGB8888_LZ4_align1.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align1/LZ4/test_I1_LZ4_align1.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align1/LZ4/test_I2_LZ4_align1.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align1/LZ4/test_I4_LZ4_align1.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align1/LZ4/test_I8_LZ4_align1.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align1/LZ4/test_L8_LZ4_align1.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align1/LZ4/test_RGB565A8_LZ4_align1.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align1/LZ4/test_RGB565_LZ4_align1.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align1/LZ4/test_RGB888_LZ4_align1.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align1/LZ4/test_XRGB8888_LZ4_align1.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align1/RLE/test_A1_RLE_align1.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align1/RLE/test_A2_RLE_align1.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align1/RLE/test_A4_RLE_align1.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align1/RLE/test_A8_RLE_align1.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align1/RLE/test_ARGB8888_RLE_align1.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align1/RLE/test_I1_RLE_align1.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align1/RLE/test_I2_RLE_align1.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align1/RLE/test_I4_RLE_align1.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align1/RLE/test_I8_RLE_align1.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align1/RLE/test_L8_RLE_align1.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align1/RLE/test_RGB565A8_RLE_align1.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align1/RLE/test_RGB565_RLE_align1.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align1/RLE/test_RGB888_RLE_align1.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align1/RLE/test_XRGB8888_RLE_align1.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align1/UNCOMPRESSED/test_A1_NONE_align1.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align1/UNCOMPRESSED/test_A2_NONE_align1.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align1/UNCOMPRESSED/test_A4_NONE_align1.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align1/UNCOMPRESSED/test_A8_NONE_align1.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align1/UNCOMPRESSED/test_ARGB8888_NONE_align1.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align1/UNCOMPRESSED/test_I1_NONE_align1.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align1/UNCOMPRESSED/test_I2_NONE_align1.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align1/UNCOMPRESSED/test_I4_NONE_align1.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align1/UNCOMPRESSED/test_I8_NONE_align1.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align1/UNCOMPRESSED/test_L8_NONE_align1.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align1/UNCOMPRESSED/test_RGB565A8_NONE_align1.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align1/UNCOMPRESSED/test_RGB565_NONE_align1.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align1/UNCOMPRESSED/test_RGB888_NONE_align1.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align1/UNCOMPRESSED/test_XRGB8888_NONE_align1.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align64/LZ4/test_A1_LZ4_align64.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align64/LZ4/test_A2_LZ4_align64.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align64/LZ4/test_A4_LZ4_align64.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align64/LZ4/test_A8_LZ4_align64.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align64/LZ4/test_ARGB8888_LZ4_align64.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align64/LZ4/test_I1_LZ4_align64.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align64/LZ4/test_I2_LZ4_align64.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align64/LZ4/test_I4_LZ4_align64.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align64/LZ4/test_I8_LZ4_align64.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align64/LZ4/test_L8_LZ4_align64.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align64/LZ4/test_RGB565A8_LZ4_align64.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align64/LZ4/test_RGB565_LZ4_align64.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align64/LZ4/test_RGB888_LZ4_align64.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align64/LZ4/test_XRGB8888_LZ4_align64.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align64/RLE/test_A1_RLE_align64.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align64/RLE/test_A2_RLE_align64.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align64/RLE/test_A4_RLE_align64.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align64/RLE/test_A8_RLE_align64.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align64/RLE/test_ARGB8888_RLE_align64.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align64/RLE/test_I1_RLE_align64.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align64/RLE/test_I2_RLE_align64.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align64/RLE/test_I4_RLE_align64.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align64/RLE/test_I8_RLE_align64.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align64/RLE/test_L8_RLE_align64.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align64/RLE/test_RGB565A8_RLE_align64.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align64/RLE/test_RGB565_RLE_align64.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align64/RLE/test_RGB888_RLE_align64.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align64/RLE/test_XRGB8888_RLE_align64.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align64/UNCOMPRESSED/test_A1_NONE_align64.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align64/UNCOMPRESSED/test_A2_NONE_align64.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align64/UNCOMPRESSED/test_A4_NONE_align64.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align64/UNCOMPRESSED/test_A8_NONE_align64.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align64/UNCOMPRESSED/test_ARGB8888_NONE_align64.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align64/UNCOMPRESSED/test_I1_NONE_align64.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align64/UNCOMPRESSED/test_I2_NONE_align64.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align64/UNCOMPRESSED/test_I4_NONE_align64.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align64/UNCOMPRESSED/test_I8_NONE_align64.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align64/UNCOMPRESSED/test_L8_NONE_align64.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align64/UNCOMPRESSED/test_RGB565A8_NONE_align64.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align64/UNCOMPRESSED/test_RGB565_NONE_align64.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align64/UNCOMPRESSED/test_RGB888_NONE_align64.c \
-Lib/LVGL/lvgl/tests/test_images/stride_align64/UNCOMPRESSED/test_XRGB8888_NONE_align64.c \
-Lib/LVGL/lvgl/tests/unity/unity.c \
-Lib/LVGL/lvgl/tests/unity/unity_support.c \
 Lib/LVGL/lvgl_callbacks.c \
 Lib/SCan/SC24/artifacts/HVCB/c_source/hvcb.c \
-Lib/SCan/SC24/artifacts/MCB/c_source/mcb.c \
-Lib/STM32_HAL_ST7032_LCD_LIBRARY/STM32_ST7032.c
+Lib/SCan/SC24/artifacts/MCB/c_source/mcb.c
 
 
-CPP_SOURCES = \
+CXX_SOURCES = \
 Lib/LVGL/lvgl/src/drivers/display/tft_espi/lv_tft_espi.cpp \
 Lib/LVGL/lvgl/src/libs/fsdrv/lv_fs_arduino_esp_littlefs.cpp \
 Lib/LVGL/lvgl/src/libs/fsdrv/lv_fs_arduino_sd.cpp \
@@ -979,6 +591,16 @@ HEX = $(CP) -O ihex
 BIN = $(CP) -O binary -S
 LSS = $(DP) -h -S
 
+
+REMOVE_DIRECTORY_COMMAND = rm -fR
+mkdir_function = mkdir -p $(1)
+ifeq ($(OS),Windows_NT)
+  convert_to_windows_path = $(strip $(subst /,\,$(patsubst %/,%,$(1))))
+  REMOVE_DIRECTORY_COMMAND = cmd /c rd /s /q
+  mkdir_function = cmd /e:on /c if not exist $(call convert_to_windows_path,$(1)) md $(call convert_to_windows_path,$(1))
+endif
+
+
 # Flash and debug tools
 # Default is openocd however will be gotten from the env file when existing
 OPENOCD ?= openocd
@@ -1033,8 +655,7 @@ C_INCLUDES =  \
 -ILib/LVGL/lvgl \
 -ILib/LVGL/lvgl/src \
 -ILib/SCan/SC24/artifacts/HVCB/c_source \
--ILib/SCan/SC24/artifacts/MCB/c_source \
--ILib/STM32_HAL_ST7032_LCD_LIBRARY
+-ILib/SCan/SC24/artifacts/MCB/c_source
 
 
 
@@ -1079,20 +700,12 @@ LDFLAGS = $(MCU) $(ADDITIONALLDFLAGS) -T$(LDSCRIPT) $(LIBDIR) $(LIBS) -Wl,-Map=$
 #######################################
 # build the application
 #######################################
-add_release_directory = $(sort $(addprefix $(RELEASE_DIRECTORY)/,$(addsuffix .$(2),$(basename $(subst ../,parent,$(1))))))
-
-REMOVE_DIRECTORY_COMMAND = rm -fR
-mkdir_function = mkdir -p $(1)
-ifeq ($(OS),Windows_NT)
-  convert_to_windows_path = $(strip $(subst /,\,$(patsubst %/,%,$(1))))
-  REMOVE_DIRECTORY_COMMAND = cmd /c rd /s /q
-  mkdir_function = cmd /e:on /c md $(call convert_to_windows_path,$(1))
-endif
+add_release_directory = $(sort $(addprefix $(RELEASE_DIRECTORY)/,$(addsuffix .$(2),$(basename $(notdir $(1))))))
 
 
 
 OBJECTS = $(call add_release_directory,$(C_SOURCES),o)
-OBJECTS += $(call add_release_directory,$(CPP_SOURCES),o)
+OBJECTS += $(call add_release_directory,$(CXX_SOURCES),o)
 OBJECTS += $(call add_release_directory,$(ASM_SOURCES),o)
 vpath %.c $(sort $(dir $(C_SOURCES)))
 vpath %.cc $(sort $(dir $(CXX_SOURCES)))
@@ -1105,82 +718,81 @@ vpath %.CPP $(sort $(dir $(CXX_SOURCES)))
 vpath %.s $(sort $(dir $(ASM_SOURCES)))
 vpath %.S $(sort $(dir $(ASM_SOURCES)))
 
-# the tree of folders which needs to be present based on the object files
-BUILD_TREE = $(sort $(dir $(OBJECTS)))
-
-# C build
-$(RELEASE_DIRECTORY)/%.o: %.c STM32Make.make | $(BUILD_TREE)
-	$(CC) -c $(CFLAGS) $< -o $@
-
-# C++ build 
-$(RELEASE_DIRECTORY)/%.o: %.cc STM32Make.make | $(BUILD_TREE)
-	$(CXX) -c $(CXXFLAGS) $< -o $@
-
-$(RELEASE_DIRECTORY)/%.o: %.cp STM32Make.make | $(BUILD_TREE)
-	$(CXX) -c $(CXXFLAGS) $< -o $@
-
-$(RELEASE_DIRECTORY)/%.o: %.cxx STM32Make.make | $(BUILD_TREE)
-	$(CXX) -c $(CXXFLAGS) $< -o $@
-
-$(RELEASE_DIRECTORY)/%.o: %.cpp STM32Make.make | $(BUILD_TREE)
-	$(CXX) -c $(CXXFLAGS) $< -o $@
-
-$(RELEASE_DIRECTORY)/%.o: %.c++ STM32Make.make | $(BUILD_TREE)
-	$(CXX) -c $(CXXFLAGS) $< -o $@
-
-$(RELEASE_DIRECTORY)/%.o: %.C STM32Make.make | $(BUILD_TREE)
-	$(CXX) -c $(CXXFLAGS) $< -o $@
-
-$(RELEASE_DIRECTORY)/%.o: %.CPP STM32Make.make | $(BUILD_TREE)
-	$(CXX) -c $(CXXFLAGS) $< -o $@
-
-#Assembly build
-$(RELEASE_DIRECTORY)/%.o: %.s STM32Make.make | $(BUILD_TREE)
-	$(AS) -c $(ASFLAGS) $< -o $@
-
-$(RELEASE_DIRECTORY)/%.o: %.S STM32Make.make | $(BUILD_TREE)
-	$(AS) -c $(ASFLAGS) $< -o $@
-
-$(RELEASE_DIRECTORY)/%.o: %.sx STM32Make.make | $(BUILD_TREE)
-	$(AS) -c $(ASFLAGS) $< -o $@
-
-$(BUILD_DIRECTORY)/$(TARGET).elf: $(OBJECTS) STM32Make.make | $(BUILD_DIRECTORY)
-	$(CC) $(OBJECTS) $(LDFLAGS) -o $@
-	$(SZ) $@
-
-$(BUILD_DIRECTORY)/%.hex: $(BUILD_DIRECTORY)/%.elf | $(BUILD_DIRECTORY)
-	$(HEX) $< $@
-
-$(BUILD_DIRECTORY)/%.bin: $(BUILD_DIRECTORY)/%.elf | $(BUILD_DIRECTORY)
-	$(BIN) $< $@
-
-$(BUILD_DIRECTORY)/%.lss: $(BUILD_DIRECTORY)/%.elf | $(BUILD_DIRECTORY)
-	$(LSS) $< > $@
-
-$(BUILD_DIRECTORY):
-	$(call mkdir_function, $@)
-
-$(BUILD_TREE):
-	$(call mkdir_function, $@)
-
 #######################################
 # all
 #######################################
+# note needs to be located as the first rule to be the default build rule
 # default action: build all
-all:
-	$(BUILD_DIRECTORY)/$(TARGET).elf 
-	$(BUILD_DIRECTORY)/$(TARGET).hex 
-	$(BUILD_DIRECTORY)/$(TARGET).bin 
-	$(BUILD_DIRECTORY)/$(TARGET).lss 
+all: $(RELEASE_DIRECTORY)/$(TARGET).elf $(RELEASE_DIRECTORY)/$(TARGET).hex $(RELEASE_DIRECTORY)/$(TARGET).bin $(RELEASE_DIRECTORY)/$(TARGET).lss 
 
 
-flash: $(BUILD_DIRECTORY)/$(TARGET).elf
-	"$(OPENOCD)" -f ./openocd.cfg -c "program $(BUILD_DIRECTORY)/$(TARGET).elf verify reset exit"
+# C build
+$(RELEASE_DIRECTORY)/%.o: %.c STM32Make.make | $(RELEASE_DIRECTORY)
+	$(CC) -c $(CFLAGS) $< -o $@
+
+# C++ build 
+$(RELEASE_DIRECTORY)/%.o: %.cc STM32Make.make | $(RELEASE_DIRECTORY)
+	$(CXX) -c $(CXXFLAGS) $< -o $@
+
+$(RELEASE_DIRECTORY)/%.o: %.cp STM32Make.make | $(RELEASE_DIRECTORY)
+	$(CXX) -c $(CXXFLAGS) $< -o $@
+
+$(RELEASE_DIRECTORY)/%.o: %.cxx STM32Make.make | $(RELEASE_DIRECTORY)
+	$(CXX) -c $(CXXFLAGS) $< -o $@
+
+$(RELEASE_DIRECTORY)/%.o: %.cpp STM32Make.make | $(RELEASE_DIRECTORY)
+	$(CXX) -c $(CXXFLAGS) $< -o $@
+
+$(RELEASE_DIRECTORY)/%.o: %.c++ STM32Make.make | $(RELEASE_DIRECTORY)
+	$(CXX) -c $(CXXFLAGS) $< -o $@
+
+$(RELEASE_DIRECTORY)/%.o: %.C STM32Make.make | $(RELEASE_DIRECTORY)
+	$(CXX) -c $(CXXFLAGS) $< -o $@
+
+$(RELEASE_DIRECTORY)/%.o: %.CPP STM32Make.make | $(RELEASE_DIRECTORY)
+	$(CXX) -c $(CXXFLAGS) $< -o $@
+
+#Assembly build
+$(RELEASE_DIRECTORY)/%.o: %.s STM32Make.make | $(RELEASE_DIRECTORY)
+	$(AS) -c $(ASFLAGS) $< -o $@
+
+$(RELEASE_DIRECTORY)/%.o: %.S STM32Make.make | $(RELEASE_DIRECTORY)
+	$(AS) -c $(ASFLAGS) $< -o $@
+
+$(RELEASE_DIRECTORY)/%.o: %.sx STM32Make.make | $(RELEASE_DIRECTORY)
+	$(AS) -c $(ASFLAGS) $< -o $@
+
+$(RELEASE_DIRECTORY)/$(TARGET).elf: $(OBJECTS) STM32Make.make | $(RELEASE_DIRECTORY)
+	@echo $(OBJECTS) > $@.in
+	$(CC) @$@.in $(LDFLAGS) -o $@
+	$(SZ) $@
+
+$(RELEASE_DIRECTORY)/%.hex: $(RELEASE_DIRECTORY)/%.elf | $(RELEASE_DIRECTORY)
+	$(HEX) $< $@
+
+$(RELEASE_DIRECTORY)/%.bin: $(RELEASE_DIRECTORY)/%.elf | $(RELEASE_DIRECTORY)
+	$(BIN) $< $@
+
+$(RELEASE_DIRECTORY)/%.lss: $(RELEASE_DIRECTORY)/%.elf | $(RELEASE_DIRECTORY)
+	$(LSS) $< > $@
+
+$(RELEASE_DIRECTORY):
+	$(call mkdir_function, $@)
+
+$(BUILD_DIRECTORY): | $(RELEASE_DIRECTORY)
+	$(call mkdir_function, $@)
+
+
+#######################################
+# flash
+#######################################
+flash: all
+	"$(OPENOCD)" -f ./openocd.cfg -c "program $(RELEASE_DIRECTORY)/$(TARGET).elf verify reset exit"
 
 #######################################
 # erase
 #######################################
-erase: $(BUILD_DIRECTORY)/$(TARGET).elf
+erase: all
 	"$(OPENOCD)" -f ./openocd.cfg -c "init; reset halt; stm32f4x mass_erase 0; exit"
 
 #######################################
@@ -1197,6 +809,6 @@ clean:
 #######################################
 # dependencies
 #######################################
--include $(wildcard $(BUILD_DIRECTORY)/*.d)
+-include $(wildcard $(RELEASE_DIRECTORY)/*.d)
 
 # *** EOF ***
