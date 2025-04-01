@@ -345,14 +345,16 @@ void Dashboard_Setup(void) {
 
     // Initialize leds (turn all off)
     LED_MONO_setState(LED_TS_Off, LED_Off);
-    LED_MONO_setState(LED_AMS_Error, LED_On);
-    LED_MONO_setState(LED_IMD_Error, LED_On);
+    LED_MONO_setState(LED_AMS_Error, LED_Off);
+    LED_MONO_setState(LED_IMD_Error, LED_Off);
 
     // Turn on all LEDs
+    #if 0
     LED_MONO_setState(LED_TS_Off, LED_On);
     LED_MONO_setState(LED_AMS_Error, LED_Off);
     LED_MONO_setState(LED_IMD_Error, LED_Off);
     LED_MONO_setState(LED_Err, LED_On);  // old RTD LED
+#endif
 
 // Disable The SDC relay and wait later for closing it
 #if 0

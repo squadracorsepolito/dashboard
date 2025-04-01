@@ -20,6 +20,7 @@
 
 #include "spi.h"
 #include "usart.h"
+#include "ili9488.h"
 
 /* ---------- Exported types -------------------------------------------------*/
 
@@ -29,8 +30,8 @@
 #define LCD_TFT_USART_Handle huart1
 
 /* ---------- Exported variables ---------------------------------------------*/
-
-
+extern struct ILI9488_Handle ili9488_handle; 
+extern struct ILI9488_GPIO_Map ili9488_gpio_map;
 /* ---------- Exported macros ------------------------------------------------*/
 
 

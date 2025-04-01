@@ -26,6 +26,7 @@
 /* ---------- Exported constants ---------------------------------------------*/
 /* ---------- Exported variables ---------------------------------------------*/
 extern uint8_t buf1[];
+extern struct ILI9488_Handle ili9488_handle; 
 /* ---------- Exported macros ------------------------------------------------*/
 /* ---------- Exported functions ---------------------------------------------*/
 void LVGL_CLB_flush_clb(lv_display_t *display, const lv_area_t *area, uint8_t *px_map);

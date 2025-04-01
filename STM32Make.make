@@ -81,6 +81,7 @@ Core/Src/button.c \
 Core/Src/can.c \
 Core/Src/dac.c \
 Core/Src/dashboard.c \
+Core/Src/display.c \
 Core/Src/dma.c \
 Core/Src/gpio.c \
 Core/Src/iwdg.c \

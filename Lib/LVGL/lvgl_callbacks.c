@@ -30,8 +30,8 @@ void LVGL_CLB_flush_clb(lv_display_t *display, const lv_area_t *area, uint8_t *p
     uint32_t height      = area->y2 - area->y1 + 1;
     uint32_t pixel_count = width * height;
 
-    ILI9488_set_draw_window(area->x1, area->y1, area->x2, area->y2);
-    ILI9488_SPI_DMA_send(px_map, pixel_count * 3);
+    ILI9488_set_draw_window(&ili9488_handle,area->x1, area->y1, area->x2, area->y2);
+    ILI9488_SPI_Send_DMA(&ili9488_handle, px_map, pixel_count * 3);
 }
 
 /**
@@ -50,7 +50,7 @@ void LVGL_CLB_flush_clb(lv_display_t *display, const lv_area_t *area, uint8_t *p
 void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi) {
     if (hspi->Instance == LCD_TFT_SPI_Handle.Instance) {
         flush_in_progress = 0;
-        ILI9488_CS_set_state(GPIO_PIN_SET);
+        ili9488_handle.CS_SetState(PinState_Set);
         lv_display_flush_ready(lv_disp_get_default());
     }
 }
