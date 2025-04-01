@@ -86,10 +86,10 @@ enum SDC_RLY_State SDC_RLY_getState(void) {
 /*---------- Private variables -----------------------------------------------*/
 
 static struct GPIO_Tuple BTN_Device_to_GPIO_Tuple_map[BTN_Device_NUM] = {
-    [BTN_RTD]       = {.GPIO_Port = nRTD_BTN_IN_GPIO_IN_GPIO_Port, .GPIO_Pin = nRTD_BTN_IN_GPIO_IN_Pin},
-    [BTN_TC] = {.GPIO_Port = nBTN_TC_IN_GPIO_IN_GPIO_Port, .GPIO_Pin = nBTN_TC_IN_GPIO_IN_Pin},
-    [BTN_TV] = {.GPIO_Port = nBTN_TV_IN_GPIO_IN_GPIO_Port, .GPIO_Pin = nBTN_TV_IN_GPIO_IN_Pin},
-    [BTN_LC] = {.GPIO_Port = nBTN_LC_IN_GPIO_IN_GPIO_Port, .GPIO_Pin = nBTN_LC_IN_GPIO_IN_Pin},
+    [BTN_RTD]     = {.GPIO_Port = nRTD_BTN_IN_GPIO_IN_GPIO_Port, .GPIO_Pin = nRTD_BTN_IN_GPIO_IN_Pin},
+    [BTN_TC]      = {.GPIO_Port = nBTN_TC_IN_GPIO_IN_GPIO_Port, .GPIO_Pin = nBTN_TC_IN_GPIO_IN_Pin},
+    [BTN_TV]      = {.GPIO_Port = nBTN_TV_IN_GPIO_IN_GPIO_Port, .GPIO_Pin = nBTN_TV_IN_GPIO_IN_Pin},
+    [BTN_LC]      = {.GPIO_Port = nBTN_LC_IN_GPIO_IN_GPIO_Port, .GPIO_Pin = nBTN_LC_IN_GPIO_IN_Pin},
     [BTN_GENERAL] = {.GPIO_Port = nBTN_GENERAL_IN_GPIO_IN_GPIO_Port, .GPIO_Pin = nBTN_GENERAL_IN_GPIO_IN_Pin}};
 
 static uint8_t BTN_GPIO_invert_vector[BTN_Device_NUM] =
@@ -292,6 +292,49 @@ void ROT_SW_Routine(void) {
     }
 }
 
+/* BUZZER ####################################################################*/
+/*---------- Private define --------------------------------------------------*/
+
+/*---------- Private macro ---------------------------------------------------*/
+
+/*---------- Private variables -----------------------------------------------*/
+
+static const struct GPIO_Tuple BUZZER_Device_to_GPIO_Tuple_map[BUZZER_Device_NUM] = {
+    [BUZZER] = {.GPIO_Port = BUZZER_CMD_GPIO_OUT_GPIO_Port, .GPIO_Pin = BUZZER_CMD_GPIO_OUT_Pin},
+};
+
+/*---------- Private function prototypes -------------------------------------*/
+
+/*---------- Exported Variables ----------------------------------------------*/
+
+/*---------- Exported Functions ----------------------------------------------*/
+
+void BUZZER_setState(enum BUZZER_Device device, enum BUZZER_State state) {
+    assert_param(device != BUZZER_Device_NUM);
+    assert_param(state != BUZZER_State_NUM);
+    GPIO_TypeDef *port = BUZZER_Device_to_GPIO_Tuple_map[device].GPIO_Port;
+    uint16_t pin       = BUZZER_Device_to_GPIO_Tuple_map[device].GPIO_Pin;
+
+    HAL_GPIO_WritePin(port, pin, state);
+}
+
+void BUZZER_toggleState(enum BUZZER_Device device, enum BUZZER_State state) {
+    assert_param(device != BUZZER_Device_NUM);
+    assert_param(state != BUZZER_State_NUM);
+    GPIO_TypeDef *port = BUZZER_Device_to_GPIO_Tuple_map[device].GPIO_Port;
+    uint16_t pin       = BUZZER_Device_to_GPIO_Tuple_map[device].GPIO_Pin;
+
+    HAL_GPIO_TogglePin(port, pin);
+}
+
+enum BUZZER_State BUZZER_getState(enum BUZZER_Device device) {
+    assert_param(device != BUZZER_Device_NUM);
+    GPIO_TypeDef *port = BUZZER_Device_to_GPIO_Tuple_map[device].GPIO_Port;
+    uint16_t pin       = BUZZER_Device_to_GPIO_Tuple_map[device].GPIO_Pin;
+
+    return HAL_GPIO_ReadPin(port, pin) == GPIO_PIN_SET ? LED_On : LED_Off;
+}
+
 /* LED MONO (Monochrome Leds) ################################################*/
 /*---------- Private define --------------------------------------------------*/
 
@@ -357,8 +400,8 @@ enum LED_MONO_State LED_MONO_getState(enum LED_MONO_Device device) {
 }
 /*---------- Private Functions -----------------------------------------------*/
 /* LED RGB (RGB Leds) ########################################################*/
-#include "main.h"
 #include "gpio.h"
+#include "main.h"
 
 /*---------- Private define --------------------------------------------------*/
 
@@ -369,35 +412,25 @@ enum LED_MONO_State LED_MONO_getState(enum LED_MONO_Device device) {
 /*
  * @brief This data structure maps RGB devices color channels to the GPIO
  */
-static const struct GPIO_Tuple LED_RGB_Device_to_GPIO_Tuples_map[LED_Device_NUM][RGB_DEVICE_ColorChnl_NUM] = {
-    // [LED_RGB1] = {
-    //     [RGB_DEVICE_ColorChnl_Red]={.GPIO_Port=LED_1_R_GPIO...._GPIO_Port, .GPIO_Pin=LED1_R_GPIO...>Pin}, 
-    //     [RGB_DEVICE_ColorChnl_Green]={.GPIO_Port=..., .GPIO_Pin=...},  
-    //     [RGB_DEVICE_ColorChnl_Blue]={.GPIO_Port=..., .GPIO_Pin=...}
-    // },
-    // [LED_RGB2] ={...},
-    [LED_RGB1] = {
-        //TODO
-        [RGB_DEVICE_ColorChnl_Red]={}, 
-        [RGB_DEVICE_ColorChnl_Green]={},  
-        [RGB_DEVICE_ColorChnl_Blue]={}
-    },
-    [LED_RGB2] = {
-        [RGB_DEVICE_ColorChnl_Red]={}, 
-        [RGB_DEVICE_ColorChnl_Green]={},  
-        [RGB_DEVICE_ColorChnl_Blue]={}
-    },
-    [LED_RGB3] = {
-        [RGB_DEVICE_ColorChnl_Red]={}, 
-        [RGB_DEVICE_ColorChnl_Green]={},  
-        [RGB_DEVICE_ColorChnl_Blue]={}
-    },
-    [LED_RGB_DASH] = {
-        [RGB_DEVICE_ColorChnl_Red]={}, 
-        [RGB_DEVICE_ColorChnl_Green]={},  
-        [RGB_DEVICE_ColorChnl_Blue]={}
-    },
-
+static const struct GPIO_Tuple LED_RGB_Device_to_GPIO_Tuples_map[LED_RGB_Device_NUM][RGB_DEVICE_ColorChnl_NUM] = {
+     [LED_RGB1] =
+        {
+            [RGB_DEVICE_ColorChnl_Red]   = {.GPIO_Port = RGB1_RED_CMD_GPIO_Port, .GPIO_Pin = RGB1_RED_CMD_Pin},
+            [RGB_DEVICE_ColorChnl_Green] = {.GPIO_Port = RGB1_GREEN_CMD_GPIO_Port, .GPIO_Pin = RGB1_GREEN_CMD_Pin},
+            [RGB_DEVICE_ColorChnl_Blue]  = {.GPIO_Port = RGB1_BLUE_CMD_GPIO_Port, .GPIO_Pin = RGB1_BLUE_CMD_Pin},
+        },
+    [LED_RGB2] =
+        {
+            [RGB_DEVICE_ColorChnl_Red]   = {.GPIO_Port = RGB2_RED_CMD_GPIO_Port, .GPIO_Pin = RGB2_RED_CMD_Pin},
+            [RGB_DEVICE_ColorChnl_Green] = {.GPIO_Port = RGB2_GREEN_CMD_GPIO_Port, .GPIO_Pin = RGB2_GREEN_CMD_Pin},
+            [RGB_DEVICE_ColorChnl_Blue]  = {.GPIO_Port = RGB2_BLUE_CMD_GPIO_Port, .GPIO_Pin = RGB2_BLUE_CMD_Pin},
+        },
+    [LED_RGB3] =
+        {
+            [RGB_DEVICE_ColorChnl_Red]   = {.GPIO_Port = RGB3_RED_CMD_GPIO_Port, .GPIO_Pin = RGB3_RED_CMD_Pin},
+            [RGB_DEVICE_ColorChnl_Green] = {.GPIO_Port = RGB3_GREEN_CMD_GPIO_Port, .GPIO_Pin = RGB3_GREEN_CMD_Pin},
+            [RGB_DEVICE_ColorChnl_Blue]  = {.GPIO_Port = RGB3_BLUE_CMD_GPIO_Port, .GPIO_Pin = RGB3_BLUE_CMD_Pin},
+        },
 };
 
 /*---------- Private function prototypes -------------------------------------*/
@@ -410,13 +443,19 @@ void LED_RGB_setColor(enum LED_RGB_Device device, uint8_t red, uint8_t green, ui
     assert_param(device != LED_RGB_Device_NUM);
 
     struct GPIO_Tuple ColorChnl_GPIO[RGB_DEVICE_ColorChnl_NUM] = {};
-    ColorChnl_GPIO[RGB_DEVICE_ColorChnl_Red] = LED_RGB_Device_to_GPIO_Tuples_map[device][RGB_DEVICE_ColorChnl_Red];
+    ColorChnl_GPIO[RGB_DEVICE_ColorChnl_Red]   = LED_RGB_Device_to_GPIO_Tuples_map[device][RGB_DEVICE_ColorChnl_Red];
     ColorChnl_GPIO[RGB_DEVICE_ColorChnl_Green] = LED_RGB_Device_to_GPIO_Tuples_map[device][RGB_DEVICE_ColorChnl_Green];
-    ColorChnl_GPIO[RGB_DEVICE_ColorChnl_Blue] = LED_RGB_Device_to_GPIO_Tuples_map[device][RGB_DEVICE_ColorChnl_Blue];
+    ColorChnl_GPIO[RGB_DEVICE_ColorChnl_Blue]  = LED_RGB_Device_to_GPIO_Tuples_map[device][RGB_DEVICE_ColorChnl_Blue];
 
-    HAL_GPIO_WritePin(ColorChnl_GPIO[RGB_DEVICE_ColorChnl_Red].GPIO_Port, ColorChnl_GPIO[RGB_DEVICE_ColorChnl_Red].GPIO_Pin, red > 0 ? GPIO_PIN_SET : GPIO_PIN_RESET);
-    HAL_GPIO_WritePin(ColorChnl_GPIO[RGB_DEVICE_ColorChnl_Green].GPIO_Port, ColorChnl_GPIO[RGB_DEVICE_ColorChnl_Green].GPIO_Pin, green > 0 ? GPIO_PIN_SET : GPIO_PIN_RESET);
-    HAL_GPIO_WritePin(ColorChnl_GPIO[RGB_DEVICE_ColorChnl_Blue].GPIO_Port, ColorChnl_GPIO[RGB_DEVICE_ColorChnl_Blue].GPIO_Pin, blue > 0 ? GPIO_PIN_SET : GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(ColorChnl_GPIO[RGB_DEVICE_ColorChnl_Red].GPIO_Port,
+                      ColorChnl_GPIO[RGB_DEVICE_ColorChnl_Red].GPIO_Pin,
+                      red > 0 ? GPIO_PIN_SET : GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(ColorChnl_GPIO[RGB_DEVICE_ColorChnl_Green].GPIO_Port,
+                      ColorChnl_GPIO[RGB_DEVICE_ColorChnl_Green].GPIO_Pin,
+                      green > 0 ? GPIO_PIN_SET : GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(ColorChnl_GPIO[RGB_DEVICE_ColorChnl_Blue].GPIO_Port,
+                      ColorChnl_GPIO[RGB_DEVICE_ColorChnl_Blue].GPIO_Pin,
+                      blue > 0 ? GPIO_PIN_SET : GPIO_PIN_RESET);
 }
 
 /* Main CAN Bus Comunication #################################################*/
@@ -483,27 +522,5 @@ void MCB_send_msg(uint32_t id) {
     // TODO: check for HAL_TIMEOUT
     CAN_send(&MCB_Handle, buffer, &tx_header);
 }
-
-/*---------- Private Functions -----------------------------------------------*/
-
-/* LCD TFT SCREEN ILI9488 ####################################################*/
-
-/*---------- Private define -----------------.--------------------------------*/
-
-/*---------- Private macro ------------------.--------------------------------*/
-
-/*---------- Private variables --------------.--------------------------------*/
-enum LCD_TFT_Device{CS, RST, DC, LCD_TFT_Device_NUM};
-static const struct GPIO_Tuple LCD_TFT_Device_to_GPIO_Tuple_map[LCD_TFT_Device_NUM] = {
-    [CS]  = {.GPIO_Port = LCD_TFT_CS_GPIO_OUT_GPIO_Port, .GPIO_Pin = LCD_TFT_CS_GPIO_OUT_Pin},
-    [DC]  = {.GPIO_Port = LCD_TFT_DC_GPIO_OUT_GPIO_Port, .GPIO_Pin = LCD_TFT_DC_GPIO_OUT_Pin},
-    [RST] = {.GPIO_Port = LCD_TFT_RST_GPIO_OUT_GPIO_Port, .GPIO_Pin = LCD_TFT_RST_GPIO_OUT_Pin},
-};
-
-/*---------- Private function prototypes ----.--------------------------------*/
-
-/*---------- Exported Variables -------------.--------------------------------*/
-
-/*---------- Exported Functions ----------------------------------------------*/
 
 /*---------- Private Functions -----------------------------------------------*/

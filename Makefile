@@ -67,6 +67,7 @@ Core/Src/dashboard.c \
 Core/Src/button.c \
 Core/Src/wdg.c \
 Core/Src/bsp.c \
+Core/Src/display.c \
 Core/Src/stm32f4xx_it.c \
 Core/Src/stm32f4xx_hal_msp.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c \

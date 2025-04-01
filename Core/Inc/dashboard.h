@@ -1,11 +1,7 @@
 /*INCLUDES*/
 
 #include "bsp.h"
-#include "ili9488.h"
-#include "lvgl_callbacks.h"
-#include "lvgl.h"
 #include "main.h"
-#include "screens.h"
 
 #include <math.h>
 #include <stdbool.h>
@@ -23,9 +19,8 @@ typedef enum { ERROR_NONE = 0, ERROR_CAN_WDG, ERROR_INIT_BTN } error_t;
 
 /*CUSTOM FUNCTIONS PROTOTYPES*/
 
-void InitDashBoard();
-void SetupDashBoard(void);
-void CoreDashBoard(void);
+void Dashboard_Setup(void);
+void Dashboard_Loop(void);
 void can_send_state(uint32_t delay_100us);
 void UpdateCockpitLed(uint32_t delay_100us);
 void ReadyToDriveFSM(uint32_t delay_100us);

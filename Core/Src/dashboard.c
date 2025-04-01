@@ -1,7 +1,7 @@
 /*INCLUDE*/
 
 #include "dashboard.h"
-
+#include "display.h"
 #include "bsp.h"
 #include "button.h"
 #include "can.h"
@@ -9,7 +9,6 @@
 #include "hvcb.h"
 #include "main.h"
 #include "mcb.h"
-#include "screen_loader.h"
 #include "tim.h"
 #include "usart.h"
 #include "utils.h"
@@ -74,7 +73,6 @@ volatile struct RGB_Led_t LED1;
 volatile struct RGB_Led_t LED2;
 volatile struct RGB_Led_t LED3;
 volatile struct RGB_Led_t LED4;
-
 
 /* dSpace ACK flags */
 volatile int8_t dspace_rtd_state;
@@ -240,49 +238,6 @@ void HAL_CAN_RxFifo1MsgPendingCallback(CAN_HandleTypeDef *hcan) {
             hvcb_hvb_rx_diagnosis_hvb_diag_bat_curr_oc_decode(msgs.hvb_rx_diagnosis.hvb_diag_bat_curr_oc);
     }
 }
-
-void InitDashBoard() {
-    //Send hello message
-    MCB_send_msg(MCB_DASH_HELLO_FRAME_ID);
-
-    // Initialize leds (turn all off)
-    HAL_GPIO_WritePin(TS_OFF_LED_CMD_GPIO_OUT_GPIO_Port, TS_OFF_LED_CMD_GPIO_OUT_Pin, GPIO_PIN_RESET);
-    HAL_GPIO_WritePin(AMS_ERR_LED_nCMD_GPIO_OUT_GPIO_Port, AMS_ERR_LED_nCMD_GPIO_OUT_Pin, GPIO_PIN_SET);
-    HAL_GPIO_WritePin(IMD_ERR_LED_nCMD_GPIO_OUT_GPIO_Port, IMD_ERR_LED_nCMD_GPIO_OUT_Pin, GPIO_PIN_SET);
-
-    // Turn on all LEDs
-    HAL_GPIO_WritePin(TS_OFF_LED_CMD_GPIO_OUT_GPIO_Port, TS_OFF_LED_CMD_GPIO_OUT_Pin, GPIO_PIN_SET);
-    HAL_GPIO_WritePin(AMS_ERR_LED_nCMD_GPIO_OUT_GPIO_Port, AMS_ERR_LED_nCMD_GPIO_OUT_Pin, GPIO_PIN_RESET);
-    HAL_GPIO_WritePin(IMD_ERR_LED_nCMD_GPIO_OUT_GPIO_Port, IMD_ERR_LED_nCMD_GPIO_OUT_Pin, GPIO_PIN_RESET);
-    HAL_GPIO_WritePin(RTD_LED_GPIO_Port, RTD_LED_Pin, GPIO_PIN_SET);
-// HAL_Delay(1500);
-
-// Disable The SDC relay and wait later for closing it
-#if 0
-    HAL_GPIO_WritePin(SDC_RLY_CMD_GPIO_OUT_GPIO_Port, SDC_RLY_CMD_GPIO_OUT_Pin, GPIO_PIN_SET);
-#endif
-
-    HAL_GPIO_WritePin(BUZZER_CMD_GPIO_OUT_GPIO_Port, BUZZER_CMD_GPIO_OUT_Pin, GPIO_PIN_SET);
-    HAL_Delay(50);
-    HAL_GPIO_WritePin(BUZZER_CMD_GPIO_OUT_GPIO_Port, BUZZER_CMD_GPIO_OUT_Pin, GPIO_PIN_RESET);
-
-#if 0
-    HAL_GPIO_WritePin(SDC_RLY_CMD_GPIO_OUT_GPIO_Port, SDC_RLY_CMD_GPIO_OUT_Pin, GPIO_PIN_RESET);
-#endif
-
-    // Test inputs
-    // if (button_get(BUTTON_RTD))
-    // {
-    //     error = ERROR_INIT_BTN;
-    //     rtd_fsm = STATE_ERROR;
-    // }
-
-    create_screen_main();
-    lv_scr_load(objects.main);
-
-    btn_press_at_start = BTN_sampleStatus(BTN_GENERAL);
-}
-
 void cock_callback() {
     RTD_BUTTON = true;
 }
@@ -316,6 +271,7 @@ void UpdateCockpitLed(uint32_t delay_100us) {
             HAL_GPIO_WritePin(IMD_ERR_LED_nCMD_GPIO_OUT_GPIO_Port, IMD_ERR_LED_nCMD_GPIO_OUT_Pin, !IMD_ERR);
         }
 
+#if 0
         // Control of Dashboard reserved led
         if ((boards_timeouts & (1 << WDG_BOARD_DSPACE)) || (boards_timeouts & (1 << WDG_BOARD_TLB))) {
             // tlb message or dspace message timeout
@@ -353,11 +309,12 @@ void UpdateCockpitLed(uint32_t delay_100us) {
         LED_RGB_setColor(LED_RGB1, LED1.R, LED1.G, LED1.B);
         LED_RGB_setColor(LED_RGB2, LED2.R, LED2.G, LED2.B);
         LED_RGB_setColor(LED_RGB3, LED3.R, LED3.G, LED3.B);
+#endif
     }
 }
 
 /*Setup TIMER, CAN*/
-void SetupDashBoard(void) {
+void Dashboard_Setup(void) {
     HAL_TIM_Base_Start_IT(&COUNTER_TIM);
 
     // start pwm at 0%
@@ -383,19 +340,35 @@ void SetupDashBoard(void) {
     }
     HAL_DAC_SetValue(&PUMPS_DAC, PUMPS_DAC_CHANNEL, DAC_ALIGN_8B_R, 0);
 
-    ILI9488_init();
-    lv_init();
+    //Send hello message
+    MCB_send_msg(MCB_DASH_HELLO_FRAME_ID);
 
-    lv_tick_set_cb(HAL_GetTick);
-    lv_display_t *display1 = lv_display_create(HORIZONTAL_RES, VERTICAL_RES);
-    lv_display_set_buffers(display1, buf1, NULL, LVGL_BUFFER_SIZE, LV_DISPLAY_RENDER_MODE_PARTIAL);
-    lv_display_set_flush_cb(display1, LVGL_CLB_flush_clb);
+    // Initialize leds (turn all off)
+    LED_MONO_setState(LED_TS_Off, LED_Off);
+    LED_MONO_setState(LED_AMS_Error, LED_On);
+    LED_MONO_setState(LED_IMD_Error, LED_On);
 
-#if LV_USE_LOG
-    lv_log_register_print_cb(LVGL_CLB_log_clb);
+    // Turn on all LEDs
+    LED_MONO_setState(LED_TS_Off, LED_On);
+    LED_MONO_setState(LED_AMS_Error, LED_Off);
+    LED_MONO_setState(LED_IMD_Error, LED_Off);
+    LED_MONO_setState(LED_Err, LED_On);  // old RTD LED
+
+// Disable The SDC relay and wait later for closing it
+#if 0
+       HAL_GPIO_WritePin(SDC_RLY_CMD_GPIO_OUT_GPIO_Port, SDC_RLY_CMD_GPIO_OUT_Pin, GPIO_PIN_SET);
+#endif
+    BUZZER_setState(BUZZER, BUZZER_On);
+    HAL_Delay(50);
+    BUZZER_setState(BUZZER, BUZZER_Off);
+
+#if 0
+       HAL_GPIO_WritePin(SDC_RLY_CMD_GPIO_OUT_GPIO_Port, SDC_RLY_CMD_GPIO_OUT_Pin, GPIO_PIN_RESET);
 #endif
 
-    custom_ui_init();
+    btn_press_at_start = BTN_sampleStatus(BTN_GENERAL);
+
+    Display_Setup();
 }
 
 /*Send status data to CAN BUS*/
@@ -504,37 +477,12 @@ uint8_t AMS_detection(uint8_t ams_err_tlb,
         }                                         \
     } while (0)
 
-static uint8_t i = 0;
-void LCD_DisplayUpdateRoutine(void) {
-    lv_obj_t *scr_act = lv_scr_act();
-    if (scr_act != NULL) {
-        lv_obj_del(lv_scr_act());
-    }
 
-    switch ((i++) % 4) {
-        case 0:
-            create_screen_main();
-            lv_scr_load(objects.main);
-            break;
-        case 1:
-            create_screen_tires();
-            lv_scr_load(objects.tires);
-            break;
-        case 2:
-            create_screen_inverters();
-            lv_scr_load(objects.inverters);
-            break;
-        case 3:
-            create_screen_extra();
-            lv_scr_load(objects.extra);
-            break;
-    }
-}
 
 /**
     * @brief Dash main loop
  */
-void CoreDashBoard(void) {
+void Dashboard_Loop(void) {
     // Blink green led to signal activity
     static uint32_t led_blink = 0;
     static uint32_t cnt10ms   = 0;

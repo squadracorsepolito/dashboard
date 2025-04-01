@@ -175,6 +175,45 @@ void BTN_Routine(void);
 
 /* ---------- Private constants ----------------------------------------------*/
 
+/* BUZZER ####################################################################*/
+
+/* ---------- Includes -------------------------------------------------------*/
+
+/* ---------- Exported types -------------------------------------------------*/
+enum BUZZER_State { BUZZER_Off = 0, BUZZER_On = 1, BUZZER_State_NUM };
+
+/**
+ * @brief Buzzer Device
+ */
+enum BUZZER_Device {
+    BUZZER,
+    BUZZER_Device_NUM /*!< Number of BUZZER Led Devices */
+};
+
+/* ---------- Exported constants ---------------------------------------------*/
+
+/* ---------- Exported variables ---------------------------------------------*/
+
+/* ---------- Exported macros ------------------------------------------------*/
+
+/* ---------- Exported functions ---------------------------------------------*/
+
+void BUZZER_setState(enum BUZZER_Device device, enum BUZZER_State state);
+void BUZZER_toggleState(enum BUZZER_Device device, enum BUZZER_State state);
+enum BUZZER_State BUZZER_getState(enum BUZZER_Device device);
+
+/* ---------- Private types --------------------------------------------------*/
+
+/* ---------- Private variables ----------------------------------------------*/
+
+/* ---------- Private constants ----------------------------------------------*/
+
+/* LED RGB (RGB Leds) ########################################################*/
+
+/* ---------- Includes -------------------------------------------------------*/
+
+/* ---------- Exported types -------------------------------------------------*/
+
 /* LED MONO (Monochrome Leds) ################################################*/
 
 /* ---------- Includes -------------------------------------------------------*/
@@ -228,8 +267,7 @@ enum LED_RGB_Device {
     LED_RGB1,      /*!< LED RGB number 1*/
     LED_RGB2,      /*!< LED RGB number 2 */
     LED_RGB3,      /*!< LED RGB number 3 */
-    LED_RGB_DASH,  /*!< LED RGB used by Dashboard device */
-    LED_Device_NUM /*!< Number of RGB Leds Devices */
+    LED_RGB_Device_NUM /*!< Number of RGB Leds Devices */
 };
 
 enum RGB_DEVICE_ColorChnl { RGB_DEVICE_ColorChnl_Red = 0, RGB_DEVICE_ColorChnl_Green, RGB_DEVICE_ColorChnl_Blue, RGB_DEVICE_ColorChnl_NUM };
@@ -323,24 +361,6 @@ void MCB_send_msg(uint32_t id);
 
 /* ---------- Private Macros -------------------------------------------------*/
 
-/* LCD TFT SCREEN ILI9488 ####################################################*/
-/* ---------- Includes -------------------------------------------------------*/
-#include "spi.h"
-#include "usart.h"
-/* ---------- Exported types -------------------------------------------------*/
-
-/* ---------- Exported constants ---------------------------------------------*/
-#define LCD_TFT_SPI_Handle hspi1
-#define LCD_TFT_USART_Handle huart1
-/* ---------- Exported variables ---------------------------------------------*/
-
-/* ---------- Exported macros ------------------------------------------------*/
-
-/* ---------- Exported functions ---------------------------------------------*/
-
-/* ---------- Private types --------------------------------------------------*/
-
-/* ---------- Private variables ----------------------------------------------*/
-
-/* ---------- Private constants ----------------------------------------------*/
 #endif
+
+
