@@ -1,54 +1,77 @@
 /**
- * @file    lvgl_callbacks.h
- * @author  Matteo Giuliani [matteo.giuliani.sc@gmail.com || glnmatteo0@gmail.com]
- * @date    2024-12-20
- * @version v0.0.1
- * @prefix  LVGL_CLB
+ * @file    eez_actions.h
+ * @author  Matteo Giuliani [matteo.giuliani.sc@gmail.com]
+ * @date    2024-11-22 (date of creation)
+ * @updated 2025-04-02 (date of last update)
+ * @version v1.0.1
+ * @prefix  EEZ_ACT
  *
- * @brief   Implementation of the fuctions required (and also auxiliary) for the LVGL Lib
+ * @brief   Header of the functions that defines actions for the eez ui 
+ *
+ * @license Licensed under "THE BEER-WARE LICENSE", Revision 69 
+ *          see LICENSE file in the root directory of this software component
  */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef _LVGL_CALLBACKS_H_
-#define _LVGL_CALLBACKS_H_
+#ifndef _EEZ_ACTIONS_H_
+#define _EEZ_ACTIONS_H_
 
-/*---------- SHARED ##########################################################*/
+/* SHARED ####################################################################*/
 /* ---------- Includes -------------------------------------------------------*/
-#include "ili9488.h"
-#include "lvgl.h"
-#include "bsp.h"
-
-/*---------- LVGL DRAW CALLBACK ##############################################*/
-/* ---------- Includes -------------------------------------------------------*/
+#include "screens.h"
 /* ---------- Exported types -------------------------------------------------*/
-#define LVGL_BYTES_PER_PIXEL (LV_COLOR_FORMAT_GET_SIZE(LV_COLOR_FORMAT_RGB888))
-#define LVGL_BUFFER_SIZE     (VERTICAL_RES * HORIZONTAL_RES * LVGL_BYTES_PER_PIXEL / 7)
+enum EEZ_Status_Bar_Color{
+    EEZ_STATUS_COLOR_GREEN,
+    EEZ_STATUS_COLOR_RED,
+    EEZ_STATUS_COLOR_BLUE,
+    EEZ_STATUS_COLOR_ORANGE,
+    EEZ_STATUS_COLOR_COUNT
+};
 /* ---------- Exported constants ---------------------------------------------*/
+
 /* ---------- Exported variables ---------------------------------------------*/
-extern uint8_t buf1[];
-extern struct ILI9488_Handle ili9488_handle; 
+
 /* ---------- Exported macros ------------------------------------------------*/
+
 /* ---------- Exported functions ---------------------------------------------*/
-void LVGL_CLB_flush_clb(lv_display_t *display, const lv_area_t *area, uint8_t *px_map);
+void EEZ_ACT_cmn_set_lbl_lv_bat_v(float new_value);
+void EEZ_ACT_cmn_set_lbl_hv_soc(uint8_t new_value);
+void EEZ_ACT_cmn_set_lbl_sx_rot_sw_map(uint8_t new_value);
+void EEZ_ACT_cmn_set_lbl_dx_rot_sw_map(uint8_t new_value);
+void EEZ_ACT_cmn_set_pnl_status_bar_color(enum EEZ_Status_Bar_Color new_color);
 /* ---------- Private types --------------------------------------------------*/
+
 /* ---------- Private variables ----------------------------------------------*/
+
 /* ---------- Private constants ----------------------------------------------*/
+
 /* ---------- Private Macros -------------------------------------------------*/
 
-/*---------- LVGL LOG CALLBACK ###############################################*/
+/* TIRES #####################################################################*/
 /* ---------- Includes -------------------------------------------------------*/
-#include <stdio.h>
-#include <string.h>
-/* ---------- Exported types -------------------------------------------------*/
-/* ---------- Exported constants ---------------------------------------------*/
-/* ---------- Exported variables ---------------------------------------------*/
-/* ---------- Exported macros ------------------------------------------------*/
-/* ---------- Exported functions ---------------------------------------------*/
-void LVGL_CLB_log_clb(lv_log_level_t level, const char *buf);
-void LVGL_CLB_mem_usage();
-/* ---------- Private types --------------------------------------------------*/
-/* ---------- Private variables ----------------------------------------------*/
-/* ---------- Private constants ----------------------------------------------*/
-/* ---------- Private Macros -------------------------------------------------*/
 
+/* ---------- Exported types -------------------------------------------------*/
+
+/* ---------- Exported constants ---------------------------------------------*/
+
+/* ---------- Exported variables ---------------------------------------------*/
+
+/* ---------- Exported macros ------------------------------------------------*/
+
+/* ---------- Exported functions ---------------------------------------------*/
+void EEZ_ACT_tires_set_lbl_fl_tmp(float new_value);
+void EEZ_ACT_tires_set_lbl_fr_tmp(float new_value);
+void EEZ_ACT_tires_set_lbl_rr_tmp(float new_value);
+void EEZ_ACT_tires_set_lbl_rl_tmp(float new_value);
+void EEZ_ACT_tires_set_lbl_fl_bar(float new_value);
+void EEZ_ACT_tires_set_lbl_fr_bar(float new_value);
+void EEZ_ACT_tires_set_lbl_rr_bar(float new_value);
+void EEZ_ACT_tires_set_lbl_rl_bar(float new_value);
+/* ---------- Private types --------------------------------------------------*/
+
+/* ---------- Private variables ----------------------------------------------*/
+
+/* ---------- Private constants ----------------------------------------------*/
+
+/* ---------- Private Macros -------------------------------------------------*/
 #endif

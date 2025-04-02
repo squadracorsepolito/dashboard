@@ -95,11 +95,11 @@ Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c \
 Lib/SCan/SC24/artifacts/MCB/c_source/mcb.c \
 Lib/SCan/SC24/artifacts/HVCB/c_source/hvcb.c \
-Lib/LVGL/lvgl_callbacks.c \
+Lib/LVGL/lvgl_utils.c \
 Drivers/ILI9488/ili9488.c \
-EEZ/screen_loader.c \
+EEZ/eez_utils.c \
+EEZ/eez_actions.c \
 EEZ/src/ui/ui.c \
-EEZ/src/ui/images.c \
 EEZ/src/ui/styles.c \
 EEZ/src/ui/screens.c \
 Core/Src/iwdg.c \

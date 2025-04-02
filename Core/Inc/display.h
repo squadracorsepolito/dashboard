@@ -3,7 +3,7 @@
  * @author  Matteo Giuliani [matteo.giuliani.sc@gmail.com | glnmatteo0@gmail.com]
  * @date    2025-04-01
  * @version v1.0.0
- * @prefix  DISPLAY
+ * @prefix  DISP
  *
  * @brief   Library for the display
  * @details This code implements bla bla
@@ -20,24 +20,30 @@
 
 #include "spi.h"
 #include "usart.h"
+#include "lvgl_utils.h"
 #include "ili9488.h"
+#include "lvgl.h"
+#include "eez_utils.h"
+#include "eez_actions.h"
 
 /* ---------- Exported types -------------------------------------------------*/
-
-
+extern struct ILI9488_Handle ili9488_handle;
+extern struct ILI9488_GPIO_Map ili9488_gpio_map;
 /* ---------- Exported constants ---------------------------------------------*/
 #define LCD_TFT_SPI_Handle hspi1
 #define LCD_TFT_USART_Handle huart1
 
+#define DISP_BYTES_PER_PIXEL (LV_COLOR_FORMAT_GET_SIZE(LV_COLOR_FORMAT_RGB888))
+#define DISP_BUFFER_SIZE     (ILI9488_VERTICAL_RES * ILI9488_HORIZONTAL_RES * DISP_BYTES_PER_PIXEL / 7)
+
 /* ---------- Exported variables ---------------------------------------------*/
-extern struct ILI9488_Handle ili9488_handle; 
-extern struct ILI9488_GPIO_Map ili9488_gpio_map;
+extern uint8_t DISP_buffer[DISP_BUFFER_SIZE];
 /* ---------- Exported macros ------------------------------------------------*/
 
 
 /* ---------- Exported functions ---------------------------------------------*/
-void Display_Setup(void);
-void LCD_DisplayUpdateRoutine(void);
+void DISP_init(void);
+void DISP_update_routine(void);
 
 /* ---------- Private types --------------------------------------------------*/
 

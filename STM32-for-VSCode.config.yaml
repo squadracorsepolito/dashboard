@@ -86,11 +86,11 @@ sourceFiles:
   - Core/Src/**
   - Lib/LVGL/lvgl/**
   - Lib/LVGL/lvgl/src/**
-  - Lib/LVGL/callbacks.c
+  - Lib/LVGL/lvgl_utils.c
   - Drivers/ILI9488/ili9488.c
-  - EEZ/screen_loader.c 
+  - EEZ/eez_utils.c 
+  - EEZ/eez_actions.c 
   - EEZ/src/ui/ui.c 
-  - EEZ/src/ui/images.c 
   - EEZ/src/ui/styles.c 
   - EEZ/src/ui/screens.c
 

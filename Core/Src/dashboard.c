@@ -370,7 +370,7 @@ void Dashboard_Setup(void) {
 
     btn_press_at_start = BTN_sampleStatus(BTN_GENERAL);
 
-    Display_Setup();
+    DISP_init();
 }
 
 /*Send status data to CAN BUS*/
@@ -528,7 +528,7 @@ void Dashboard_Loop(void) {
     // RUN the ready to drive FSM
     RTD_fsm(500);
 
-    LCD_DisplayUpdateRoutine();
+    DISP_update_routine();
 
     // Run the AS FSM
     // mission_run();

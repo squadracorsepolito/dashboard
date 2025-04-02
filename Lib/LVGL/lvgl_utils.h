@@ -1,51 +1,31 @@
 /**
- * @file    screen_loader.h
- * @author  Matteo Giuliani [matteo.giuliani.sc@gmail.com]
- * @date    2024-11-22 (date of creation)
- * @updated 202x-xx-xx (date of last update)
- * @version v0.0.1
- * @prefix  TMP
+ * @file    lvgl_utils.h
+ * @author  Matteo Giuliani [matteo.giuliani.sc@gmail.com || glnmatteo0@gmail.com]
+ * @date    2024-12-20
+ * @version v1.0.1
+ * @prefix  LVGL
  *
- * @brief   Header file of some sceen loader
- *
- * @license Licensed under "THE BEER-WARE LICENSE", Revision 69 
- *          see LICENSE file in the root directory of this software component
+ * @brief   Implementation of the fuctions required (and also auxiliary) for the LVGL Lib
  */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef _SCREEN_LOADER_H_
-#define _SCREEN_LOADER_H_
+#ifndef _LVGL_UTILS_H_
+#define _LVGL_UTILS_H_
 
 /* ---------- Includes -------------------------------------------------------*/
+#include "ili9488.h"
 #include "lvgl.h"
-#include "ui.h"
-
+#include "display.h"
 /* ---------- Exported types -------------------------------------------------*/
-
-
 /* ---------- Exported constants ---------------------------------------------*/
-
-
 /* ---------- Exported variables ---------------------------------------------*/
-
-
+extern struct ILI9488_Handle ili9488_handle; 
 /* ---------- Exported macros ------------------------------------------------*/
-
-
 /* ---------- Exported functions ---------------------------------------------*/
-
-
+void LVGL_flush_clbk(lv_display_t *display, const lv_area_t *area, uint8_t *px_map);
+void LVGL_init(void);
 /* ---------- Private types --------------------------------------------------*/
-
-
 /* ---------- Private variables ----------------------------------------------*/
-
-
 /* ---------- Private constants ----------------------------------------------*/
-
-
 /* ---------- Private Macros -------------------------------------------------*/
-static lv_obj_t *getLvglObjectFromIndex(int32_t index);
-void custom_ui_init();
-
 #endif

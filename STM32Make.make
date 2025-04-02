@@ -121,8 +121,8 @@ Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_adc.c \
-EEZ/screen_loader.c \
-EEZ/src/ui/images.c \
+EEZ/eez_actions.c \
+EEZ/eez_utils.c \
 EEZ/src/ui/screens.c \
 EEZ/src/ui/styles.c \
 EEZ/src/ui/ui.c \
@@ -495,7 +495,7 @@ Lib/LVGL/lvgl/src/widgets/tabview/lv_tabview.c \
 Lib/LVGL/lvgl/src/widgets/textarea/lv_textarea.c \
 Lib/LVGL/lvgl/src/widgets/tileview/lv_tileview.c \
 Lib/LVGL/lvgl/src/widgets/win/lv_win.c \
-Lib/LVGL/lvgl_callbacks.c \
+Lib/LVGL/lvgl_utils.c \
 Lib/SCan/SC24/artifacts/HVCB/c_source/hvcb.c \
 Lib/SCan/SC24/artifacts/MCB/c_source/mcb.c
 

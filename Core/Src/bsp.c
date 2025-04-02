@@ -413,7 +413,7 @@ enum LED_MONO_State LED_MONO_getState(enum LED_MONO_Device device) {
  * @brief This data structure maps RGB devices color channels to the GPIO
  */
 static const struct GPIO_Tuple LED_RGB_Device_to_GPIO_Tuples_map[LED_RGB_Device_NUM][RGB_DEVICE_ColorChnl_NUM] = {
-     [LED_RGB1] =
+    [LED_RGB1] =
         {
             [RGB_DEVICE_ColorChnl_Red]   = {.GPIO_Port = RGB1_RED_CMD_GPIO_Port, .GPIO_Pin = RGB1_RED_CMD_Pin},
             [RGB_DEVICE_ColorChnl_Green] = {.GPIO_Port = RGB1_GREEN_CMD_GPIO_Port, .GPIO_Pin = RGB1_GREEN_CMD_Pin},
