@@ -1,9 +1,9 @@
 {
   "navigation": {
-    "selectedUserPageObject": "[ILI9488.eez-project]:/userPages/3",
+    "selectedUserPageObject": "[ILI9488.eez-project]:/userPages/0",
     "selectedStyleObject": "[ILI9488.eez-project]:/lvglStyles/styles/1",
     "subnavigationSelectedItems": {
-      "variables-tab/sub-navigation/selected-item": "Global"
+      "variables-tab/sub-navigation/selected-item": "Enums"
     }
   },
   "layoutModel": {
@@ -24,10 +24,25 @@
           },
           {
             "type": "border",
-            "selected": 0,
-            "size": 234.5,
+            "size": 324.5,
             "location": "right",
             "children": [
+              {
+                "type": "tab",
+                "id": "PROPERTIES",
+                "name": "Properties",
+                "component": "propertiesPanel",
+                "enableClose": false,
+                "icon": "svg:properties"
+              },
+              {
+                "type": "tab",
+                "id": "COMPONENTS_PALETTE",
+                "name": "Components Palette",
+                "component": "componentsPalette",
+                "enableClose": false,
+                "icon": "svg:components"
+              },
               {
                 "type": "tab",
                 "id": "styles",
@@ -108,9 +123,43 @@
           },
           {
             "type": "border",
+            "selected": 1,
             "size": 240,
             "location": "left",
-            "children": []
+            "children": [
+              {
+                "type": "tab",
+                "id": "WIDGETS",
+                "name": "User Widgets",
+                "component": "widgets",
+                "enableClose": false,
+                "icon": "svg:user_widgets"
+              },
+              {
+                "type": "tab",
+                "id": "PAGES",
+                "name": "Pages",
+                "component": "pages",
+                "enableClose": false,
+                "icon": "svg:pages"
+              },
+              {
+                "type": "tab",
+                "id": "ACTIONS",
+                "name": "User Actions",
+                "component": "actions",
+                "enableClose": false,
+                "icon": "material:code"
+              },
+              {
+                "type": "tab",
+                "id": "VARIABLES",
+                "name": "Variables",
+                "component": "variables",
+                "enableClose": false,
+                "icon": "svg:variable"
+              }
+            ]
           }
         ],
         "layout": {
@@ -118,120 +167,32 @@
           "id": "#de82cd23-b5fd-4013-bf34-2918ead62fcc",
           "children": [
             {
-              "type": "row",
-              "id": "#63914e5a-c848-4a6f-877b-075579237bde",
-              "weight": 41.968911917098445,
-              "width": 243,
+              "type": "tabset",
+              "id": "#f13df622-2264-4f6d-a26e-12e6815f699c",
+              "weight": 16.429747922387033,
+              "enableClose": false,
               "children": [
                 {
-                  "type": "tabset",
-                  "id": "#cda62737-924e-4b41-bf64-7f744b80fce8",
-                  "weight": 1,
+                  "type": "tab",
+                  "id": "#a463a578-b903-47cf-b054-c3694621a90a",
+                  "name": "Widgets Structure",
+                  "component": "flow-structure",
                   "enableClose": false,
-                  "children": [
-                    {
-                      "type": "tab",
-                      "id": "PAGES",
-                      "name": "Pages",
-                      "component": "pages",
-                      "enableClose": false,
-                      "icon": "svg:pages"
-                    },
-                    {
-                      "type": "tab",
-                      "id": "WIDGETS",
-                      "name": "User Widgets",
-                      "component": "widgets",
-                      "enableClose": false,
-                      "icon": "svg:user_widgets"
-                    },
-                    {
-                      "type": "tab",
-                      "id": "ACTIONS",
-                      "name": "User Actions",
-                      "component": "actions",
-                      "enableClose": false,
-                      "icon": "material:code"
-                    }
-                  ]
-                },
-                {
-                  "type": "tabset",
-                  "id": "#f13df622-2264-4f6d-a26e-12e6815f699c",
-                  "weight": 1.2202729044834308,
-                  "enableClose": false,
-                  "children": [
-                    {
-                      "type": "tab",
-                      "id": "#a463a578-b903-47cf-b054-c3694621a90a",
-                      "name": "Widgets Structure",
-                      "component": "flow-structure",
-                      "enableClose": false,
-                      "icon": "svg:hierarchy"
-                    }
-                  ]
-                },
-                {
-                  "type": "tabset",
-                  "id": "#35525d6b-2f36-4a46-89a8-753fc1292598",
-                  "weight": 0.7797270955165692,
-                  "enableClose": false,
-                  "children": [
-                    {
-                      "type": "tab",
-                      "id": "VARIABLES",
-                      "name": "Variables",
-                      "component": "variables",
-                      "enableClose": false,
-                      "icon": "svg:variable"
-                    }
-                  ]
+                  "icon": "svg:hierarchy"
                 }
               ]
             },
             {
               "type": "tabset",
               "id": "EDITORS",
-              "weight": 37.925829219534066,
+              "weight": 63.46499321424545,
+              "selected": 1,
               "enableDeleteWhenEmpty": false,
               "enableClose": false,
               "children": [
                 {
                   "type": "tab",
-                  "id": "#abb73d2d-1f68-4690-a1a2-c913eda800f2",
-                  "name": "Main",
-                  "component": "editor",
-                  "config": {
-                    "objectPath": "[ILI9488.eez-project]:/userPages/0",
-                    "permanent": true
-                  },
-                  "icon": "svg:page"
-                },
-                {
-                  "type": "tab",
-                  "id": "#c45d1ff8-d1bd-4dfd-9303-287c11e4cae0",
-                  "name": "Extra",
-                  "component": "editor",
-                  "config": {
-                    "objectPath": "[ILI9488.eez-project]:/userPages/3",
-                    "permanent": true
-                  },
-                  "icon": "svg:page"
-                },
-                {
-                  "type": "tab",
-                  "id": "#4dc5f6fb-7d66-4fe1-86f0-ecdba09946c8",
-                  "name": "Inverters",
-                  "component": "editor",
-                  "config": {
-                    "objectPath": "[ILI9488.eez-project]:/userPages/2",
-                    "permanent": true
-                  },
-                  "icon": "svg:page"
-                },
-                {
-                  "type": "tab",
-                  "id": "#6c782a38-d2eb-46c2-a9fc-6cfe25f167da",
+                  "id": "#f0afb765-4eb0-4b81-bd7b-1276c1c06df2",
                   "name": "Settings",
                   "component": "editor",
                   "config": {
@@ -243,55 +204,17 @@
                 },
                 {
                   "type": "tab",
-                  "id": "#56f6d1eb-e4da-4f28-bf89-a355308569f6",
+                  "id": "#f196f48a-086c-470c-adc2-76de73effdbc",
                   "name": "Tires",
                   "component": "editor",
                   "config": {
-                    "objectPath": "[ILI9488.eez-project]:/userPages/1",
-                    "permanent": true
+                    "objectPath": "[ILI9488.eez-project]:/userPages/0",
+                    "permanent": false
                   },
                   "icon": "svg:page"
                 }
               ],
               "active": true
-            },
-            {
-              "type": "row",
-              "id": "#1fdebd68-1bf4-46a3-977b-2af8c306a7e9",
-              "weight": 20.105258863367457,
-              "width": 352,
-              "children": [
-                {
-                  "type": "tabset",
-                  "id": "#c9b4a7ff-2010-4b73-9f5b-9c8a1b02efb0",
-                  "weight": 2,
-                  "children": [
-                    {
-                      "type": "tab",
-                      "id": "PROPERTIES",
-                      "name": "Properties",
-                      "component": "propertiesPanel",
-                      "enableClose": false,
-                      "icon": "svg:properties"
-                    }
-                  ]
-                },
-                {
-                  "type": "tabset",
-                  "id": "#4d281faa-a21c-408e-8907-02cc055019f7",
-                  "weight": 1,
-                  "children": [
-                    {
-                      "type": "tab",
-                      "id": "COMPONENTS_PALETTE",
-                      "name": "Components Palette",
-                      "component": "componentsPalette",
-                      "enableClose": false,
-                      "icon": "svg:components"
-                    }
-                  ]
-                }
-              ]
             }
           ]
         }
@@ -1026,12 +949,24 @@
     "[ILI9488.eez-project]:/userPages/0[flow-state]": {
       "selection": {
         "0": {
-          "0": {},
-          "1": {
-            "2": {
-              "$selected": true
-            }
-          }
+          "0": {
+            "0": {},
+            "1": {},
+            "2": {},
+            "3": {}
+          },
+          "1": {},
+          "2": {},
+          "3": {},
+          "4": {},
+          "5": {
+            "0": {}
+          },
+          "6": {
+            "1": {},
+            "2": {}
+          },
+          "7": {}
         }
       },
       "transform": {
@@ -1050,21 +985,27 @@
     },
     "[ILI9488.eez-project]:/lvglStyles/styles[tree-state]": {
       "0": {},
-      "1": {}
+      "1": {
+        "$selected": true
+      }
     },
     "[ILI9488.eez-project]:/userPages/1[flow-state]": {
       "selection": {
         "0": {
-          "0": {
-            "0": {},
-            "2": {},
-            "4": {},
-            "6": {
-              "1": {
-                "$selected": true
-              }
-            }
-          }
+          "0": {},
+          "1": {
+            "0": {}
+          },
+          "2": {},
+          "3": {},
+          "4": {
+            "$selected": true
+          },
+          "5": {},
+          "6": {
+            "1": {}
+          },
+          "7": {}
         }
       },
       "transform": {
@@ -1082,7 +1023,29 @@
       }
     },
     "[ILI9488.eez-project]:/userWidgets/0[flow-state]": {
-      "selection": {},
+      "selection": {
+        "0": {
+          "$selected": true
+        },
+        "1": {
+          "$selected": true
+        },
+        "2": {
+          "$selected": true
+        },
+        "3": {
+          "$selected": true
+        },
+        "4": {
+          "$selected": true
+        },
+        "5": {
+          "$selected": true
+        },
+        "6": {
+          "$selected": true
+        }
+      },
       "transform": {
         "translate": {
           "x": -240,
@@ -1100,17 +1063,20 @@
     "[ILI9488.eez-project]:/userPages/2[flow-state]": {
       "selection": {
         "0": {
-          "0": {
-            "0": {},
-            "2": {},
-            "4": {},
-            "6": {
-              "1": {
-                "$selected": true
-              }
+          "0": {},
+          "1": {},
+          "2": {},
+          "3": {},
+          "4": {},
+          "5": {},
+          "6": {
+            "1": {
+              "$selected": true
             }
           },
-          "1": {}
+          "7": {
+            "0": {}
+          }
         }
       },
       "transform": {
@@ -1130,8 +1096,17 @@
     "[ILI9488.eez-project]:/userPages/3[flow-state]": {
       "selection": {
         "0": {
-          "0": {},
-          "1": {}
+          "0": {
+            "2": {}
+          },
+          "5": {
+            "0": {
+              "$selected": true
+            }
+          },
+          "6": {
+            "1": {}
+          }
         }
       },
       "transform": {

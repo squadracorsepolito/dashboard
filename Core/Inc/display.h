@@ -25,13 +25,17 @@
 #include "lvgl.h"
 #include "eez_utils.h"
 #include "eez_actions.h"
+#include "bsp.h"
 
 /* ---------- Exported types -------------------------------------------------*/
-extern struct ILI9488_Handle ili9488_handle;
-extern struct ILI9488_GPIO_Map ili9488_gpio_map;
 /* ---------- Exported constants ---------------------------------------------*/
+struct ILI9488_GPIO_Map {
+    struct GPIO_Tuple CS;
+    struct GPIO_Tuple DC;
+    struct GPIO_Tuple RST;
+};
+
 #define LCD_TFT_SPI_Handle hspi1
-#define LCD_TFT_USART_Handle huart1
 
 #define DISP_BYTES_PER_PIXEL (LV_COLOR_FORMAT_GET_SIZE(LV_COLOR_FORMAT_RGB888))
 #define DISP_BUFFER_SIZE     (ILI9488_VERTICAL_RES * ILI9488_HORIZONTAL_RES * DISP_BYTES_PER_PIXEL / 7)
