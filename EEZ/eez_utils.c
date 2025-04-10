@@ -43,15 +43,6 @@ void EEZ_create_screen(enum EEZ_UTI_Page page) {
         case EEZ_UTI_Tires_Page:
             target_screen_ptr = &objects.tires;
             break;
-        case EEZ_UTI_Main_Page:
-            target_screen_ptr = &objects.main;
-            break;
-        case EEZ_UTI_Inverters_Page:
-            target_screen_ptr = &objects.inverters;
-            break;
-        case EEZ_UTI_Extra_Page:
-            target_screen_ptr = &objects.extra;
-            break;
         default:
             return;
     }
@@ -71,21 +62,6 @@ void EEZ_create_screen(enum EEZ_UTI_Page page) {
         case EEZ_UTI_Tires_Page:
             create_screen_tires();
             lv_scr_load(objects.tires);
-            break;
-            
-        case EEZ_UTI_Main_Page:
-            create_screen_main();
-            lv_scr_load(objects.main);
-            break;
-            
-        case EEZ_UTI_Inverters_Page:
-            create_screen_inverters();
-            lv_scr_load(objects.inverters);
-            break;
-            
-        case EEZ_UTI_Extra_Page:
-            create_screen_extra();
-            lv_scr_load(objects.extra);
             break;
             
         default:

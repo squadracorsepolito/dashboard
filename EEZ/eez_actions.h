@@ -21,11 +21,14 @@
 #include "screens.h"
 /* ---------- Exported types -------------------------------------------------*/
 enum EEZ_Status_Bar_Color{
-    EEZ_STATUS_COLOR_GREEN,
-    EEZ_STATUS_COLOR_RED,
-    EEZ_STATUS_COLOR_BLUE,
-    EEZ_STATUS_COLOR_ORANGE,
-    EEZ_STATUS_COLOR_COUNT
+    EEZ_STATUS_BAR_COLOR_WHITE = 0,
+    EEZ_STATUS_BAR_COLOR_BLACK,
+    EEZ_STATUS_BAR_COLOR_GREEN,
+    EEZ_STATUS_BAR_COLOR_RED,
+    EEZ_STATUS_BAR_COLOR_BLUE,
+    EEZ_STATUS_BAR_COLOR_PURPLE,
+    EEZ_STATUS_BAR_COLOR_YELLOW,
+    EEZ_STATUS_BAR_COLOR_COUNT
 };
 /* ---------- Exported constants ---------------------------------------------*/
 

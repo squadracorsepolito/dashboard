@@ -22,71 +22,71 @@
 /*---------- Private macro ---------------------------------------------------*/
 
 /*---------- Private variables -----------------------------------------------*/
-static const lv_color_t LVGL_Colors[EEZ_STATUS_COLOR_COUNT] = {
+static const lv_color_t LVGL_Colors[EEZ_STATUS_BAR_COLOR_COUNT] = {
+    LV_COLOR_MAKE(0xFF, 0xFF, 0xFF),  // White
+    LV_COLOR_MAKE(0x00, 0x00, 0x00),  // Black
     LV_COLOR_MAKE(0x00, 0xFF, 0x00),  // Green
-    LV_COLOR_MAKE(0xFF, 0x00, 0x00),  // Red
-    LV_COLOR_MAKE(0x00, 0x00, 0xFF),  // Blue
-    LV_COLOR_MAKE(0xFF, 0xA5, 0x00)   // Orange
+    LV_COLOR_MAKE(0x00, 0x00, 0xFF),  // Red
+    LV_COLOR_MAKE(0xFF, 0x00, 0x00),  // Blue
+    LV_COLOR_MAKE(0x80, 0x00, 0x80),  // Purple
+    LV_COLOR_MAKE(0xFF, 0xFF, 0x00),  // Yellow
 };
 /*---------- Private function prototypes -------------------------------------*/
-static lv_obj_t* EEZ_ACT_get_active_lbl_lv_bat_v_object(void);
-static lv_obj_t* EEZ_ACT_get_active_lbl_hv_soc_object(void);
-static lv_obj_t* EEZ_ACT_get_active_lbl_sx_rot_sw_map_object(void);
-static lv_obj_t* EEZ_ACT_get_active_lbl_dx_rot_sw_map_object(void);
-static void EEZ_ACT_get_active_pnl_status_bar_object(lv_obj_t** left_bar, lv_obj_t** right_bar);
+static lv_obj_t *EEZ_ACT_get_active_lbl_lv_bat_v_object(void);
+static lv_obj_t *EEZ_ACT_get_active_lbl_hv_soc_object(void);
+static lv_obj_t *EEZ_ACT_get_active_lbl_sx_rot_sw_map_object(void);
+static lv_obj_t *EEZ_ACT_get_active_lbl_dx_rot_sw_map_object(void);
+static void EEZ_ACT_get_active_pnl_status_bar_object(lv_obj_t **left_bar, lv_obj_t **right_bar);
 
 /*---------- Exported Variables ----------------------------------------------*/
 
 /*---------- Exported Functions ----------------------------------------------*/
-void EEZ_ACT_cmn_set_lbl_lv_bat_v(float new_value){
+void EEZ_ACT_cmn_set_lbl_lv_bat_v(float new_value) {
     char new_value_str[16];
     snprintf(new_value_str, sizeof(new_value_str), "%.1f", new_value);
 
-    lv_obj_t* active_label = EEZ_ACT_get_active_lbl_lv_bat_v_object();
+    lv_obj_t *active_label = EEZ_ACT_get_active_lbl_lv_bat_v_object();
     if (active_label != NULL) {
         lv_label_set_text(active_label, new_value_str);
     }
 }
 
-void EEZ_ACT_cmn_set_lbl_hv_soc(uint8_t new_value){
+void EEZ_ACT_cmn_set_lbl_hv_soc(uint8_t new_value) {
     char new_value_str[16];
     snprintf(new_value_str, sizeof(new_value_str), "%.1i", new_value);
 
-    lv_obj_t* active_label = EEZ_ACT_get_active_lbl_hv_soc_object();
+    lv_obj_t *active_label = EEZ_ACT_get_active_lbl_hv_soc_object();
     if (active_label != NULL) {
         lv_label_set_text(active_label, new_value_str);
     }
-
 }
 
-void EEZ_ACT_cmn_set_lbl_sx_rot_sw_map(uint8_t new_value){
+void EEZ_ACT_cmn_set_lbl_sx_rot_sw_map(uint8_t new_value) {
     char new_value_str[16];
     snprintf(new_value_str, sizeof(new_value_str), "%.1i", new_value);
 
-    lv_obj_t* active_label = EEZ_ACT_get_active_lbl_sx_rot_sw_map_object();
+    lv_obj_t *active_label = EEZ_ACT_get_active_lbl_sx_rot_sw_map_object();
     if (active_label != NULL) {
         lv_label_set_text(active_label, new_value_str);
     }
-
 }
 
-void EEZ_ACT_cmn_set_lbl_dx_rot_sw_map(uint8_t new_value){
+void EEZ_ACT_cmn_set_lbl_dx_rot_sw_map(uint8_t new_value) {
     char new_value_str[16];
     snprintf(new_value_str, sizeof(new_value_str), "%.1i", new_value);
 
-    lv_obj_t* active_label = EEZ_ACT_get_active_lbl_dx_rot_sw_map_object();
+    lv_obj_t *active_label = EEZ_ACT_get_active_lbl_dx_rot_sw_map_object();
     if (active_label != NULL) {
         lv_label_set_text(active_label, new_value_str);
     }
-
 }
 
-void EEZ_ACT_cmn_set_pnl_status_bar_color(enum EEZ_Status_Bar_Color new_color){
-    if (new_color >= EEZ_STATUS_COLOR_COUNT) {
-        return; 
+void EEZ_ACT_cmn_set_pnl_status_bar_color(enum EEZ_Status_Bar_Color new_color) {
+    if (new_color >= EEZ_STATUS_BAR_COLOR_COUNT) {
+        return;
     }
 
-    lv_obj_t *left_bar = NULL;
+    lv_obj_t *left_bar  = NULL;
     lv_obj_t *right_bar = NULL;
     EEZ_ACT_get_active_pnl_status_bar_object(&left_bar, &right_bar);
 
@@ -97,7 +97,6 @@ void EEZ_ACT_cmn_set_pnl_status_bar_color(enum EEZ_Status_Bar_Color new_color){
     if (right_bar != NULL) {
         lv_obj_set_style_bg_color(right_bar, LVGL_Colors[new_color], LV_PART_MAIN | LV_STATE_DEFAULT);
     }
-
 }
 
 /*---------- Private Functions -----------------------------------------------*/
@@ -110,22 +109,12 @@ void EEZ_ACT_cmn_set_pnl_status_bar_color(enum EEZ_Status_Bar_Color new_color){
  * the corresponding battery voltage display object.
  * Returns NULL if no matching screen is found.
  */
-static lv_obj_t* EEZ_ACT_get_active_lbl_lv_bat_v_object(void) {
-    lv_obj_t* current_screen = lv_scr_act();
-    
+static lv_obj_t *EEZ_ACT_get_active_lbl_lv_bat_v_object(void) {
+    lv_obj_t *current_screen = lv_scr_act();
+
     if (current_screen == objects.tires) {
         return objects.pg_tires_lv_bat_v;
-    }
-    else if (current_screen == objects.main) {
-        return objects.pg_main_lv_bat_v;
-    }
-    else if (current_screen == objects.inverters) {
-        return objects.pg_inverters_lv_bat_v;
-    }
-    else if (current_screen == objects.extra) {
-        return objects.pg_extra_lv_bat_v;
-    }
-    
+    } 
     return NULL;
 }
 
@@ -137,22 +126,13 @@ static lv_obj_t* EEZ_ACT_get_active_lbl_lv_bat_v_object(void) {
  * the corresponding display object.
  * Returns NULL if no matching screen is found.
  */
-static lv_obj_t* EEZ_ACT_get_active_lbl_hv_soc_object(void) {
-    lv_obj_t* current_screen = lv_scr_act();
-    
+static lv_obj_t *EEZ_ACT_get_active_lbl_hv_soc_object(void) {
+    lv_obj_t *current_screen = lv_scr_act();
+
     if (current_screen == objects.tires) {
         return objects.pg_tires_hv_soc_est;
-    }
-    else if (current_screen == objects.main) {
-        return objects.pg_main_hv_soc_est;
-    }
-    else if (current_screen == objects.inverters) {
-        return objects.pg_inverters_hv_soc_est;
-    }
-    else if (current_screen == objects.extra) {
-        return objects.pg_extra_hv_soc_est;
-    }
-    
+    } 
+
     return NULL;
 }
 
@@ -164,22 +144,13 @@ static lv_obj_t* EEZ_ACT_get_active_lbl_hv_soc_object(void) {
  * the corresponding display object.
  * Returns NULL if no matching screen is found.
  */
-static lv_obj_t* EEZ_ACT_get_active_lbl_sx_rot_sw_map_object(void) {
-    lv_obj_t* current_screen = lv_scr_act();
-    
+static lv_obj_t *EEZ_ACT_get_active_lbl_sx_rot_sw_map_object(void) {
+    lv_obj_t *current_screen = lv_scr_act();
+
     if (current_screen == objects.tires) {
         return objects.pg_tires_sx_map;
     }
-    else if (current_screen == objects.main) {
-        return objects.pg_main_sx_map;
-    }
-    else if (current_screen == objects.inverters) {
-        return objects.pg_inverters_sx_map;
-    }
-    else if (current_screen == objects.extra) {
-        return objects.pg_extra_sx_map;
-    }
-    
+
     return NULL;
 }
 
@@ -191,22 +162,13 @@ static lv_obj_t* EEZ_ACT_get_active_lbl_sx_rot_sw_map_object(void) {
  * the corresponding display object.
  * Returns NULL if no matching screen is found.
  */
-static lv_obj_t* EEZ_ACT_get_active_lbl_dx_rot_sw_map_object(void) {
-    lv_obj_t* current_screen = lv_scr_act();
-    
+static lv_obj_t *EEZ_ACT_get_active_lbl_dx_rot_sw_map_object(void) {
+    lv_obj_t *current_screen = lv_scr_act();
+
     if (current_screen == objects.tires) {
         return objects.pg_tires_dx_map;
-    }
-    else if (current_screen == objects.main) {
-        return objects.pg_main_dx_map;
-    }
-    else if (current_screen == objects.inverters) {
-        return objects.pg_inverters_dx_map;
-    }
-    else if (current_screen == objects.extra) {
-        return objects.pg_extra_dx_map;
-    }
-    
+    } 
+
     return NULL;
 }
 
@@ -218,30 +180,17 @@ static lv_obj_t* EEZ_ACT_get_active_lbl_dx_rot_sw_map_object(void) {
  * This function retrieves both status bar objects for the currently active screen.
  * If no matching screen is found, both pointers will be set to NULL.
  */
-static void EEZ_ACT_get_active_pnl_status_bar_object(lv_obj_t** left_bar, lv_obj_t** right_bar) {
-    lv_obj_t* current_screen = lv_scr_act();
+static void EEZ_ACT_get_active_pnl_status_bar_object(lv_obj_t **left_bar, lv_obj_t **right_bar) {
+    lv_obj_t *current_screen = lv_scr_act();
 
-    *left_bar = NULL;
+    *left_bar  = NULL;
     *right_bar = NULL;
 
     if (current_screen == objects.tires) {
-        *left_bar = objects.pg_tires_sx_status_bar;
+        *left_bar  = objects.pg_tires_sx_status_bar;
         *right_bar = objects.pg_tires_dx_status_bar;
-    }
-    else if (current_screen == objects.main) {
-        *left_bar = objects.pg_main_sx_status_bar;
-        *right_bar = objects.pg_main_dx_status_bar;
-    }
-    else if (current_screen == objects.inverters) {
-        *left_bar = objects.pg_inverters_sx_status_bar;
-        *right_bar = objects.pg_inverters_dx_status_bar;
-    }
-    else if (current_screen == objects.extra) {
-        *left_bar = objects.pg_extra_sx_status_bar;
-        *right_bar = objects.pg_extra_dx_status_bar;
-    }
+    } 
 }
-
 
 /* TIRES #####################################################################*/
 /*---------- Includes --------------------------------------------------------*/
@@ -257,81 +206,81 @@ static void EEZ_ACT_get_active_pnl_status_bar_object(lv_obj_t** left_bar, lv_obj
 /*---------- Exported Variables ----------------------------------------------*/
 
 /*---------- Exported Functions ----------------------------------------------*/
-void EEZ_ACT_tires_set_lbl_fl_tmp(float new_value){
+void EEZ_ACT_tires_set_lbl_fl_tmp(float new_value) {
     char new_value_str[16];
     snprintf(new_value_str, sizeof(new_value_str), "%.1f", new_value);
 
-    lv_obj_t* active_label = objects.pg_tires_fl_temp;
+    lv_obj_t *active_label = objects.pg_tires_fl_temp;
     if (active_label != NULL) {
         lv_label_set_text(active_label, new_value_str);
     }
 }
 
-void EEZ_ACT_tires_set_lbl_fr_tmp(float new_value){
+void EEZ_ACT_tires_set_lbl_fr_tmp(float new_value) {
     char new_value_str[16];
     snprintf(new_value_str, sizeof(new_value_str), "%.1f", new_value);
 
-    lv_obj_t* active_label = objects.pg_tires_fr_temp;
+    lv_obj_t *active_label = objects.pg_tires_fr_temp;
     if (active_label != NULL) {
         lv_label_set_text(active_label, new_value_str);
     }
 }
 
-void EEZ_ACT_tires_set_lbl_rr_tmp(float new_value){
+void EEZ_ACT_tires_set_lbl_rr_tmp(float new_value) {
     char new_value_str[16];
     snprintf(new_value_str, sizeof(new_value_str), "%.1f", new_value);
 
-    lv_obj_t* active_label = objects.pg_tires_rr_temp;
+    lv_obj_t *active_label = objects.pg_tires_rr_temp;
     if (active_label != NULL) {
         lv_label_set_text(active_label, new_value_str);
     }
 }
 
-void EEZ_ACT_tires_set_lbl_rl_tmp(float new_value){
+void EEZ_ACT_tires_set_lbl_rl_tmp(float new_value) {
     char new_value_str[16];
     snprintf(new_value_str, sizeof(new_value_str), "%.1f", new_value);
 
-    lv_obj_t* active_label = objects.pg_tires_rl_temp;
+    lv_obj_t *active_label = objects.pg_tires_rl_temp;
     if (active_label != NULL) {
         lv_label_set_text(active_label, new_value_str);
     }
 }
 
-void EEZ_ACT_tires_set_lbl_fl_bar(float new_value){
+void EEZ_ACT_tires_set_lbl_fl_bar(float new_value) {
     char new_value_str[16];
     snprintf(new_value_str, sizeof(new_value_str), "%.1f", new_value);
 
-    lv_obj_t* active_label = objects.pg_tires_fl_bar;
+    lv_obj_t *active_label = objects.pg_tires_fl_bar;
     if (active_label != NULL) {
         lv_label_set_text(active_label, new_value_str);
     }
 }
 
-void EEZ_ACT_tires_set_lbl_fr_bar(float new_value){
+void EEZ_ACT_tires_set_lbl_fr_bar(float new_value) {
     char new_value_str[16];
     snprintf(new_value_str, sizeof(new_value_str), "%.1f", new_value);
 
-    lv_obj_t* active_label = objects.pg_tires_fr_bar;
+    lv_obj_t *active_label = objects.pg_tires_fr_bar;
     if (active_label != NULL) {
         lv_label_set_text(active_label, new_value_str);
     }
 }
 
-void EEZ_ACT_tires_set_lbl_rr_bar(float new_value){
+void EEZ_ACT_tires_set_lbl_rr_bar(float new_value) {
     char new_value_str[16];
     snprintf(new_value_str, sizeof(new_value_str), "%.1f", new_value);
 
-    lv_obj_t* active_label = objects.pg_tires_rr_bar;
+    lv_obj_t *active_label = objects.pg_tires_rr_bar;
     if (active_label != NULL) {
         lv_label_set_text(active_label, new_value_str);
     }
 }
 
-void EEZ_ACT_tires_set_lbl_rl_bar(float new_value){
+void EEZ_ACT_tires_set_lbl_rl_bar(float new_value) {
     char new_value_str[16];
     snprintf(new_value_str, sizeof(new_value_str), "%.1f", new_value);
 
-    lv_obj_t* active_label = objects.pg_tires_rl_bar;
+    lv_obj_t *active_label = objects.pg_tires_rl_bar;
     if (active_label != NULL) {
         lv_label_set_text(active_label, new_value_str);
     }

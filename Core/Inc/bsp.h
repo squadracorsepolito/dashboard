@@ -100,6 +100,7 @@ enum ROT_SW_State {
     ROT_SW_State_NUM   /*!< Number of Rotary Switch states/positions */
 };
 
+static enum ROT_SW_State ROT_SW_Device_State[ROT_SW_Device_NUM];
 /* ---------- Exported constants ---------------------------------------------*/
 
 // clang-format off

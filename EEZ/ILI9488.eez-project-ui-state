@@ -1,7 +1,8 @@
 {
   "navigation": {
     "selectedUserPageObject": "[ILI9488.eez-project]:/userPages/0",
-    "selectedStyleObject": "[ILI9488.eez-project]:/lvglStyles/styles/1",
+    "selectedStyleObject": "[ILI9488.eez-project]:/lvglStyles/styles/2",
+    "selectedThemeObject": "[ILI9488.eez-project]:/themes/0",
     "subnavigationSelectedItems": {
       "variables-tab/sub-navigation/selected-item": "Enums"
     }
@@ -24,7 +25,8 @@
           },
           {
             "type": "border",
-            "size": 324.5,
+            "selected": 0,
+            "size": 389.5,
             "location": "right",
             "children": [
               {
@@ -42,14 +44,6 @@
                 "component": "componentsPalette",
                 "enableClose": false,
                 "icon": "svg:components"
-              },
-              {
-                "type": "tab",
-                "id": "styles",
-                "name": "Styles",
-                "component": "styles",
-                "enableClose": false,
-                "icon": "material:format_color_fill"
               },
               {
                 "type": "tab",
@@ -215,6 +209,21 @@
                 }
               ],
               "active": true
+            },
+            {
+              "type": "tabset",
+              "id": "#41600787-ac01-49a6-ae0c-9be1ed073d32",
+              "weight": 26.631580378877498,
+              "children": [
+                {
+                  "type": "tab",
+                  "id": "styles",
+                  "name": "Styles",
+                  "component": "styles",
+                  "enableClose": false,
+                  "icon": "material:format_color_fill"
+                }
+              ]
             }
           ]
         }
@@ -915,16 +924,13 @@
                       "component": "groups",
                       "enableClose": false
                     }
-                  ]
+                  ],
+                  "active": true
                 },
                 {
                   "type": "tabset",
-                  "id": "#451d5e26-4e41-4598-9fbc-1833530f136b",
+                  "id": "#a33e4cf6-292b-4604-8658-9791c25587cf",
                   "weight": 50,
-                  "enableDrop": false,
-                  "enableDrag": false,
-                  "enableClose": false,
-                  "enableTabStrip": true,
                   "children": [
                     {
                       "type": "tab",
@@ -933,8 +939,7 @@
                       "component": "order",
                       "enableClose": false
                     }
-                  ],
-                  "active": true
+                  ]
                 }
               ]
             }
@@ -949,24 +954,22 @@
     "[ILI9488.eez-project]:/userPages/0[flow-state]": {
       "selection": {
         "0": {
-          "0": {
-            "0": {},
-            "1": {},
-            "2": {},
-            "3": {}
+          "3": {
+            "$selected": true
           },
-          "1": {},
-          "2": {},
-          "3": {},
-          "4": {},
-          "5": {
+          "4": {
             "0": {}
           },
-          "6": {
+          "5": {},
+          "6": {},
+          "7": {
+            "0": {}
+          },
+          "8": {
             "1": {},
             "2": {}
           },
-          "7": {}
+          "9": {}
         }
       },
       "transform": {
@@ -986,6 +989,13 @@
     "[ILI9488.eez-project]:/lvglStyles/styles[tree-state]": {
       "0": {},
       "1": {
+        "1": {},
+        "2": {},
+        "3": {},
+        "4": {},
+        "5": {}
+      },
+      "2": {
         "$selected": true
       }
     },
@@ -994,13 +1004,12 @@
         "0": {
           "0": {},
           "1": {
-            "0": {}
+            "0": {},
+            "$selected": true
           },
           "2": {},
           "3": {},
-          "4": {
-            "$selected": true
-          },
+          "4": {},
           "5": {},
           "6": {
             "1": {}
@@ -1210,10 +1219,7 @@
   "selectedStylePropertyName": "",
   "lvglPart": "MAIN",
   "lvglState": "DEFAULT",
-  "lvglExpandedPropertiesGroup": [
-    "MISCELLANEOUS",
-    "TEXT"
-  ],
+  "lvglExpandedPropertiesGroup": [],
   "showInactiveFlowsInDebugger": true,
   "globalFlowZoom": true,
   "flowZoom": 1,

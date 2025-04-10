@@ -16,13 +16,15 @@
 
 #include "display.h"
 
+#include "bsp.h"
+#include "dashboard.h"
+
 /*---------- Private define --------------------------------------------------*/
 
 /*---------- Private macro ---------------------------------------------------*/
 
 /*---------- Private variables -----------------------------------------------*/
 uint8_t DISP_buffer[DISP_BUFFER_SIZE];
-volatile uint8_t ILI9488_SPI_DMA_transfer_done = 0;
 /*---------- Private function prototypes -------------------------------------*/
 void ILI9488_CS_Pin_SetState(enum ILI9488_PinState state);
 void ILI9488_DC_Pin_SetState(enum ILI9488_PinState state);
@@ -46,27 +48,45 @@ struct ILI9488_Handle ili9488_handle = {
 
 /*---------- Exported Functions ----------------------------------------------*/
 void DISP_init(void) {
-    ILI9488_SPI_DMA_transfer_done = 1;
     if (ILI9488_init(&ili9488_handle) == Status_OK) {
         LVGL_init();
         EEZ_create_screen(EEZ_UTI_Tires_Page);
-        EEZ_ACT_cmn_set_lbl_lv_bat_v(11.2);
-        EEZ_ACT_cmn_set_lbl_hv_soc(90);
-        EEZ_ACT_cmn_set_lbl_sx_rot_sw_map(2);
-        EEZ_ACT_cmn_set_lbl_dx_rot_sw_map(5);
-        EEZ_ACT_cmn_set_pnl_status_bar_color(EEZ_STATUS_COLOR_BLUE);
-        EEZ_ACT_tires_set_lbl_fl_tmp(40.9);
-        EEZ_ACT_tires_set_lbl_fr_tmp(2.5);
-        EEZ_ACT_tires_set_lbl_rr_tmp(1.4);
-        EEZ_ACT_tires_set_lbl_rl_tmp(2.0);
-        EEZ_ACT_tires_set_lbl_fl_bar(22.0);
-        EEZ_ACT_tires_set_lbl_fr_bar(11.0);
-        EEZ_ACT_tires_set_lbl_rr_bar(21.0);
-        EEZ_ACT_tires_set_lbl_rl_bar(22.0);
     }  //TODO else statement
 }
-int cont = 0;
-void DISP_update_routine(void) {}
+
+void DISP_update_routine(void) {
+    EEZ_ACT_cmn_set_lbl_lv_bat_v(LVBAT_V);
+    EEZ_ACT_cmn_set_lbl_hv_soc(HVBAT_SOC);
+    EEZ_ACT_cmn_set_lbl_sx_rot_sw_map(ROT_SW_Device_State[ROT_SW_Device1]);
+    EEZ_ACT_cmn_set_lbl_dx_rot_sw_map(ROT_SW_Device_State[ROT_SW_Device2]);
+    switch (rtd_fsm_state) {
+        case STATE_IDLE:
+            EEZ_ACT_cmn_set_pnl_status_bar_color(EEZ_STATUS_BAR_COLOR_BLUE);
+            break;
+        case STATE_TSON:
+            EEZ_ACT_cmn_set_pnl_status_bar_color(EEZ_STATUS_BAR_COLOR_PURPLE);
+            break;
+        case STATE_RTD_SOUND:
+            break;
+        case STATE_RTD:
+            EEZ_ACT_cmn_set_pnl_status_bar_color(EEZ_STATUS_BAR_COLOR_GREEN);
+            break;
+        case STATE_DISCHARGE:
+            EEZ_ACT_cmn_set_pnl_status_bar_color(EEZ_STATUS_BAR_COLOR_YELLOW);
+            break;
+        default:
+            break;
+    }
+
+    EEZ_ACT_tires_set_lbl_fl_tmp(TIRE_FL_TEMP);
+    EEZ_ACT_tires_set_lbl_fr_tmp(TIRE_FR_TEMP);
+    EEZ_ACT_tires_set_lbl_rl_tmp(TIRE_RL_TEMP);
+    EEZ_ACT_tires_set_lbl_rr_tmp(TIRE_RR_TEMP);
+    EEZ_ACT_tires_set_lbl_fl_bar(TIRE_FL_PRESSURE);
+    EEZ_ACT_tires_set_lbl_fr_bar(TIRE_FR_PRESSURE);
+    EEZ_ACT_tires_set_lbl_rl_bar(TIRE_RL_PRESSURE);
+    EEZ_ACT_tires_set_lbl_rr_bar(TIRE_RR_PRESSURE);
+}
 
 void ILI9488_CS_Pin_SetState(enum ILI9488_PinState state) {
     HAL_GPIO_WritePin(ili9488_gpio_map.CS.GPIO_Port,

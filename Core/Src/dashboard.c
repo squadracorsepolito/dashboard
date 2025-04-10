@@ -1,11 +1,12 @@
 /*INCLUDE*/
 
 #include "dashboard.h"
-#include "display.h"
+
 #include "bsp.h"
 #include "button.h"
 #include "can.h"
 #include "dac.h"
+#include "display.h"
 #include "hvcb.h"
 #include "main.h"
 #include "mcb.h"
@@ -44,6 +45,8 @@ struct RGB_Led_t {
     uint8_t B;
 };
 
+volatile rtd_fsm_state_t rtd_fsm_state = STATE_IDLE;
+
 volatile GPIO_PinState SD_CLOSED;
 volatile GPIO_PinState BMS_ERR;
 volatile GPIO_PinState TSOFF;
@@ -69,6 +72,15 @@ volatile uint8_t hvb_diag_cell_ut;
 volatile uint8_t hvb_diag_inv_vlt_ov;
 volatile uint8_t hvb_diag_bat_curr_oc;
 
+volatile double TIRE_FL_TEMP     = 0.0;
+volatile double TIRE_FR_TEMP     = 0.0;
+volatile double TIRE_RL_TEMP     = 0.0;
+volatile double TIRE_RR_TEMP     = 0.0;
+volatile double TIRE_FL_PRESSURE = 0.0;
+volatile double TIRE_FR_PRESSURE = 0.0;
+volatile double TIRE_RL_PRESSURE = 0.0;
+volatile double TIRE_RR_PRESSURE = 0.0;
+
 volatile struct RGB_Led_t LED1;
 volatile struct RGB_Led_t LED2;
 volatile struct RGB_Led_t LED3;
@@ -76,8 +88,6 @@ volatile struct RGB_Led_t LED4;
 
 /* dSpace ACK flags */
 volatile int8_t dspace_rtd_state;
-
-enum { STATE_IDLE, STATE_TSON, STATE_RTD_SOUND, STATE_RTD, STATE_DISCHARGE } rtd_fsm_state = STATE_IDLE;
 
 /* PWM Variables */
 volatile uint32_t PWM_BAT_FAN;
@@ -104,6 +114,8 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
         struct mcb_tlb_bat_sd_csensing_status_t shut_status;
         struct mcb_dspace_dash_leds_color_rgb_t rgb_status;
         struct mcb_bms_lv_lv_bat_general_t lv_bat_general;
+        struct mcb_tpms_front_wheels_pressure_t front_wheels_status;
+        struct mcb_tpms_rear_wheels_pressure_t rear_wheels_status;
     } msgs = {};
 
     if (HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &RxHeader, RxData) != HAL_OK) {
@@ -203,6 +215,31 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
                (RxHeader.DLC == MCB_BMS_LV_LV_BAT_GENERAL_LENGTH)) {
         mcb_bms_lv_lv_bat_general_unpack(&msgs.lv_bat_general, RxData, MCB_BMS_LV_LV_BAT_GENERAL_LENGTH);
         LVBAT_V = mcb_bms_lv_lv_bat_general_lv_bat_summed_voltage_decode(msgs.lv_bat_general.lv_bat_summed_voltage);
+    }
+
+    /*
+     *
+     * TMPS Front Wheels And Rear Wheels
+     *
+     */
+    else if ((RxHeader.StdId == MCB_TPMS_FRONT_WHEELS_PRESSURE_FRAME_ID) &&
+             (RxHeader.DLC == MCB_TPMS_FRONT_WHEELS_PRESSURE_LENGTH)) {
+        mcb_tpms_front_wheels_pressure_unpack(&msgs.front_wheels_status, RxData, MCB_TPMS_FRONT_WHEELS_PRESSURE_LENGTH);
+        TIRE_FL_TEMP = mcb_tpms_front_wheels_pressure_tire_fl_temperature_decode(msgs.front_wheels_status.tire_fl_temperature);
+        TIRE_FR_TEMP = mcb_tpms_front_wheels_pressure_tire_fr_temperature_decode(msgs.front_wheels_status.tire_fr_temperature);
+        TIRE_FL_PRESSURE =
+            mcb_tpms_front_wheels_pressure_tire_fl_pressure_decode(msgs.front_wheels_status.tire_fl_pressure);
+        TIRE_FR_PRESSURE =
+            mcb_tpms_front_wheels_pressure_tire_fr_pressure_decode(msgs.front_wheels_status.tire_fr_pressure);
+    } else if ((RxHeader.StdId == MCB_TPMS_REAR_WHEELS_PRESSURE_FRAME_ID) &&
+               (RxHeader.DLC == MCB_TPMS_REAR_WHEELS_PRESSURE_LENGTH)) {
+        mcb_tpms_rear_wheels_pressure_unpack(&msgs.rear_wheels_status, RxData, MCB_TPMS_REAR_WHEELS_PRESSURE_LENGTH);
+        TIRE_RL_TEMP = mcb_tpms_rear_wheels_pressure_tire_rl_temperature_decode(msgs.rear_wheels_status.tire_rl_temperature);
+        TIRE_RR_TEMP = mcb_tpms_rear_wheels_pressure_tire_rr_temperature_decode(msgs.rear_wheels_status.tire_rr_temperature);
+        TIRE_RL_PRESSURE =
+            mcb_tpms_rear_wheels_pressure_tire_rl_pressure_decode(msgs.rear_wheels_status.tire_rl_pressure);
+        TIRE_RR_PRESSURE =
+            mcb_tpms_rear_wheels_pressure_tire_rr_pressure_decode(msgs.rear_wheels_status.tire_rr_pressure);
     }
 }
 
@@ -344,17 +381,15 @@ void Dashboard_Setup(void) {
     MCB_send_msg(MCB_DASH_HELLO_FRAME_ID);
 
     // Initialize leds (turn all off)
+
     LED_MONO_setState(LED_TS_Off, LED_Off);
-    LED_MONO_setState(LED_AMS_Error, LED_Off);
+    LED_MONO_setState(LED_AMS_Error, LED_On);
     LED_MONO_setState(LED_IMD_Error, LED_Off);
 
-    // Turn on all LEDs
-    #if 0
     LED_MONO_setState(LED_TS_Off, LED_On);
     LED_MONO_setState(LED_AMS_Error, LED_Off);
     LED_MONO_setState(LED_IMD_Error, LED_Off);
     LED_MONO_setState(LED_Err, LED_On);  // old RTD LED
-#endif
 
 // Disable The SDC relay and wait later for closing it
 #if 0
@@ -479,8 +514,6 @@ uint8_t AMS_detection(uint8_t ams_err_tlb,
         }                                         \
     } while (0)
 
-
-
 /**
     * @brief Dash main loop
  */
@@ -516,7 +549,7 @@ void Dashboard_Loop(void) {
         cnt10ms += 10U;
     }
     // Update state Cockpit's LEDs
-    UpdateCockpitLed(1000);
+    //UpdateCockpitLed(1000);
 
     // Update buttons state
     button_sample();

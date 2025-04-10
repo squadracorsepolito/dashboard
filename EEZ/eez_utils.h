@@ -25,9 +25,6 @@
 /* ---------- Exported constants ---------------------------------------------*/
 enum EEZ_UTI_Page {
     EEZ_UTI_Tires_Page = SCREEN_ID_TIRES,
-    EEZ_UTI_Main_Page = SCREEN_ID_MAIN,
-    EEZ_UTI_Inverters_Page = SCREEN_ID_INVERTERS,
-    EEZ_UTI_Extra_Page = SCREEN_ID_EXTRA,
     EEZ_UTI_NUM_Page,
 };
 
