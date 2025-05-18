@@ -353,8 +353,8 @@ static const struct GPIO_Tuple LED_MONO_Device_to_GPIO_Tuple_map[LED_MONO_Device
     [LED_Err]       = {.GPIO_Port = ERR_LED_GPIO_OUT_GPIO_Port, .GPIO_Pin = ERR_LED_GPIO_OUT_Pin}};
 
 static uint8_t LED_MONO_GPIO_invert_vector[LED_MONO_Device_NUM] = {
-    [LED_AMS_Error] = 1U,
-    [LED_IMD_Error] = 1U,
+    [LED_AMS_Error] = 0U,
+    [LED_IMD_Error] = 0U,
     [LED_TS_Off]    = 0U,
     [LED_KeepAlive] = 0U,
     [LED_User1]     = 0U,

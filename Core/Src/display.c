@@ -55,37 +55,56 @@ void DISP_init(void) {
 }
 
 void DISP_update_routine(void) {
-    EEZ_ACT_cmn_set_lbl_lv_bat_v(LVBAT_V);
-    EEZ_ACT_cmn_set_lbl_hv_soc(HVBAT_SOC);
+    EEZ_ACT_cmn_set_lbl_lv_bat_v(dashboard_data.LV_BAT_V);
+    EEZ_ACT_cmn_set_lbl_hv_soc(dashboard_data.HV_BAT_SOC);
     EEZ_ACT_cmn_set_lbl_sx_rot_sw_map(ROT_SW_Device_State[ROT_SW_Device1]);
     EEZ_ACT_cmn_set_lbl_dx_rot_sw_map(ROT_SW_Device_State[ROT_SW_Device2]);
-    switch (rtd_fsm_state) {
+
+    if (BTN_getStatus(BTN_LC)) {
+        EEZ_ACT_cmn_set_lbl_LC_color(EEZ_COLOR_BLACK);
+    }else{
+        EEZ_ACT_cmn_set_lbl_LC_color(EEZ_COLOR_CYAN);
+    }
+
+    if (BTN_getStatus(BTN_TC)) {
+        EEZ_ACT_cmn_set_lbl_TC_color(EEZ_COLOR_BLACK);
+    }else{
+        EEZ_ACT_cmn_set_lbl_TC_color(EEZ_COLOR_CYAN);
+    }
+
+    if (BTN_getStatus(BTN_TV)) {
+        EEZ_ACT_cmn_set_lbl_TV_color(EEZ_COLOR_BLACK);
+    }else{
+        EEZ_ACT_cmn_set_lbl_TV_color(EEZ_COLOR_CYAN);
+    }
+
+    switch (dashboard_data.RTD_FSM_State) {
         case STATE_IDLE:
-            EEZ_ACT_cmn_set_pnl_status_bar_color(EEZ_STATUS_BAR_COLOR_BLUE);
+            EEZ_ACT_cmn_set_pnl_status_bar_color(EEZ_COLOR_BLUE);
             break;
         case STATE_TSON:
-            EEZ_ACT_cmn_set_pnl_status_bar_color(EEZ_STATUS_BAR_COLOR_PURPLE);
+            EEZ_ACT_cmn_set_pnl_status_bar_color(EEZ_COLOR_PURPLE);
             break;
         case STATE_RTD_SOUND:
             break;
         case STATE_RTD:
-            EEZ_ACT_cmn_set_pnl_status_bar_color(EEZ_STATUS_BAR_COLOR_GREEN);
+            EEZ_ACT_cmn_set_pnl_status_bar_color(EEZ_COLOR_GREEN);
             break;
         case STATE_DISCHARGE:
-            EEZ_ACT_cmn_set_pnl_status_bar_color(EEZ_STATUS_BAR_COLOR_YELLOW);
+            EEZ_ACT_cmn_set_pnl_status_bar_color(EEZ_COLOR_CYAN);
             break;
         default:
             break;
     }
 
-    EEZ_ACT_tires_set_lbl_fl_tmp(TIRE_FL_TEMP);
-    EEZ_ACT_tires_set_lbl_fr_tmp(TIRE_FR_TEMP);
-    EEZ_ACT_tires_set_lbl_rl_tmp(TIRE_RL_TEMP);
-    EEZ_ACT_tires_set_lbl_rr_tmp(TIRE_RR_TEMP);
-    EEZ_ACT_tires_set_lbl_fl_bar(TIRE_FL_PRESSURE);
-    EEZ_ACT_tires_set_lbl_fr_bar(TIRE_FR_PRESSURE);
-    EEZ_ACT_tires_set_lbl_rl_bar(TIRE_RL_PRESSURE);
-    EEZ_ACT_tires_set_lbl_rr_bar(TIRE_RR_PRESSURE);
+    EEZ_ACT_tires_set_lbl_fl_tmp(dashboard_data.TIRE_FL_TEMP);
+    EEZ_ACT_tires_set_lbl_fr_tmp(dashboard_data.TIRE_FR_TEMP);
+    EEZ_ACT_tires_set_lbl_rl_tmp(dashboard_data.TIRE_RL_TEMP);
+    EEZ_ACT_tires_set_lbl_rr_tmp(dashboard_data.TIRE_RR_TEMP);
+    EEZ_ACT_tires_set_lbl_fl_bar(dashboard_data.TIRE_FL_PRESSURE);
+    EEZ_ACT_tires_set_lbl_fr_bar(dashboard_data.TIRE_FR_PRESSURE);
+    EEZ_ACT_tires_set_lbl_rl_bar(dashboard_data.TIRE_RL_PRESSURE);
+    EEZ_ACT_tires_set_lbl_rr_bar(dashboard_data.TIRE_RR_PRESSURE);
 }
 
 void ILI9488_CS_Pin_SetState(enum ILI9488_PinState state) {

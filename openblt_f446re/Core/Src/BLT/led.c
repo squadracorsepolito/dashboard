@@ -64,7 +64,7 @@ void LedBlinkTask(void)
   static blt_bool ledOn = BLT_FALSE;
   static blt_int32u nextBlinkEvent = 0;
 
-  // turn off IMD,AMS,TSOFF
+  // turn off IMD,AMS,TS_OFF
   HAL_GPIO_WritePin(TSOFF_GPIO_Port, TSOFF_Pin, GPIO_PIN_RESET);
   HAL_GPIO_WritePin(IMD_GPIO_Port, IMD_Pin, GPIO_PIN_SET);
   HAL_GPIO_WritePin(AMS_GPIO_Port, AMS_Pin, GPIO_PIN_SET);

@@ -24,7 +24,6 @@
 #include "dac.h"
 #include "dma.h"
 #include "gpio.h"
-#include "iwdg.h"
 #include "spi.h"
 #include "tim.h"
 #include "usart.h"
@@ -99,36 +98,32 @@ int main(void) {
     /* Initialize all configured peripherals */
     MX_GPIO_Init();
     MX_DMA_Init();
-#if 0
-  MX_CAN1_Init();
-  MX_CAN2_Init();
-  MX_IWDG_Init();
-#endif
     MX_ADC1_Init();
+    MX_CAN2_Init();
     MX_DAC_Init();
+    MX_CAN1_Init();
     MX_SPI1_Init();
     MX_SPI2_Init();
     MX_USART1_UART_Init();
     MX_TIM2_Init();
     MX_TIM3_Init();
     MX_TIM7_Init();
-
     /* USER CODE BEGIN 2 */
     // Start the counter
     HAL_TIM_Base_Start_IT(&COUNTER_TIM);
 
     Dashboard_Setup();
+    Display_Setup();
     /* USER CODE END 2 */
 
     /* Infinite loop */
     /* USER CODE BEGIN WHILE */
     while (1) {
         Dashboard_Loop();
+        Display_Loop();
         /* USER CODE END WHILE */
 
         /* USER CODE BEGIN 3 */
-
-        // HAL_IWDG_Refresh(&hiwdg);
         lv_timer_periodic_handler();
     }
     /* USER CODE END 3 */
@@ -150,9 +145,8 @@ void SystemClock_Config(void) {
     /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
-    RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSI | RCC_OSCILLATORTYPE_HSE;
+    RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
     RCC_OscInitStruct.HSEState       = RCC_HSE_ON;
-    RCC_OscInitStruct.LSIState       = RCC_LSI_ON;
     RCC_OscInitStruct.PLL.PLLState   = RCC_PLL_ON;
     RCC_OscInitStruct.PLL.PLLSource  = RCC_PLLSOURCE_HSE;
     RCC_OscInitStruct.PLL.PLLM       = 4;
