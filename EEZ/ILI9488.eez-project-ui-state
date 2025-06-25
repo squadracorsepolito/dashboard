@@ -1,8 +1,8 @@
 {
   "navigation": {
     "selectedUserPageObject": "[ILI9488.eez-project]:/userPages/0",
-    "selectedStyleObject": "[ILI9488.eez-project]:/lvglStyles/styles/2",
     "selectedThemeObject": "[ILI9488.eez-project]:/themes/0",
+    "selectedBitmapObject": "[ILI9488.eez-project]:/bitmaps/-1",
     "subnavigationSelectedItems": {
       "variables-tab/sub-navigation/selected-item": "Enums"
     }
@@ -25,7 +25,7 @@
           },
           {
             "type": "border",
-            "selected": 0,
+            "selected": 3,
             "size": 389.5,
             "location": "right",
             "children": [
@@ -174,7 +174,8 @@
                   "enableClose": false,
                   "icon": "svg:hierarchy"
                 }
-              ]
+              ],
+              "active": true
             },
             {
               "type": "tabset",
@@ -203,12 +204,11 @@
                   "component": "editor",
                   "config": {
                     "objectPath": "[ILI9488.eez-project]:/userPages/0",
-                    "permanent": false
+                    "permanent": true
                   },
                   "icon": "svg:page"
                 }
-              ],
-              "active": true
+              ]
             },
             {
               "type": "tabset",
@@ -954,22 +954,9 @@
     "[ILI9488.eez-project]:/userPages/0[flow-state]": {
       "selection": {
         "0": {
-          "3": {
+          "0": {
             "$selected": true
-          },
-          "4": {
-            "0": {}
-          },
-          "5": {},
-          "6": {},
-          "7": {
-            "0": {}
-          },
-          "8": {
-            "1": {},
-            "2": {}
-          },
-          "9": {}
+          }
         }
       },
       "transform": {
@@ -1219,7 +1206,10 @@
   "selectedStylePropertyName": "",
   "lvglPart": "MAIN",
   "lvglState": "DEFAULT",
-  "lvglExpandedPropertiesGroup": [],
+  "lvglExpandedPropertiesGroup": [
+    "POSITION AND SIZE",
+    "BACKGROUND"
+  ],
   "showInactiveFlowsInDebugger": true,
   "globalFlowZoom": true,
   "flowZoom": 1,

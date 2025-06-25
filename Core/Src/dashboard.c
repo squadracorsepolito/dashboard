@@ -20,7 +20,7 @@
 /* Initialize the dashboard data structure */
 DashboardData_t dashboard_data = {
     .HV_BAT_SOC            = 0,
-    .LV_BAT_V              = 0.0,
+    .LV_BAT_mV              = 0.0,
     .TIRE_FL_TEMP          = 0.0,
     .TIRE_FR_TEMP          = 0.0,
     .TIRE_RL_TEMP          = 0.0,
@@ -186,7 +186,7 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
     } else if ((RxHeader.StdId == MCB_BMS_LV_LV_BAT_GENERAL_FRAME_ID) &&
                (RxHeader.DLC == MCB_BMS_LV_LV_BAT_GENERAL_LENGTH)) {
         mcb_bms_lv_lv_bat_general_unpack(&msgs.lv_bat_general, RxData, MCB_BMS_LV_LV_BAT_GENERAL_LENGTH);
-        dashboard_data.LV_BAT_V =
+        dashboard_data.LV_BAT_mV =
             mcb_bms_lv_lv_bat_general_lv_bat_summed_voltage_decode(msgs.lv_bat_general.lv_bat_summed_voltage);
     }
 
@@ -547,6 +547,7 @@ void Dashboard_Loop(void) {
     BTN_Routine();
 
     ROT_SW_Routine();
+    
 
     // RUN the ready to drive FSM
     RTD_fsm(500);

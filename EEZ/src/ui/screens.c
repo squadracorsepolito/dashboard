@@ -1,5 +1,6 @@
 #include "screens.h"
 #include "styles.h"
+#include "images.h"
 #include "ui.h"
 
 #include <string.h>

@@ -109,7 +109,7 @@ static enum ROT_SW_State ROT_SW_Device_State[ROT_SW_Device_NUM];
 // (Physical input * volt_divider_const) +- offset -> ADC input
 
 #define ROT_SW_AIN_GAIN (1/ROT_SW_SIGNAL_CONDITIONING_GAIN) /*!< voltage value in ADC Dynamic Range to Physical Dynamic Range conversion constant */
-#define ROT_SW_AIN_OFFSET_V (0.0) /*!< voltage value in ADC Dynamic Range to Physical Dynamic Range conversion offset */
+#define ROT_SW_AIN_OFFSET_V (0.06) /*!< voltage value in ADC Dynamic Range to Physical Dynamic Range conversion offset */
 
 #define ROT_SW_STATE_STEP_V (0.54) /*!< Rotary Switch State step voltage (Physical Value)
                                         state1 - state2 = state_step_v */

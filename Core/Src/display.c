@@ -55,24 +55,24 @@ void DISP_init(void) {
 }
 
 void DISP_update_routine(void) {
-    EEZ_ACT_cmn_set_lbl_lv_bat_v(dashboard_data.LV_BAT_V);
+    EEZ_ACT_cmn_set_lbl_lv_bat_v(dashboard_data.LV_BAT_mV/1000.0);
     EEZ_ACT_cmn_set_lbl_hv_soc(dashboard_data.HV_BAT_SOC);
-    EEZ_ACT_cmn_set_lbl_sx_rot_sw_map(ROT_SW_Device_State[ROT_SW_Device1]);
-    EEZ_ACT_cmn_set_lbl_dx_rot_sw_map(ROT_SW_Device_State[ROT_SW_Device2]);
+    EEZ_ACT_cmn_set_lbl_sx_rot_sw_map(ROT_SW_getState(ROT_SW_Device1));
+    EEZ_ACT_cmn_set_lbl_dx_rot_sw_map(ROT_SW_getState(ROT_SW_Device2));
 
-    if (BTN_getStatus(BTN_LC)) {
+    if (!BTN_getStatus(BTN_LC)) {
         EEZ_ACT_cmn_set_lbl_LC_color(EEZ_COLOR_BLACK);
     }else{
         EEZ_ACT_cmn_set_lbl_LC_color(EEZ_COLOR_CYAN);
     }
 
-    if (BTN_getStatus(BTN_TC)) {
+    if (!BTN_getStatus(BTN_TC)) {
         EEZ_ACT_cmn_set_lbl_TC_color(EEZ_COLOR_BLACK);
     }else{
         EEZ_ACT_cmn_set_lbl_TC_color(EEZ_COLOR_CYAN);
     }
 
-    if (BTN_getStatus(BTN_TV)) {
+    if (!BTN_getStatus(BTN_TV)) {
         EEZ_ACT_cmn_set_lbl_TV_color(EEZ_COLOR_BLACK);
     }else{
         EEZ_ACT_cmn_set_lbl_TV_color(EEZ_COLOR_CYAN);

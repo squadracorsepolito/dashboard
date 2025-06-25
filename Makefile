@@ -102,6 +102,8 @@ EEZ/eez_actions.c \
 EEZ/src/ui/ui.c \
 EEZ/src/ui/styles.c \
 EEZ/src/ui/screens.c \
+EEZ/src/ui/images.c \
+EEZ/src/ui/images/ui_image_squadra_logo.c \
 Core/Src/dma.c
 
 # ASM sources

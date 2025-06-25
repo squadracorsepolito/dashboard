@@ -121,6 +121,8 @@ Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_adc.c \
 EEZ/eez_actions.c \
 EEZ/eez_utils.c \
+EEZ/src/ui/images.c \
+EEZ/src/ui/images/ui_image_squadra_logo.c \
 EEZ/src/ui/screens.c \
 EEZ/src/ui/styles.c \
 EEZ/src/ui/ui.c \
