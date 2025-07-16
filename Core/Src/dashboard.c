@@ -278,7 +278,6 @@ void UpdateCockpitLed(uint32_t delay_100us) {
         toggle_led_value_200ms = !toggle_led_value_200ms;
     }
 
-    //TODO OCIOOO
     if (delay_fun(&delay_100us_last, delay_100us)) {
         //HAL_GPIO_WritePin(RTD_LED_GPIO_Port, RTD_LED_Pin, SD_CLOSED);
 
@@ -371,10 +370,6 @@ void Dashboard_Setup(void) {
     LED_MONO_setState(LED_TS_Off, LED_Off);
     LED_MONO_setState(LED_AMS_Error, LED_Off);
     LED_MONO_setState(LED_IMD_Error, LED_Off);
-
-    //LED_RGB_setColor(LED_RGB1, 255, 255, 255);
-    //LED_RGB_setColor(LED_RGB2, 255, 255, 255);
-    //LED_RGB_setColor(LED_RGB3, 255, 255, 255);
 
 // Disable The SDC relay and wait later for closing it
 #if 0

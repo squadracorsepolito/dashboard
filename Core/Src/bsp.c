@@ -175,16 +175,16 @@ static enum ROT_SW_State ROT_SW_Device_State[ROT_SW_Device_NUM] =
     {[ROT_SW_Device1] = ROT_SW_State_NUM, [ROT_SW_Device2] = ROT_SW_State_NUM};
 
 static float ROT_SW_ain_V_to_state_map[ROT_SW_State_NUM][2U] = {
-    [ROT_SW_State0] = {(0.00), (0.08) + ROT_SW_STATE_ERR_MARGIN_V},
-    [ROT_SW_State1] = {(1.30) - ROT_SW_STATE_ERR_MARGIN_V, (1.30) + ROT_SW_STATE_ERR_MARGIN_V},
-    [ROT_SW_State2] = {(0.25) - ROT_SW_STATE_ERR_MARGIN_V, (0.25) + ROT_SW_STATE_ERR_MARGIN_V},
-    [ROT_SW_State3] = {(1.60) - ROT_SW_STATE_ERR_MARGIN_V, (1.60) + ROT_SW_STATE_ERR_MARGIN_V},
-    [ROT_SW_State4] = {(0.50) - ROT_SW_STATE_ERR_MARGIN_V, (0.50) + ROT_SW_STATE_ERR_MARGIN_V},
-    [ROT_SW_State5] = {(1.85) - ROT_SW_STATE_ERR_MARGIN_V, (1.85) + ROT_SW_STATE_ERR_MARGIN_V},
-    [ROT_SW_State6] = {(0.77) - ROT_SW_STATE_ERR_MARGIN_V, (0.77) + ROT_SW_STATE_ERR_MARGIN_V},
-    [ROT_SW_State7] = {(2.14) - ROT_SW_STATE_ERR_MARGIN_V, (2.14) + ROT_SW_STATE_ERR_MARGIN_V},
-    [ROT_SW_State8] = {(1.05) - ROT_SW_STATE_ERR_MARGIN_V, (1.05) + ROT_SW_STATE_ERR_MARGIN_V},
-    [ROT_SW_State9] = {(2.40) - ROT_SW_STATE_ERR_MARGIN_V, (2.40) + ROT_SW_STATE_ERR_MARGIN_V},
+    [ROT_SW_State0] = {(0.0), (0.0) + ROT_SW_STATE_ERR_MARGIN_V},
+    [ROT_SW_State1] = {(2.71) - ROT_SW_STATE_ERR_MARGIN_V, (2.71) + ROT_SW_STATE_ERR_MARGIN_V},
+    [ROT_SW_State2] = {(0.54) - ROT_SW_STATE_ERR_MARGIN_V, (0.54) + ROT_SW_STATE_ERR_MARGIN_V},
+    [ROT_SW_State3] = {(3.26) - ROT_SW_STATE_ERR_MARGIN_V, (3.26) + ROT_SW_STATE_ERR_MARGIN_V},
+    [ROT_SW_State4] = {(1.10) - ROT_SW_STATE_ERR_MARGIN_V, (1.10) + ROT_SW_STATE_ERR_MARGIN_V},
+    [ROT_SW_State5] = {(3.81) - ROT_SW_STATE_ERR_MARGIN_V, (3.81) + ROT_SW_STATE_ERR_MARGIN_V},
+    [ROT_SW_State6] = {(1.63) - ROT_SW_STATE_ERR_MARGIN_V, (1.63) + ROT_SW_STATE_ERR_MARGIN_V},
+    [ROT_SW_State7] = {(4.35) - ROT_SW_STATE_ERR_MARGIN_V, (4.35) + ROT_SW_STATE_ERR_MARGIN_V},
+    [ROT_SW_State8] = {(2.17) - ROT_SW_STATE_ERR_MARGIN_V, (2.17) + ROT_SW_STATE_ERR_MARGIN_V},
+    [ROT_SW_State9] = {(4.89) - ROT_SW_STATE_ERR_MARGIN_V, (4.89) + ROT_SW_STATE_ERR_MARGIN_V},
 };
 /*---------- Private Functions -----------------------------------------------*/
 enum ROT_SW_State __ROT_SW_analogV_to_state(float analogV) {
@@ -287,6 +287,7 @@ void ROT_SW_Routine(void) {
             last_state = curr_state;
         }
 
+#if 0
         if (curr_state != ROT_SW_State_NUM && curr_state >= (last_state)-1 && curr_state <= (last_state) + 1) {
             // if no error and the state progressed correctly, update current state
             ROT_SW_Device_State[i] = curr_state;
@@ -294,6 +295,12 @@ void ROT_SW_Routine(void) {
             // if either in error or the step was not in range keep the same state
             ROT_SW_Device_State[i] = last_state;
         }
+#else
+        // Simplified version: always update state if valid (no stability filter)
+        if (curr_state != ROT_SW_State_NUM) {
+            ROT_SW_Device_State[i] = curr_state;
+        }
+#endif
     }
 }
 
