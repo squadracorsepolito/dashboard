@@ -1,6 +1,7 @@
 {
   "navigation": {
     "selectedUserPageObject": "[ILI9488.eez-project]:/userPages/0",
+    "selectedStyleObject": "[ILI9488.eez-project]:/lvglStyles/styles/0/childStyles/10",
     "selectedThemeObject": "[ILI9488.eez-project]:/themes/0",
     "subnavigationSelectedItems": {
       "variables-tab/sub-navigation/selected-item": "Enums"
@@ -24,7 +25,8 @@
           },
           {
             "type": "border",
-            "size": 389.5,
+            "selected": 0,
+            "size": 366.5,
             "location": "right",
             "children": [
               {
@@ -115,7 +117,7 @@
           },
           {
             "type": "border",
-            "selected": 1,
+            "selected": 4,
             "size": 240,
             "location": "left",
             "children": [
@@ -150,6 +152,14 @@
                 "component": "variables",
                 "enableClose": false,
                 "icon": "svg:variable"
+              },
+              {
+                "type": "tab",
+                "id": "#a463a578-b903-47cf-b054-c3694621a90a",
+                "name": "Widgets Structure",
+                "component": "flow-structure",
+                "enableClose": false,
+                "icon": "svg:hierarchy"
               }
             ]
           }
@@ -160,31 +170,15 @@
           "children": [
             {
               "type": "tabset",
-              "id": "#f13df622-2264-4f6d-a26e-12e6815f699c",
-              "weight": 16.429747922387033,
-              "enableClose": false,
-              "children": [
-                {
-                  "type": "tab",
-                  "id": "#a463a578-b903-47cf-b054-c3694621a90a",
-                  "name": "Widgets Structure",
-                  "component": "flow-structure",
-                  "enableClose": false,
-                  "icon": "svg:hierarchy"
-                }
-              ]
-            },
-            {
-              "type": "tabset",
               "id": "EDITORS",
-              "weight": 63.46499321424545,
+              "weight": 47.1580157911407,
               "selected": 1,
               "enableDeleteWhenEmpty": false,
               "enableClose": false,
               "children": [
                 {
                   "type": "tab",
-                  "id": "#f0afb765-4eb0-4b81-bd7b-1276c1c06df2",
+                  "id": "#74d53793-0561-4b48-b87e-fa32e142f84d",
                   "name": "Settings",
                   "component": "editor",
                   "config": {
@@ -196,8 +190,8 @@
                 },
                 {
                   "type": "tab",
-                  "id": "#f196f48a-086c-470c-adc2-76de73effdbc",
-                  "name": "Tires",
+                  "id": "#efef9a2f-1c1f-4bd3-8921-1ea07c7e9c35",
+                  "name": "Main",
                   "component": "editor",
                   "config": {
                     "objectPath": "[ILI9488.eez-project]:/userPages/0",
@@ -210,8 +204,8 @@
             },
             {
               "type": "tabset",
-              "id": "#41600787-ac01-49a6-ae0c-9be1ed073d32",
-              "weight": 26.631580378877498,
+              "id": "#731a08b9-9924-4f9f-adf2-1354af512769",
+              "weight": 16.306977423104726,
               "children": [
                 {
                   "type": "tab",
@@ -427,7 +421,8 @@
               "selected": -1,
               "enableDeleteWhenEmpty": false,
               "enableClose": false,
-              "children": []
+              "children": [],
+              "active": true
             },
             {
               "type": "row",
@@ -952,7 +947,13 @@
     "[ILI9488.eez-project]:/userPages/0[flow-state]": {
       "selection": {
         "0": {
-          "0": {}
+          "0": {},
+          "1": {
+            "7": {},
+            "13": {
+              "$selected": true
+            }
+          }
         }
       },
       "transform": {
@@ -970,35 +971,27 @@
       }
     },
     "[ILI9488.eez-project]:/lvglStyles/styles[tree-state]": {
-      "0": {},
-      "1": {
+      "0": {
+        "0": {},
         "1": {},
         "2": {},
         "3": {},
         "4": {},
-        "5": {}
+        "5": {},
+        "6": {},
+        "9": {},
+        "10": {
+          "$selected": true
+        }
       },
+      "1": {},
       "2": {
         "$selected": true
       }
     },
     "[ILI9488.eez-project]:/userPages/1[flow-state]": {
       "selection": {
-        "0": {
-          "0": {},
-          "1": {
-            "0": {},
-            "$selected": true
-          },
-          "2": {},
-          "3": {},
-          "4": {},
-          "5": {},
-          "6": {
-            "1": {}
-          },
-          "7": {}
-        }
+        "0": {}
       },
       "transform": {
         "translate": {
@@ -1194,7 +1187,7 @@
   "searchMatchWholeWord": false,
   "replaceEnabled": false,
   "replaceText": "",
-  "pageRuntimeFrontFace": true,
+  "pageRuntimeFrontFace": false,
   "breakpoints": {},
   "watchExpressions": [],
   "showComponentDescriptions": true,
@@ -1204,7 +1197,8 @@
   "lvglState": "DEFAULT",
   "lvglExpandedPropertiesGroup": [
     "POSITION AND SIZE",
-    "BACKGROUND"
+    "BACKGROUND",
+    "TEXT"
   ],
   "showInactiveFlowsInDebugger": true,
   "globalFlowZoom": true,
