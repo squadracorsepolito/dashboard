@@ -38,6 +38,10 @@ extern TIM_HandleTypeDef htim4;
 
 extern TIM_HandleTypeDef htim7;
 
+extern TIM_HandleTypeDef htim10;
+
+extern TIM_HandleTypeDef htim11;
+
 /* USER CODE BEGIN Private defines */
 
 #define TIM_ADC1_HANDLE htim2 /*!< TIM timer used for retriggering ADC1 conversions in DMA mode */
@@ -47,6 +51,8 @@ extern TIM_HandleTypeDef htim7;
 void MX_TIM2_Init(void);
 void MX_TIM4_Init(void);
 void MX_TIM7_Init(void);
+void MX_TIM10_Init(void);
+void MX_TIM11_Init(void);
 
 void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
 
