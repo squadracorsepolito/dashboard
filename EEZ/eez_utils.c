@@ -40,8 +40,8 @@ void EEZ_create_screen(enum EEZ_UTI_Page page) {
     lv_obj_t** target_screen_ptr = NULL;
     
     switch (page) {
-        case EEZ_UTI_Tires_Page:
-            target_screen_ptr = &objects.tires;
+        case EEZ_UTI_Main_Page:
+            target_screen_ptr = &objects.main;
             break;
         default:
             return;
@@ -59,9 +59,9 @@ void EEZ_create_screen(enum EEZ_UTI_Page page) {
     }
 
     switch (page) {
-        case EEZ_UTI_Tires_Page:
-            create_screen_tires();
-            lv_scr_load(objects.tires);
+        case EEZ_UTI_Main_Page:
+            create_screen_main();
+            lv_scr_load(objects.main);
             break;
             
         default:

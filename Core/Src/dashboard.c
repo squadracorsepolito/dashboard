@@ -86,6 +86,7 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
         struct mcb_bms_lv_lv_bat_general_t lv_bat_general;
         struct mcb_tpms_front_wheels_pressure_t front_wheels_status;
         struct mcb_tpms_rear_wheels_pressure_t rear_wheels_status;
+        struct mcb_sb_rear_analog_device_t sb_rear_analog_device;
     } msgs = {};
 
     if (HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &RxHeader, RxData) != HAL_OK) {
@@ -216,6 +217,20 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
             mcb_tpms_rear_wheels_pressure_tire_rl_pressure_decode(msgs.rear_wheels_status.tire_rl_pressure);
         dashboard_data.TIRE_RR_PRESSURE =
             mcb_tpms_rear_wheels_pressure_tire_rr_pressure_decode(msgs.rear_wheels_status.tire_rr_pressure);
+    }
+
+    /*
+     *
+     * SB REAR analog device
+     *
+     */
+    else if((RxHeader.StdId == MCB_SB_REAR_ANALOG_DEVICE_FRAME_ID) &&
+            (RxHeader.DLC == MCB_SB_REAR_ANALOG_DEVICE_LENGTH)) {
+        mcb_sb_rear_analog_device_unpack(&msgs.sb_rear_analog_device, RxData, MCB_SB_REAR_ANALOG_DEVICE_LENGTH);
+        dashboard_data.COOL_PRESS_LEFT_mV =
+            mcb_sb_rear_analog_device_cool_press_left_voltage_decode(msgs.sb_rear_analog_device.cool_press_left_voltage);
+        dashboard_data.COOL_PRESS_RIGHT_mV =
+            mcb_sb_rear_analog_device_cool_press_right_voltage_decode(msgs.sb_rear_analog_device.cool_press_right_voltage);
     }
 }
 

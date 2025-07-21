@@ -12,11 +12,9 @@
  *          see LICENSE file in the root directory of this software component
  */
 
-/* SHARED ####################################################################*/
 /*---------- Includes --------------------------------------------------------*/
 
 #include "eez_actions.h"
-
 
 /*---------- Private define --------------------------------------------------*/
 
@@ -33,326 +31,97 @@ static const lv_color_t LVGL_Colors[EEZ_COLOR_COUNT] = {
     LV_COLOR_MAKE(0xFF, 0xFF, 0x00),  // Yellow
 };
 /*---------- Private function prototypes -------------------------------------*/
-static lv_obj_t *EEZ_ACT_get_active_lbl_lv_bat_v_object(void);
-static lv_obj_t *EEZ_ACT_get_active_lbl_hv_soc_object(void);
-static lv_obj_t *EEZ_ACT_get_active_lbl_sx_rot_sw_map_object(void);
-static lv_obj_t *EEZ_ACT_get_active_lbl_dx_rot_sw_map_object(void);
-static lv_obj_t *EEZ_ACT_get_active_lbl_LC_object(void);
-static lv_obj_t *EEZ_ACT_get_active_lbl_TC_object(void);
-static lv_obj_t *EEZ_ACT_get_active_lbl_TV_object(void);
-static void EEZ_ACT_get_active_pnl_status_bar_object(lv_obj_t **left_bar, lv_obj_t **right_bar);
-
+static lv_obj_t *EEZ_ACT_get_curr_screen(void);
 /*---------- Exported Variables ----------------------------------------------*/
 
 /*---------- Exported Functions ----------------------------------------------*/
-void EEZ_ACT_cmn_set_lbl_lv_bat_v(float new_value) {
+
+/**
+ * @brief Sets the text of a label object to a formatted float value.
+ *
+ * @param new_value The float value to display.
+ * @param screen The screen object where the label resides.
+ * @param obj The label object to update.
+ *
+ * The label is updated only if the provided screen is the current screen and the object is not NULL.
+ */
+void EEZ_ACT_set_lbl_float(float new_value, lv_obj_t *screen, lv_obj_t *obj) {
     char new_value_str[16];
     snprintf(new_value_str, sizeof(new_value_str), "%.1f", new_value);
 
-    lv_obj_t *active_label = EEZ_ACT_get_active_lbl_lv_bat_v_object();
-    if (active_label != NULL) {
-        lv_label_set_text(active_label, new_value_str);
+    if (screen == EEZ_ACT_get_curr_screen()) {
+        if (obj != NULL) {
+            lv_label_set_text(obj, new_value_str);
+        }
     }
 }
 
-void EEZ_ACT_cmn_set_lbl_hv_soc(uint8_t new_value) {
+/**
+ * @brief Sets the text of a label object to a formatted uint8_t value.
+ *
+ * @param new_value The uint8_t value to display.
+ * @param screen The screen object where the label resides.
+ * @param obj The label object to update.
+ *
+ * The label is updated only if the provided screen is the current screen and the object is not NULL.
+ */
+void EEZ_ACT_set_lbl_uint8(uint8_t new_value, lv_obj_t *screen, lv_obj_t *obj) {
     char new_value_str[16];
-    snprintf(new_value_str, sizeof(new_value_str), "%.1i", new_value);
+    snprintf(new_value_str, sizeof(new_value_str), "%u", new_value);
 
-    lv_obj_t *active_label = EEZ_ACT_get_active_lbl_hv_soc_object();
-    if (active_label != NULL) {
-        lv_label_set_text(active_label, new_value_str);
+    if (screen == EEZ_ACT_get_curr_screen()) {
+        if (obj != NULL) {
+            lv_label_set_text(obj, new_value_str);
+        }
     }
 }
 
-void EEZ_ACT_cmn_set_lbl_sx_rot_sw_map(uint8_t new_value) {
-    char new_value_str[16];
-    snprintf(new_value_str, sizeof(new_value_str), "%.1i", new_value);
-
-    lv_obj_t *active_label = EEZ_ACT_get_active_lbl_sx_rot_sw_map_object();
-    if (active_label != NULL) {
-        lv_label_set_text(active_label, new_value_str);
-    }
-}
-
-void EEZ_ACT_cmn_set_lbl_dx_rot_sw_map(uint8_t new_value) {
-    char new_value_str[16];
-    snprintf(new_value_str, sizeof(new_value_str), "%.1i", new_value);
-    lv_obj_t *active_label = EEZ_ACT_get_active_lbl_dx_rot_sw_map_object();
-    if (active_label != NULL) {
-        lv_label_set_text(active_label, new_value_str);
-    }
-}
-
-void EEZ_ACT_cmn_set_lbl_LC_color(enum EEZ_Colors new_color) {
+/**
+ * @brief Sets the text color of a label object.
+ *
+ * @param new_color The color to set, as an EEZ_Colors enum value.
+ * @param screen The screen object where the label resides.
+ * @param obj The label object to update.
+ *
+ * The color is updated only if the provided screen is the current screen, the object is not NULL,
+ * and the color is within the valid range.
+ */
+void EEZ_ACT_set_lbl_color(enum EEZ_Colors new_color, lv_obj_t *screen, lv_obj_t *obj) {
     if (new_color >= EEZ_COLOR_COUNT) {
         return;
     }
 
-    lv_obj_t *active_label = EEZ_ACT_get_active_lbl_LC_object();
-
-    if (active_label != NULL) {
-        lv_obj_set_style_text_color(active_label, LVGL_Colors[new_color], LV_PART_MAIN | LV_STATE_DEFAULT);
+    if (screen == EEZ_ACT_get_curr_screen()) {
+        if (obj != NULL) {
+            lv_obj_set_style_text_color(obj, LVGL_Colors[new_color], LV_PART_MAIN | LV_STATE_DEFAULT);
+        }
     }
 }
 
-void EEZ_ACT_cmn_set_lbl_TC_color(enum EEZ_Colors new_color) {
+/**
+ * @brief Sets the background color of a panel object.
+ *
+ * @param new_color The color to set, as an EEZ_Colors enum value.
+ * @param screen The screen object where the panel resides.
+ * @param obj The panel object to update.
+ *
+ * The color is updated only if the provided screen is the current screen, the object is not NULL,
+ * and the color is within the valid range.
+ */
+void EEZ_ACT_set_panel_color(enum EEZ_Colors new_color, lv_obj_t *screen, lv_obj_t *obj_sx, lv_obj_t *obj_dx) {
     if (new_color >= EEZ_COLOR_COUNT) {
         return;
     }
 
-    lv_obj_t *active_label = EEZ_ACT_get_active_lbl_TC_object();
-
-    if (active_label != NULL) {
-        lv_obj_set_style_text_color(active_label, LVGL_Colors[new_color], LV_PART_MAIN | LV_STATE_DEFAULT);
-    }
-}
-
-void EEZ_ACT_cmn_set_lbl_TV_color(enum EEZ_Colors new_color) {
-   if (new_color >= EEZ_COLOR_COUNT) {
-        return;
-    }
-
-    lv_obj_t *active_label = EEZ_ACT_get_active_lbl_TV_object();
-
-    if (active_label != NULL) {
-        lv_obj_set_style_text_color(active_label, LVGL_Colors[new_color], LV_PART_MAIN | LV_STATE_DEFAULT);
-    }
-}
-
-void EEZ_ACT_cmn_set_pnl_status_bar_color(enum EEZ_Colors new_color) {
-    if (new_color >= EEZ_COLOR_COUNT) {
-        return;
-    }
-
-    lv_obj_t *left_bar  = NULL;
-    lv_obj_t *right_bar = NULL;
-    EEZ_ACT_get_active_pnl_status_bar_object(&left_bar, &right_bar);
-
-    if (left_bar != NULL) {
-        lv_obj_set_style_bg_color(left_bar, LVGL_Colors[new_color], LV_PART_MAIN | LV_STATE_DEFAULT);
-    }
-
-    if (right_bar != NULL) {
-        lv_obj_set_style_bg_color(right_bar, LVGL_Colors[new_color], LV_PART_MAIN | LV_STATE_DEFAULT);
+    if (screen == EEZ_ACT_get_curr_screen()) {
+        if (obj_sx != NULL && obj_dx != NULL) {
+            lv_obj_set_style_bg_color(obj_sx, LVGL_Colors[new_color], LV_PART_MAIN | LV_STATE_DEFAULT);
+            lv_obj_set_style_bg_color(obj_dx, LVGL_Colors[new_color], LV_PART_MAIN | LV_STATE_DEFAULT);
+        }
     }
 }
 
 /*---------- Private Functions -----------------------------------------------*/
-
-/**
- * @brief Gets the correct battery voltage label for the currently active screen
- * @return Pointer to the active screen's battery voltage label object
- * 
- * This function checks which screen is currently active and returns
- * the corresponding battery voltage display object.
- * Returns NULL if no matching screen is found.
- */
-static lv_obj_t *EEZ_ACT_get_active_lbl_lv_bat_v_object(void) {
-    lv_obj_t *current_screen = lv_scr_act();
-
-    if (current_screen == objects.tires) {
-        return objects.pg_tires_lv_bat_v;
-    }
-    return NULL;
+static lv_obj_t *EEZ_ACT_get_curr_screen(void) {
+    return lv_scr_act();
 }
-
-/**
- * @brief Gets the correct high voltage SoC label for the currently active screen
- * @return Pointer to the active screen's label object
- * 
- * This function checks which screen is currently active and returns
- * the corresponding display object.
- * Returns NULL if no matching screen is found.
- */
-static lv_obj_t *EEZ_ACT_get_active_lbl_hv_soc_object(void) {
-    lv_obj_t *current_screen = lv_scr_act();
-
-    if (current_screen == objects.tires) {
-        return objects.pg_tires_hv_soc_est;
-    }
-
-    return NULL;
-}
-
-/**
- * @brief Gets the correct left rotary switch label for the currently active screen
- * @return Pointer to the active screen's label object
- * 
- * This function checks which screen is currently active and returns
- * the corresponding display object.
- * Returns NULL if no matching screen is found.
- */
-static lv_obj_t *EEZ_ACT_get_active_lbl_sx_rot_sw_map_object(void) {
-    lv_obj_t *current_screen = lv_scr_act();
-
-    if (current_screen == objects.tires) {
-        return objects.pg_tires_sx_map;
-    }
-
-    return NULL;
-}
-
-/**
- * @brief Gets the correct right rotary switch label for the currently active screen
- * @return Pointer to the active screen's label object
- * 
- * This function checks which screen is currently active and returns
- * the corresponding display object.
- * Returns NULL if no matching screen is found.
- */
-static lv_obj_t *EEZ_ACT_get_active_lbl_dx_rot_sw_map_object(void) {
-    lv_obj_t *current_screen = lv_scr_act();
-
-    if (current_screen == objects.tires) {
-        return objects.pg_tires_dx_map;
-    }
-
-    return NULL;
-}
-
-static lv_obj_t *EEZ_ACT_get_active_lbl_LC_object(void) {
-    lv_obj_t *current_screen = lv_scr_act();
-
-    if (current_screen == objects.tires) {
-        return objects.pg_tires_lc;
-    }
-
-    return NULL;
-}
-
-static lv_obj_t *EEZ_ACT_get_active_lbl_TC_object(void) {
-    lv_obj_t *current_screen = lv_scr_act();
-
-    if (current_screen == objects.tires) {
-        return objects.pg_tires_tc;
-    }
-
-    return NULL;
-}
-
-static lv_obj_t *EEZ_ACT_get_active_lbl_TV_object(void) {
-    lv_obj_t *current_screen = lv_scr_act();
-
-    if (current_screen == objects.tires) {
-        return objects.pg_tires_tv;
-    } 
-
-    return NULL;
-}
-
-/**
- * @brief Gets the active status bar objects for the current screen
- * @param[out] left_bar Pointer to store the left status bar object
- * @param[out] right_bar Pointer to store the right status bar object
- * 
- * This function retrieves both status bar objects for the currently active screen.
- * If no matching screen is found, both pointers will be set to NULL.
- */
-static void EEZ_ACT_get_active_pnl_status_bar_object(lv_obj_t **left_bar, lv_obj_t **right_bar) {
-    lv_obj_t *current_screen = lv_scr_act();
-
-    *left_bar  = NULL;
-    *right_bar = NULL;
-
-    if (current_screen == objects.tires) {
-        *left_bar  = objects.pg_tires_sx_status_bar;
-        *right_bar = objects.pg_tires_dx_status_bar;
-    }
-}
-
-/* TIRES #####################################################################*/
-/*---------- Includes --------------------------------------------------------*/
-
-/*---------- Private define --------------------------------------------------*/
-
-/*---------- Private macro ---------------------------------------------------*/
-
-/*---------- Private variables -----------------------------------------------*/
-
-/*---------- Private function prototypes -------------------------------------*/
-
-/*---------- Exported Variables ----------------------------------------------*/
-
-/*---------- Exported Functions ----------------------------------------------*/
-void EEZ_ACT_tires_set_lbl_fl_tmp(float new_value) {
-    char new_value_str[16];
-    snprintf(new_value_str, sizeof(new_value_str), "%.1f", new_value);
-
-    lv_obj_t *active_label = objects.pg_tires_fl_temp;
-    if (active_label != NULL) {
-        lv_label_set_text(active_label, new_value_str);
-    }
-}
-
-void EEZ_ACT_tires_set_lbl_fr_tmp(float new_value) {
-    char new_value_str[16];
-    snprintf(new_value_str, sizeof(new_value_str), "%.1f", new_value);
-
-    lv_obj_t *active_label = objects.pg_tires_fr_temp;
-    if (active_label != NULL) {
-        lv_label_set_text(active_label, new_value_str);
-    }
-}
-
-void EEZ_ACT_tires_set_lbl_rr_tmp(float new_value) {
-    char new_value_str[16];
-    snprintf(new_value_str, sizeof(new_value_str), "%.1f", new_value);
-
-    lv_obj_t *active_label = objects.pg_tires_rr_temp;
-    if (active_label != NULL) {
-        lv_label_set_text(active_label, new_value_str);
-    }
-}
-
-void EEZ_ACT_tires_set_lbl_rl_tmp(float new_value) {
-    char new_value_str[16];
-    snprintf(new_value_str, sizeof(new_value_str), "%.1f", new_value);
-
-    lv_obj_t *active_label = objects.pg_tires_rl_temp;
-    if (active_label != NULL) {
-        lv_label_set_text(active_label, new_value_str);
-    }
-}
-
-void EEZ_ACT_tires_set_lbl_fl_bar(float new_value) {
-    char new_value_str[16];
-    snprintf(new_value_str, sizeof(new_value_str), "%.1f", new_value);
-
-    lv_obj_t *active_label = objects.pg_tires_fl_bar;
-    if (active_label != NULL) {
-        lv_label_set_text(active_label, new_value_str);
-    }
-}
-
-void EEZ_ACT_tires_set_lbl_fr_bar(float new_value) {
-    char new_value_str[16];
-    snprintf(new_value_str, sizeof(new_value_str), "%.1f", new_value);
-
-    lv_obj_t *active_label = objects.pg_tires_fr_bar;
-    if (active_label != NULL) {
-        lv_label_set_text(active_label, new_value_str);
-    }
-}
-
-void EEZ_ACT_tires_set_lbl_rr_bar(float new_value) {
-    char new_value_str[16];
-    snprintf(new_value_str, sizeof(new_value_str), "%.1f", new_value);
-
-    lv_obj_t *active_label = objects.pg_tires_rr_bar;
-    if (active_label != NULL) {
-        lv_label_set_text(active_label, new_value_str);
-    }
-}
-
-void EEZ_ACT_tires_set_lbl_rl_bar(float new_value) {
-    char new_value_str[16];
-    snprintf(new_value_str, sizeof(new_value_str), "%.1f", new_value);
-
-    lv_obj_t *active_label = objects.pg_tires_rl_bar;
-    if (active_label != NULL) {
-        lv_label_set_text(active_label, new_value_str);
-    }
-}
-
-/*---------- Private Functions -----------------------------------------------*/

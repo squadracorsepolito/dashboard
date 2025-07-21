@@ -16,12 +16,12 @@
 #ifndef _EEZ_ACTIONS_H_
 #define _EEZ_ACTIONS_H_
 
-/* SHARED ####################################################################*/
 /* ---------- Includes -------------------------------------------------------*/
 #include "screens.h"
+
 #include <stdio.h>
 /* ---------- Exported types -------------------------------------------------*/
-enum EEZ_Colors{
+enum EEZ_Colors {
     EEZ_COLOR_WHITE = 0,
     EEZ_COLOR_BLACK,
     EEZ_COLOR_GREEN,
@@ -39,42 +39,10 @@ enum EEZ_Colors{
 /* ---------- Exported macros ------------------------------------------------*/
 
 /* ---------- Exported functions ---------------------------------------------*/
-void EEZ_ACT_cmn_set_lbl_lv_bat_v(float new_value);
-void EEZ_ACT_cmn_set_lbl_hv_soc(uint8_t new_value);
-void EEZ_ACT_cmn_set_lbl_sx_rot_sw_map(uint8_t new_value);
-void EEZ_ACT_cmn_set_lbl_dx_rot_sw_map(uint8_t new_value);
-void EEZ_ACT_cmn_set_pnl_status_bar_color(enum EEZ_Colors new_color);
-void EEZ_ACT_cmn_set_lbl_LC_color(enum EEZ_Colors new_color);
-void EEZ_ACT_cmn_set_lbl_TC_color(enum EEZ_Colors new_color);
-void EEZ_ACT_cmn_set_lbl_TV_color(enum EEZ_Colors new_color);
-/* ---------- Private types --------------------------------------------------*/
-
-/* ---------- Private variables ----------------------------------------------*/
-
-/* ---------- Private constants ----------------------------------------------*/
-
-/* ---------- Private Macros -------------------------------------------------*/
-
-/* TIRES #####################################################################*/
-/* ---------- Includes -------------------------------------------------------*/
-
-/* ---------- Exported types -------------------------------------------------*/
-
-/* ---------- Exported constants ---------------------------------------------*/
-
-/* ---------- Exported variables ---------------------------------------------*/
-
-/* ---------- Exported macros ------------------------------------------------*/
-
-/* ---------- Exported functions ---------------------------------------------*/
-void EEZ_ACT_tires_set_lbl_fl_tmp(float new_value);
-void EEZ_ACT_tires_set_lbl_fr_tmp(float new_value);
-void EEZ_ACT_tires_set_lbl_rr_tmp(float new_value);
-void EEZ_ACT_tires_set_lbl_rl_tmp(float new_value);
-void EEZ_ACT_tires_set_lbl_fl_bar(float new_value);
-void EEZ_ACT_tires_set_lbl_fr_bar(float new_value);
-void EEZ_ACT_tires_set_lbl_rr_bar(float new_value);
-void EEZ_ACT_tires_set_lbl_rl_bar(float new_value);
+void EEZ_ACT_set_lbl_float(float new_value, lv_obj_t *screen, lv_obj_t *obj);
+void EEZ_ACT_set_lbl_uint8(uint8_t new_value, lv_obj_t *screen, lv_obj_t *obj);
+void EEZ_ACT_set_lbl_color(enum EEZ_Colors new_color, lv_obj_t *screen, lv_obj_t *obj);
+void EEZ_ACT_set_panel_color(enum EEZ_Colors new_color, lv_obj_t *screen, lv_obj_t *obj_sx, lv_obj_t *obj_dx);
 /* ---------- Private types --------------------------------------------------*/
 
 /* ---------- Private variables ----------------------------------------------*/

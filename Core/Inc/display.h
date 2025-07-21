@@ -26,6 +26,7 @@
 #include "eez_utils.h"
 #include "eez_actions.h"
 #include "bsp.h"
+#include "screens.h"
 
 /* ---------- Exported types -------------------------------------------------*/
 /* ---------- Exported constants ---------------------------------------------*/

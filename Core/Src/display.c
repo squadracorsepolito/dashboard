@@ -50,61 +50,58 @@ struct ILI9488_Handle ili9488_handle = {
 void DISP_init(void) {
     if (ILI9488_init(&ili9488_handle) == Status_OK) {
         LVGL_init();
-        EEZ_create_screen(EEZ_UTI_Tires_Page);
+        EEZ_create_screen(EEZ_UTI_Main_Page);
     }  //TODO else statement
 }
 
 void DISP_update_routine(void) {
-    EEZ_ACT_cmn_set_lbl_lv_bat_v(dashboard_data.LV_BAT_mV/1000.0);
-    EEZ_ACT_cmn_set_lbl_hv_soc(dashboard_data.HV_BAT_SOC);
-    EEZ_ACT_cmn_set_lbl_sx_rot_sw_map(ROT_SW_getState(ROT_SW_Device1));
-    EEZ_ACT_cmn_set_lbl_dx_rot_sw_map(ROT_SW_getState(ROT_SW_Device2));
+    EEZ_ACT_set_lbl_float(dashboard_data.LV_BAT_mV / 1000.0, objects.main, objects.pg_main_lv_bat_v);
+    EEZ_ACT_set_lbl_uint8(dashboard_data.HV_BAT_SOC, objects.main, objects.pg_main_hv_soc_est);
+    EEZ_ACT_set_lbl_uint8(ROT_SW_getState(ROT_SW_Device1), objects.main, objects.pg_main_sx_map);
+    EEZ_ACT_set_lbl_uint8(ROT_SW_getState(ROT_SW_Device2), objects.main, objects.pg_main_dx_map);
 
     if (!BTN_getStatus(BTN_LC)) {
-        EEZ_ACT_cmn_set_lbl_LC_color(EEZ_COLOR_BLACK);
-    }else{
-        EEZ_ACT_cmn_set_lbl_LC_color(EEZ_COLOR_CYAN);
+        EEZ_ACT_set_lbl_color(EEZ_COLOR_WHITE, objects.main, objects.pg_main_lc);
+    } else {
+        EEZ_ACT_set_lbl_color(EEZ_COLOR_GREEN, objects.main, objects.pg_main_lc);
     }
 
     if (!BTN_getStatus(BTN_TC)) {
-        EEZ_ACT_cmn_set_lbl_TC_color(EEZ_COLOR_BLACK);
-    }else{
-        EEZ_ACT_cmn_set_lbl_TC_color(EEZ_COLOR_CYAN);
+        EEZ_ACT_set_lbl_color(EEZ_COLOR_WHITE, objects.main, objects.pg_main_tc);
+    } else {
+        EEZ_ACT_set_lbl_color(EEZ_COLOR_GREEN, objects.main, objects.pg_main_tc);
     }
 
     if (!BTN_getStatus(BTN_TV)) {
-        EEZ_ACT_cmn_set_lbl_TV_color(EEZ_COLOR_BLACK);
-    }else{
-        EEZ_ACT_cmn_set_lbl_TV_color(EEZ_COLOR_CYAN);
+        EEZ_ACT_set_lbl_color(EEZ_COLOR_WHITE, objects.main, objects.pg_main_tv);
+    } else {
+        EEZ_ACT_set_lbl_color(EEZ_COLOR_GREEN, objects.main, objects.pg_main_tv);
     }
 
     switch (dashboard_data.RTD_FSM_State) {
         case STATE_IDLE:
-            EEZ_ACT_cmn_set_pnl_status_bar_color(EEZ_COLOR_BLUE);
+            EEZ_ACT_set_panel_color(
+                EEZ_COLOR_BLUE, objects.main, objects.pg_main_sx_status_bar, objects.pg_main_dx_status_bar);
             break;
         case STATE_TSON:
-            EEZ_ACT_cmn_set_pnl_status_bar_color(EEZ_COLOR_PURPLE);
+            EEZ_ACT_set_panel_color(
+                EEZ_COLOR_PURPLE, objects.main, objects.pg_main_sx_status_bar, objects.pg_main_dx_status_bar );
+
             break;
         case STATE_RTD_SOUND:
             break;
         case STATE_RTD:
-            EEZ_ACT_cmn_set_pnl_status_bar_color(EEZ_COLOR_GREEN);
+            EEZ_ACT_set_panel_color(EEZ_COLOR_GREEN, objects.main, objects.pg_main_sx_status_bar, objects.pg_main_dx_status_bar);
             break;
         case STATE_DISCHARGE:
-            EEZ_ACT_cmn_set_pnl_status_bar_color(EEZ_COLOR_CYAN);
+            EEZ_ACT_set_panel_color(EEZ_COLOR_CYAN, objects.main, objects.pg_main_sx_status_bar, objects.pg_main_dx_status_bar);
             break;
         default:
             break;
     }
-
-    EEZ_ACT_tires_set_lbl_fl_tmp(dashboard_data.TIRE_FL_TEMP);
-    EEZ_ACT_tires_set_lbl_fr_tmp(dashboard_data.TIRE_FR_TEMP);
-    EEZ_ACT_tires_set_lbl_rl_tmp(dashboard_data.TIRE_RL_TEMP);
-    EEZ_ACT_tires_set_lbl_rr_tmp(dashboard_data.TIRE_RR_TEMP);
-    EEZ_ACT_tires_set_lbl_fl_bar(dashboard_data.TIRE_FL_PRESSURE);
-    EEZ_ACT_tires_set_lbl_fr_bar(dashboard_data.TIRE_FR_PRESSURE);
-    EEZ_ACT_tires_set_lbl_rl_bar(dashboard_data.TIRE_RL_PRESSURE);
-    EEZ_ACT_tires_set_lbl_rr_bar(dashboard_data.TIRE_RR_PRESSURE);
+    
+    EEZ_ACT_set_lbl_float(dashboard_data.COOL_PRESS_LEFT_mV, objects.main, objects.pg_main_cool_press_l);
+    EEZ_ACT_set_lbl_float(dashboard_data.COOL_PRESS_RIGHT_mV, objects.main, objects.pg_main_cool_press_r);
 }
 
 void ILI9488_CS_Pin_SetState(enum ILI9488_PinState state) {

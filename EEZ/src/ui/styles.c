@@ -45,6 +45,7 @@ void init_style_label_basic_f40_style_MAIN_DEFAULT(lv_style_t *style) {
     init_style_label_basic_style_MAIN_DEFAULT(style);
     
     lv_style_set_text_font(style, &lv_font_montserrat_40);
+    lv_style_set_text_color(style, lv_color_hex(0xff000000));
 };
 
 lv_style_t *get_style_label_basic_f40_style_MAIN_DEFAULT() {
@@ -75,6 +76,7 @@ void init_style_label_basic_f38_style_MAIN_DEFAULT(lv_style_t *style) {
     init_style_label_basic_style_MAIN_DEFAULT(style);
     
     lv_style_set_text_font(style, &lv_font_montserrat_38);
+    lv_style_set_text_color(style, lv_color_hex(0xff000000));
 };
 
 lv_style_t *get_style_label_basic_f38_style_MAIN_DEFAULT() {
@@ -105,6 +107,7 @@ void init_style_label_basic_f32_style_MAIN_DEFAULT(lv_style_t *style) {
     init_style_label_basic_style_MAIN_DEFAULT(style);
     
     lv_style_set_text_font(style, &lv_font_montserrat_32);
+    lv_style_set_text_color(style, lv_color_hex(0xff000000));
 };
 
 lv_style_t *get_style_label_basic_f32_style_MAIN_DEFAULT() {
@@ -135,6 +138,7 @@ void init_style_label_basic_f30_style_MAIN_DEFAULT(lv_style_t *style) {
     init_style_label_basic_style_MAIN_DEFAULT(style);
     
     lv_style_set_text_font(style, &lv_font_montserrat_30);
+    lv_style_set_text_color(style, lv_color_hex(0xff000000));
 };
 
 lv_style_t *get_style_label_basic_f30_style_MAIN_DEFAULT() {
@@ -165,6 +169,7 @@ void init_style_label_basic_f28_style_MAIN_DEFAULT(lv_style_t *style) {
     init_style_label_basic_style_MAIN_DEFAULT(style);
     
     lv_style_set_text_font(style, &lv_font_montserrat_28);
+    lv_style_set_text_color(style, lv_color_hex(0xff000000));
 };
 
 lv_style_t *get_style_label_basic_f28_style_MAIN_DEFAULT() {
@@ -195,6 +200,7 @@ void init_style_label_basic_f26_style_MAIN_DEFAULT(lv_style_t *style) {
     init_style_label_basic_style_MAIN_DEFAULT(style);
     
     lv_style_set_text_font(style, &lv_font_montserrat_26);
+    lv_style_set_text_color(style, lv_color_hex(0xff000000));
 };
 
 lv_style_t *get_style_label_basic_f26_style_MAIN_DEFAULT() {
@@ -225,6 +231,7 @@ void init_style_label_basic_f24_style_MAIN_DEFAULT(lv_style_t *style) {
     init_style_label_basic_style_MAIN_DEFAULT(style);
     
     lv_style_set_text_font(style, &lv_font_montserrat_26);
+    lv_style_set_text_color(style, lv_color_hex(0xff000000));
 };
 
 lv_style_t *get_style_label_basic_f24_style_MAIN_DEFAULT() {
@@ -255,6 +262,7 @@ void init_style_label_basic_f22_style_MAIN_DEFAULT(lv_style_t *style) {
     init_style_label_basic_style_MAIN_DEFAULT(style);
     
     lv_style_set_text_font(style, &lv_font_montserrat_26);
+    lv_style_set_text_color(style, lv_color_hex(0xff000000));
 };
 
 lv_style_t *get_style_label_basic_f22_style_MAIN_DEFAULT() {
@@ -285,6 +293,7 @@ void init_style_label_basic_f20_style_MAIN_DEFAULT(lv_style_t *style) {
     init_style_label_basic_style_MAIN_DEFAULT(style);
     
     lv_style_set_text_font(style, &lv_font_montserrat_26);
+    lv_style_set_text_color(style, lv_color_hex(0xff000000));
 };
 
 lv_style_t *get_style_label_basic_f20_style_MAIN_DEFAULT() {

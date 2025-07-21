@@ -175,16 +175,16 @@ static enum ROT_SW_State ROT_SW_Device_State[ROT_SW_Device_NUM] =
     {[ROT_SW_Device1] = ROT_SW_State_NUM, [ROT_SW_Device2] = ROT_SW_State_NUM};
 
 static float ROT_SW_ain_V_to_state_map[ROT_SW_State_NUM][2U] = {
-    [ROT_SW_State0] = {(0.0), (0.0) + ROT_SW_STATE_ERR_MARGIN_V},
-    [ROT_SW_State1] = {(2.71) - ROT_SW_STATE_ERR_MARGIN_V, (2.71) + ROT_SW_STATE_ERR_MARGIN_V},
-    [ROT_SW_State2] = {(0.54) - ROT_SW_STATE_ERR_MARGIN_V, (0.54) + ROT_SW_STATE_ERR_MARGIN_V},
-    [ROT_SW_State3] = {(3.26) - ROT_SW_STATE_ERR_MARGIN_V, (3.26) + ROT_SW_STATE_ERR_MARGIN_V},
-    [ROT_SW_State4] = {(1.10) - ROT_SW_STATE_ERR_MARGIN_V, (1.10) + ROT_SW_STATE_ERR_MARGIN_V},
-    [ROT_SW_State5] = {(3.81) - ROT_SW_STATE_ERR_MARGIN_V, (3.81) + ROT_SW_STATE_ERR_MARGIN_V},
-    [ROT_SW_State6] = {(1.63) - ROT_SW_STATE_ERR_MARGIN_V, (1.63) + ROT_SW_STATE_ERR_MARGIN_V},
-    [ROT_SW_State7] = {(4.35) - ROT_SW_STATE_ERR_MARGIN_V, (4.35) + ROT_SW_STATE_ERR_MARGIN_V},
-    [ROT_SW_State8] = {(2.17) - ROT_SW_STATE_ERR_MARGIN_V, (2.17) + ROT_SW_STATE_ERR_MARGIN_V},
-    [ROT_SW_State9] = {(4.89) - ROT_SW_STATE_ERR_MARGIN_V, (4.89) + ROT_SW_STATE_ERR_MARGIN_V},
+    [ROT_SW_State0] = {(0.0), (0.102) + ROT_SW_STATE_ERR_MARGIN_V},
+    [ROT_SW_State1] = {(1.76) - ROT_SW_STATE_ERR_MARGIN_V, (1.76) + ROT_SW_STATE_ERR_MARGIN_V},
+    [ROT_SW_State2] = {(0.347) - ROT_SW_STATE_ERR_MARGIN_V, (0.347) + ROT_SW_STATE_ERR_MARGIN_V},
+    [ROT_SW_State3] = {(2.108) - ROT_SW_STATE_ERR_MARGIN_V, (2.108) + ROT_SW_STATE_ERR_MARGIN_V},
+    [ROT_SW_State4] = {(0.700) - ROT_SW_STATE_ERR_MARGIN_V, (0.700) + ROT_SW_STATE_ERR_MARGIN_V},
+    [ROT_SW_State5] = {(2.46) - ROT_SW_STATE_ERR_MARGIN_V, (2.46) + ROT_SW_STATE_ERR_MARGIN_V},
+    [ROT_SW_State6] = {(1.053) - ROT_SW_STATE_ERR_MARGIN_V, (1.053) + ROT_SW_STATE_ERR_MARGIN_V},
+    [ROT_SW_State7] = {(2.817) - ROT_SW_STATE_ERR_MARGIN_V, (2.817) + ROT_SW_STATE_ERR_MARGIN_V},
+    [ROT_SW_State8] = {(1.407) - ROT_SW_STATE_ERR_MARGIN_V, (1.407) + ROT_SW_STATE_ERR_MARGIN_V},
+    [ROT_SW_State9] = {(3.170) - ROT_SW_STATE_ERR_MARGIN_V, (3.170) + ROT_SW_STATE_ERR_MARGIN_V},
 };
 /*---------- Private Functions -----------------------------------------------*/
 enum ROT_SW_State __ROT_SW_analogV_to_state(float analogV) {

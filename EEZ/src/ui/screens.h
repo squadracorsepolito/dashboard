@@ -8,34 +8,31 @@ extern "C" {
 #endif
 
 typedef struct _objects_t {
-    lv_obj_t *tires;
-    lv_obj_t *pg_tires_lv_bat_v;
-    lv_obj_t *pg_tires_hv_soc_est;
-    lv_obj_t *pg_tires_sx_status_bar;
-    lv_obj_t *pg_tires_dx_status_bar;
-    lv_obj_t *pg_tires_sx_map;
-    lv_obj_t *pg_tires_dx_map;
-    lv_obj_t *pg_tires_lc;
-    lv_obj_t *pg_tires_tc;
-    lv_obj_t *pg_tires_tv;
-    lv_obj_t *pg_tires_fl_temp;
-    lv_obj_t *pg_tires_fl_bar;
-    lv_obj_t *pg_tires_fr_temp;
-    lv_obj_t *pg_tires_fr_bar;
-    lv_obj_t *pg_tires_rl_temp;
-    lv_obj_t *pg_tires_rl_bar;
-    lv_obj_t *pg_tires_rr_temp;
-    lv_obj_t *pg_tires_rr_bar;
+    lv_obj_t *main;
+    lv_obj_t *pg_main_lv_bat_v;
+    lv_obj_t *pg_main_hv_soc_est;
+    lv_obj_t *pg_main_sx_status_bar;
+    lv_obj_t *pg_main_dx_status_bar;
+    lv_obj_t *pg_main_sx_map;
+    lv_obj_t *pg_main_dx_map;
+    lv_obj_t *pg_main_lc;
+    lv_obj_t *pg_main_tc;
+    lv_obj_t *pg_main_tv;
+    lv_obj_t *pg_main_inv_temp;
+    lv_obj_t *pg_main_inv_temp_1;
+    lv_obj_t *pg_main_inv_temp_2;
+    lv_obj_t *pg_main_cool_press_l;
+    lv_obj_t *pg_main_cool_press_r;
 } objects_t;
 
 extern objects_t objects;
 
 enum ScreensEnum {
-    SCREEN_ID_TIRES = 1,
+    SCREEN_ID_MAIN = 1,
 };
 
-void create_screen_tires();
-void tick_screen_tires();
+void create_screen_main();
+void tick_screen_main();
 
 void tick_screen_by_id(enum ScreensEnum screenId);
 void tick_screen(int screen_index);

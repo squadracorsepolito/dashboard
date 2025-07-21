@@ -32,6 +32,8 @@ typedef struct {
     volatile double TIRE_FR_PRESSURE;             // Front right tire pressure
     volatile double TIRE_RL_PRESSURE;             // Rear left tire pressure
     volatile double TIRE_RR_PRESSURE;             // Rear right tire pressure
+    volatile double COOL_PRESS_LEFT_mV;            // Cooling pressure left
+    volatile double COOL_PRESS_RIGHT_mV;           // Cooling pressure right
     volatile enum RTD_FSM_State_t RTD_FSM_State;  // RTD finite state machine state
     volatile int8_t Dspace_RTD_State;             // dSPACE RTD state
     volatile GPIO_PinState SD_CLOSED;             // Shutdown circuit closed state

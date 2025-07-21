@@ -2,7 +2,6 @@
   "navigation": {
     "selectedUserPageObject": "[ILI9488.eez-project]:/userPages/0",
     "selectedThemeObject": "[ILI9488.eez-project]:/themes/0",
-    "selectedBitmapObject": "[ILI9488.eez-project]:/bitmaps/-1",
     "subnavigationSelectedItems": {
       "variables-tab/sub-navigation/selected-item": "Enums"
     }
@@ -25,7 +24,6 @@
           },
           {
             "type": "border",
-            "selected": 3,
             "size": 389.5,
             "location": "right",
             "children": [
@@ -174,8 +172,7 @@
                   "enableClose": false,
                   "icon": "svg:hierarchy"
                 }
-              ],
-              "active": true
+              ]
             },
             {
               "type": "tabset",
@@ -208,7 +205,8 @@
                   },
                   "icon": "svg:page"
                 }
-              ]
+              ],
+              "active": true
             },
             {
               "type": "tabset",
@@ -954,9 +952,7 @@
     "[ILI9488.eez-project]:/userPages/0[flow-state]": {
       "selection": {
         "0": {
-          "0": {
-            "$selected": true
-          }
+          "0": {}
         }
       },
       "transform": {
