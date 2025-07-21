@@ -40,7 +40,7 @@ extern TIM_HandleTypeDef htim7;
 
 /* USER CODE BEGIN Private defines */
 
-#define TIM_ADC1_HANDLE htim2 /*!< TIM timer used for retriggering ADC1 conversions in DMA mode */
+#define TIM_ADC1_HANDLE htim7 /*!< TIM timer used for retriggering ADC1 conversions in DMA mode */
 
 /* USER CODE END Private defines */
 
