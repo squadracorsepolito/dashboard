@@ -2,8 +2,9 @@
 ADC1.Channel-0\#ChannelRegularConversion=ADC_CHANNEL_0
 ADC1.Channel-1\#ChannelRegularConversion=ADC_CHANNEL_1
 ADC1.ClockPrescaler=ADC_CLOCK_SYNC_PCLK_DIV4
+ADC1.DMAContinuousRequests=ENABLE
 ADC1.ExternalTrigConv=ADC_EXTERNALTRIGCONV_T2_TRGO
-ADC1.IPParameters=Rank-0\#ChannelRegularConversion,Channel-0\#ChannelRegularConversion,SamplingTime-0\#ChannelRegularConversion,NbrOfConversionFlag,master,ClockPrescaler,ScanConvMode,Rank-1\#ChannelRegularConversion,Channel-1\#ChannelRegularConversion,SamplingTime-1\#ChannelRegularConversion,NbrOfConversion,ExternalTrigConv
+ADC1.IPParameters=Rank-0\#ChannelRegularConversion,Channel-0\#ChannelRegularConversion,SamplingTime-0\#ChannelRegularConversion,NbrOfConversionFlag,master,ClockPrescaler,ScanConvMode,Rank-1\#ChannelRegularConversion,Channel-1\#ChannelRegularConversion,SamplingTime-1\#ChannelRegularConversion,NbrOfConversion,ExternalTrigConv,DMAContinuousRequests
 ADC1.NbrOfConversion=2
 ADC1.NbrOfConversionFlag=1
 ADC1.Rank-0\#ChannelRegularConversion=1
