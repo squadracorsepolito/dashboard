@@ -102,6 +102,14 @@ void DISP_update_routine(void) {
     
     EEZ_ACT_set_lbl_float(dashboard_data.COOL_PRESS_LEFT_mV, objects.main, objects.pg_main_cool_press_l);
     EEZ_ACT_set_lbl_float(dashboard_data.COOL_PRESS_RIGHT_mV, objects.main, objects.pg_main_cool_press_r);
+    EEZ_ACT_set_lbl_float(dashboard_data.INVERTER_FL_TEMP, objects.main, objects.pg_main_inv_temp_fl);
+    EEZ_ACT_set_lbl_float(dashboard_data.INVERTER_FR_TEMP, objects.main, objects.pg_main_inv_temp_fr);
+    EEZ_ACT_set_lbl_float(dashboard_data.INVERTER_RL_TEMP, objects.main, objects.pg_main_inv_temp_rl);
+    EEZ_ACT_set_lbl_float(dashboard_data.INVERTER_RR_TEMP, objects.main, objects.pg_main_inv_temp_rr);
+    EEZ_ACT_set_lbl_float(dashboard_data.MOTOR_FL_TEMP, objects.main, objects.pg_main_motor_temp_fl);
+    EEZ_ACT_set_lbl_float(dashboard_data.MOTOR_FR_TEMP, objects.main, objects.pg_main_motor_temp_fr);
+    EEZ_ACT_set_lbl_float(dashboard_data.MOTOR_RL_TEMP, objects.main, objects.pg_main_motor_temp_rl);
+    EEZ_ACT_set_lbl_float(dashboard_data.MOTOR_RR_TEMP, objects.main, objects.pg_main_motor_temp_rr);
 }
 
 void ILI9488_CS_Pin_SetState(enum ILI9488_PinState state) {

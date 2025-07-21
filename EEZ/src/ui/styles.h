@@ -57,6 +57,16 @@ lv_style_t *get_style_label_basic_f20_style_MAIN_DEFAULT();
 void add_style_label_basic_f20_style(lv_obj_t *obj);
 void remove_style_label_basic_f20_style(lv_obj_t *obj);
 
+// Style: label_basic_F18_style
+lv_style_t *get_style_label_basic_f18_style_MAIN_DEFAULT();
+void add_style_label_basic_f18_style(lv_obj_t *obj);
+void remove_style_label_basic_f18_style(lv_obj_t *obj);
+
+// Style: label_basic_F16_style
+lv_style_t *get_style_label_basic_f16_style_MAIN_DEFAULT();
+void add_style_label_basic_f16_style(lv_obj_t *obj);
+void remove_style_label_basic_f16_style(lv_obj_t *obj);
+
 // Style: container_basic_style
 lv_style_t *get_style_container_basic_style_MAIN_DEFAULT();
 void add_style_container_basic_style(lv_obj_t *obj);

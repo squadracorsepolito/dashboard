@@ -19,8 +19,16 @@
 
 /* Initialize the dashboard data structure */
 DashboardData_t dashboard_data = {
+    .INVERTER_FL_TEMP      = 0.0,
+    .INVERTER_FR_TEMP      = 0.0,
+    .INVERTER_RL_TEMP      = 0.0,
+    .INVERTER_RR_TEMP      = 0.0,
+    .MOTOR_FL_TEMP         = 0.0,
+    .MOTOR_FR_TEMP         = 0.0,
+    .MOTOR_RL_TEMP         = 0.0,
+    .MOTOR_RR_TEMP         = 0.0,
     .HV_BAT_SOC            = 0,
-    .LV_BAT_mV              = 0.0,
+    .LV_BAT_mV             = 0.0,
     .TIRE_FL_TEMP          = 0.0,
     .TIRE_FR_TEMP          = 0.0,
     .TIRE_RL_TEMP          = 0.0,
@@ -87,6 +95,9 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
         struct mcb_tpms_front_wheels_pressure_t front_wheels_status;
         struct mcb_tpms_rear_wheels_pressure_t rear_wheels_status;
         struct mcb_sb_rear_analog_device_t sb_rear_analog_device;
+        struct mcb_dspace_pwt_front_temp_t dspace_pwt_front_temp;
+        struct mcb_dspace_pwt_rear_temp_t dspace_pwt_rear_temp;
+
     } msgs = {};
 
     if (HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &RxHeader, RxData) != HAL_OK) {
@@ -151,9 +162,9 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
              (RxHeader.DLC == MCB_TLB_BAT_SIGNALS_STATUS_LENGTH)) {
         // TS_OFF when tsal green is enabled
         mcb_tlb_bat_signals_status_unpack(&msgs.tsal_status, RxData, MCB_TLB_BAT_SIGNALS_STATUS_LENGTH);
-        dashboard_data.TS_OFF  = msgs.tsal_status.tsal_green_is_active ? GPIO_PIN_SET : GPIO_PIN_RESET;
+        dashboard_data.TS_OFF      = msgs.tsal_status.tsal_green_is_active ? GPIO_PIN_SET : GPIO_PIN_RESET;
         dashboard_data.AMS_ERR_TLB = msgs.tsal_status.ams_err_is_active;
-        dashboard_data.IMD_ERR = msgs.tsal_status.imd_err_is_active ? GPIO_PIN_SET : GPIO_PIN_RESET;
+        dashboard_data.IMD_ERR     = msgs.tsal_status.imd_err_is_active ? GPIO_PIN_SET : GPIO_PIN_RESET;
     }
     // shut status
     else if ((RxHeader.StdId == MCB_TLB_BAT_SD_CSENSING_STATUS_FRAME_ID) &&
@@ -224,13 +235,34 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
      * SB REAR analog device
      *
      */
-    else if((RxHeader.StdId == MCB_SB_REAR_ANALOG_DEVICE_FRAME_ID) &&
-            (RxHeader.DLC == MCB_SB_REAR_ANALOG_DEVICE_LENGTH)) {
+    else if ((RxHeader.StdId == MCB_SB_REAR_ANALOG_DEVICE_FRAME_ID) &&
+             (RxHeader.DLC == MCB_SB_REAR_ANALOG_DEVICE_LENGTH)) {
         mcb_sb_rear_analog_device_unpack(&msgs.sb_rear_analog_device, RxData, MCB_SB_REAR_ANALOG_DEVICE_LENGTH);
-        dashboard_data.COOL_PRESS_LEFT_mV =
-            mcb_sb_rear_analog_device_cool_press_left_voltage_decode(msgs.sb_rear_analog_device.cool_press_left_voltage);
-        dashboard_data.COOL_PRESS_RIGHT_mV =
-            mcb_sb_rear_analog_device_cool_press_right_voltage_decode(msgs.sb_rear_analog_device.cool_press_right_voltage);
+        dashboard_data.COOL_PRESS_LEFT_mV = mcb_sb_rear_analog_device_cool_press_left_voltage_decode(
+            msgs.sb_rear_analog_device.cool_press_left_voltage);
+        dashboard_data.COOL_PRESS_RIGHT_mV = mcb_sb_rear_analog_device_cool_press_right_voltage_decode(
+            msgs.sb_rear_analog_device.cool_press_right_voltage);
+    }
+
+    /*
+     *
+     * DSPACE INVERT + MOTOR temperature
+     *
+     */
+    else if ((RxHeader.StdId == MCB_DSPACE_PWT_FRONT_TEMP_FRAME_ID) &&
+             (RxHeader.DLC == MCB_DSPACE_PWT_FRONT_TEMP_LENGTH)) {
+        mcb_dspace_pwt_front_temp_unpack(&msgs.dspace_pwt_front_temp, RxData, MCB_DSPACE_PWT_FRONT_TEMP_LENGTH);
+        dashboard_data.INVERTER_FL_TEMP = mcb_dspace_pwt_front_temp_inverter_fl_temp_decode(msgs.dspace_pwt_front_temp.inverter_fl_temp);
+        dashboard_data.INVERTER_FR_TEMP = mcb_dspace_pwt_front_temp_inverter_fr_temp_decode(msgs.dspace_pwt_front_temp.inverter_fr_temp);
+        dashboard_data.MOTOR_FL_TEMP = mcb_dspace_pwt_front_temp_motor_fl_temp_decode(msgs.dspace_pwt_front_temp.motor_fl_temp);
+        dashboard_data.MOTOR_FR_TEMP = mcb_dspace_pwt_front_temp_motor_fr_temp_decode(msgs.dspace_pwt_front_temp.motor_fr_temp);
+    }else if((RxHeader.StdId == MCB_DSPACE_PWT_REAR_TEMP_FRAME_ID) &&
+             (RxHeader.DLC == MCB_DSPACE_PWT_REAR_TEMP_LENGTH)){
+        mcb_dspace_pwt_rear_temp_unpack(&msgs.dspace_pwt_rear_temp, RxData, MCB_DSPACE_PWT_REAR_TEMP_LENGTH);
+        dashboard_data.INVERTER_RL_TEMP = mcb_dspace_pwt_rear_temp_inverter_rl_temp_decode(msgs.dspace_pwt_rear_temp.inverter_rl_temp);
+        dashboard_data.INVERTER_RR_TEMP = mcb_dspace_pwt_rear_temp_inverter_rr_temp_decode(msgs.dspace_pwt_rear_temp.inverter_rr_temp);
+        dashboard_data.MOTOR_RL_TEMP = mcb_dspace_pwt_rear_temp_motor_rl_temp_decode(msgs.dspace_pwt_rear_temp.motor_rl_temp);
+        dashboard_data.MOTOR_RR_TEMP = mcb_dspace_pwt_rear_temp_motor_rr_temp_decode(msgs.dspace_pwt_rear_temp.motor_rr_temp);
     }
 }
 
@@ -556,7 +588,6 @@ void Dashboard_Loop(void) {
     BTN_Routine();
 
     ROT_SW_Routine();
-    
 
     // RUN the ready to drive FSM
     RTD_fsm(500);

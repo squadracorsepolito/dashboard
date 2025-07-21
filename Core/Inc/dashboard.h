@@ -23,6 +23,14 @@ struct RGB_Led_t {
 /* Data structure to group all dashboard-related variables */
 typedef struct {
     volatile uint8_t HV_BAT_SOC;                  // High voltage battery state of charge
+    volatile double INVERTER_FL_TEMP;
+    volatile double INVERTER_FR_TEMP;
+    volatile double INVERTER_RL_TEMP;
+    volatile double INVERTER_RR_TEMP;
+    volatile double MOTOR_FL_TEMP;
+    volatile double MOTOR_FR_TEMP;
+    volatile double MOTOR_RL_TEMP;
+    volatile double MOTOR_RR_TEMP;
     volatile double LV_BAT_mV;                     // Low voltage batter voltage
     volatile double TIRE_FL_TEMP;                 // Front left tire temperature
     volatile double TIRE_FR_TEMP;                 // Front right tire temperature

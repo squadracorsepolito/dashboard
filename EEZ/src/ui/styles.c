@@ -230,7 +230,7 @@ void remove_style_label_basic_f26_style(lv_obj_t *obj) {
 void init_style_label_basic_f24_style_MAIN_DEFAULT(lv_style_t *style) {
     init_style_label_basic_style_MAIN_DEFAULT(style);
     
-    lv_style_set_text_font(style, &lv_font_montserrat_26);
+    lv_style_set_text_font(style, &lv_font_montserrat_24);
     lv_style_set_text_color(style, lv_color_hex(0xff000000));
 };
 
@@ -261,7 +261,7 @@ void remove_style_label_basic_f24_style(lv_obj_t *obj) {
 void init_style_label_basic_f22_style_MAIN_DEFAULT(lv_style_t *style) {
     init_style_label_basic_style_MAIN_DEFAULT(style);
     
-    lv_style_set_text_font(style, &lv_font_montserrat_26);
+    lv_style_set_text_font(style, &lv_font_montserrat_22);
     lv_style_set_text_color(style, lv_color_hex(0xff000000));
 };
 
@@ -292,7 +292,7 @@ void remove_style_label_basic_f22_style(lv_obj_t *obj) {
 void init_style_label_basic_f20_style_MAIN_DEFAULT(lv_style_t *style) {
     init_style_label_basic_style_MAIN_DEFAULT(style);
     
-    lv_style_set_text_font(style, &lv_font_montserrat_26);
+    lv_style_set_text_font(style, &lv_font_montserrat_20);
     lv_style_set_text_color(style, lv_color_hex(0xff000000));
 };
 
@@ -314,6 +314,68 @@ void add_style_label_basic_f20_style(lv_obj_t *obj) {
 void remove_style_label_basic_f20_style(lv_obj_t *obj) {
     (void)obj;
     lv_obj_remove_style(obj, get_style_label_basic_f20_style_MAIN_DEFAULT(), LV_PART_MAIN | LV_STATE_DEFAULT);
+};
+
+//
+// Style: label_basic_F18_style
+//
+
+void init_style_label_basic_f18_style_MAIN_DEFAULT(lv_style_t *style) {
+    init_style_label_basic_style_MAIN_DEFAULT(style);
+    
+    lv_style_set_text_font(style, &lv_font_montserrat_18);
+    lv_style_set_text_color(style, lv_color_hex(0xff000000));
+};
+
+lv_style_t *get_style_label_basic_f18_style_MAIN_DEFAULT() {
+    static lv_style_t *style;
+    if (!style) {
+        style = lv_malloc(sizeof(lv_style_t));
+        lv_style_init(style);
+        init_style_label_basic_f18_style_MAIN_DEFAULT(style);
+    }
+    return style;
+};
+
+void add_style_label_basic_f18_style(lv_obj_t *obj) {
+    (void)obj;
+    lv_obj_add_style(obj, get_style_label_basic_f18_style_MAIN_DEFAULT(), LV_PART_MAIN | LV_STATE_DEFAULT);
+};
+
+void remove_style_label_basic_f18_style(lv_obj_t *obj) {
+    (void)obj;
+    lv_obj_remove_style(obj, get_style_label_basic_f18_style_MAIN_DEFAULT(), LV_PART_MAIN | LV_STATE_DEFAULT);
+};
+
+//
+// Style: label_basic_F16_style
+//
+
+void init_style_label_basic_f16_style_MAIN_DEFAULT(lv_style_t *style) {
+    init_style_label_basic_style_MAIN_DEFAULT(style);
+    
+    lv_style_set_text_font(style, &lv_font_montserrat_16);
+    lv_style_set_text_color(style, lv_color_hex(0xff000000));
+};
+
+lv_style_t *get_style_label_basic_f16_style_MAIN_DEFAULT() {
+    static lv_style_t *style;
+    if (!style) {
+        style = lv_malloc(sizeof(lv_style_t));
+        lv_style_init(style);
+        init_style_label_basic_f16_style_MAIN_DEFAULT(style);
+    }
+    return style;
+};
+
+void add_style_label_basic_f16_style(lv_obj_t *obj) {
+    (void)obj;
+    lv_obj_add_style(obj, get_style_label_basic_f16_style_MAIN_DEFAULT(), LV_PART_MAIN | LV_STATE_DEFAULT);
+};
+
+void remove_style_label_basic_f16_style(lv_obj_t *obj) {
+    (void)obj;
+    lv_obj_remove_style(obj, get_style_label_basic_f16_style_MAIN_DEFAULT(), LV_PART_MAIN | LV_STATE_DEFAULT);
 };
 
 //
@@ -365,6 +427,8 @@ void add_style(lv_obj_t *obj, int32_t styleIndex) {
         add_style_label_basic_f24_style,
         add_style_label_basic_f22_style,
         add_style_label_basic_f20_style,
+        add_style_label_basic_f18_style,
+        add_style_label_basic_f16_style,
         add_style_container_basic_style,
     };
     add_style_funcs[styleIndex](obj);
@@ -383,6 +447,8 @@ void remove_style(lv_obj_t *obj, int32_t styleIndex) {
         remove_style_label_basic_f24_style,
         remove_style_label_basic_f22_style,
         remove_style_label_basic_f20_style,
+        remove_style_label_basic_f18_style,
+        remove_style_label_basic_f16_style,
         remove_style_container_basic_style,
     };
     remove_style_funcs[styleIndex](obj);

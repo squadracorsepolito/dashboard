@@ -18,11 +18,16 @@ typedef struct _objects_t {
     lv_obj_t *pg_main_lc;
     lv_obj_t *pg_main_tc;
     lv_obj_t *pg_main_tv;
-    lv_obj_t *pg_main_inv_temp;
-    lv_obj_t *pg_main_inv_temp_1;
-    lv_obj_t *pg_main_inv_temp_2;
+    lv_obj_t *pg_main_inv_temp_fl;
+    lv_obj_t *pg_main_inv_temp_fr;
     lv_obj_t *pg_main_cool_press_l;
     lv_obj_t *pg_main_cool_press_r;
+    lv_obj_t *pg_main_inv_temp_rl;
+    lv_obj_t *pg_main_inv_temp_rr;
+    lv_obj_t *pg_main_motor_temp_fl;
+    lv_obj_t *pg_main_motor_temp_fr;
+    lv_obj_t *pg_main_motor_temp_rl;
+    lv_obj_t *pg_main_motor_temp_rr;
 } objects_t;
 
 extern objects_t objects;
