@@ -318,10 +318,10 @@ void LED_RGB_setColor(enum LED_RGB_Device device, uint8_t red, uint8_t green, ui
 
 /* ---------- Exported constants ---------------------------------------------*/
 
-#define FAN_BAT_TIM_HANDLE htim3
+#define FAN_BAT_TIM_HANDLE htim4
 #define FAN_BAT_PWM_CH     TIM_CHANNEL_2
 
-#define RADIATOR_FANS_PWM_TIM htim3
+#define RADIATOR_FANS_PWM_TIM htim4
 #define RADIATOR_FANS_PWM_CH  TIM_CHANNEL_1
 
 /* ---------- Exported variables ---------------------------------------------*/

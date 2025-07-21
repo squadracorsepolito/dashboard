@@ -166,10 +166,10 @@ void Error_Handler(void);
 // PCB ver 2 (the black one)
 #elif PCBVER == 2
 
-#define BAT_FAN_PWM_TIM htim3
+#define BAT_FAN_PWM_TIM htim4
 #define BAT_FAN_PWM_CH TIM_CHANNEL_2
 
-#define RADIATOR_FANS_PWM_TIM htim3
+#define RADIATOR_FANS_PWM_TIM htim4
 #define RADIATOR_FANS_PWM_CH TIM_CHANNEL_1
 
 #define COUNTER_TIM htim7
