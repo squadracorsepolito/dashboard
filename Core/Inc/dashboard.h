@@ -48,7 +48,7 @@ typedef struct {
     volatile GPIO_PinState BMS_ERR;               // Battery Management System error state
     volatile GPIO_PinState TS_OFF;                // TS (Tractive System) off state
     volatile GPIO_PinState IMD_ERR;               // Insulation Monitoring Device error state
-    volatile uint8_t AMS_ERR_TLB;                     // AMS (Accumulator Management System) error table
+    volatile uint8_t ams_err_tlb;                     // AMS (Accumulator Management System) error table
     volatile uint8_t btn_press_at_start;          // Button press at start
     volatile uint8_t hvb_diag_bat_vlt_sna;        // HV battery diagnostic: battery voltage signal not available
     volatile uint8_t hvb_diag_inv_vlt_sna;        // HV battery diagnostic: inverter voltage signal not available

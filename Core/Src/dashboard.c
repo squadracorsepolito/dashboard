@@ -42,6 +42,7 @@ DashboardData_t dashboard_data = {
     .BMS_ERR               = GPIO_PIN_RESET,
     .TS_OFF                = GPIO_PIN_RESET,
     .IMD_ERR               = GPIO_PIN_SET,
+    .ams_err_tlb           = 0,
     .btn_press_at_start    = 0,
     .hvb_diag_bat_vlt_sna  = 0,
     .hvb_diag_inv_vlt_sna  = 0,
@@ -163,7 +164,7 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
         // TS_OFF when tsal green is enabled
         mcb_tlb_bat_signals_status_unpack(&msgs.tsal_status, RxData, MCB_TLB_BAT_SIGNALS_STATUS_LENGTH);
         dashboard_data.TS_OFF      = msgs.tsal_status.tsal_green_is_active ? GPIO_PIN_SET : GPIO_PIN_RESET;
-        dashboard_data.AMS_ERR_TLB = msgs.tsal_status.ams_err_is_active;
+        dashboard_data.ams_err_tlb = msgs.tsal_status.ams_err_is_active;
         dashboard_data.IMD_ERR     = msgs.tsal_status.imd_err_is_active ? GPIO_PIN_SET : GPIO_PIN_RESET;
     }
     // shut status
@@ -252,17 +253,25 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
     else if ((RxHeader.StdId == MCB_DSPACE_PWT_FRONT_TEMP_FRAME_ID) &&
              (RxHeader.DLC == MCB_DSPACE_PWT_FRONT_TEMP_LENGTH)) {
         mcb_dspace_pwt_front_temp_unpack(&msgs.dspace_pwt_front_temp, RxData, MCB_DSPACE_PWT_FRONT_TEMP_LENGTH);
-        dashboard_data.INVERTER_FL_TEMP = mcb_dspace_pwt_front_temp_inverter_fl_temp_decode(msgs.dspace_pwt_front_temp.inverter_fl_temp);
-        dashboard_data.INVERTER_FR_TEMP = mcb_dspace_pwt_front_temp_inverter_fr_temp_decode(msgs.dspace_pwt_front_temp.inverter_fr_temp);
-        dashboard_data.MOTOR_FL_TEMP = mcb_dspace_pwt_front_temp_motor_fl_temp_decode(msgs.dspace_pwt_front_temp.motor_fl_temp);
-        dashboard_data.MOTOR_FR_TEMP = mcb_dspace_pwt_front_temp_motor_fr_temp_decode(msgs.dspace_pwt_front_temp.motor_fr_temp);
-    }else if((RxHeader.StdId == MCB_DSPACE_PWT_REAR_TEMP_FRAME_ID) &&
-             (RxHeader.DLC == MCB_DSPACE_PWT_REAR_TEMP_LENGTH)){
+        dashboard_data.INVERTER_FL_TEMP =
+            mcb_dspace_pwt_front_temp_inverter_fl_temp_decode(msgs.dspace_pwt_front_temp.inverter_fl_temp);
+        dashboard_data.INVERTER_FR_TEMP =
+            mcb_dspace_pwt_front_temp_inverter_fr_temp_decode(msgs.dspace_pwt_front_temp.inverter_fr_temp);
+        dashboard_data.MOTOR_FL_TEMP =
+            mcb_dspace_pwt_front_temp_motor_fl_temp_decode(msgs.dspace_pwt_front_temp.motor_fl_temp);
+        dashboard_data.MOTOR_FR_TEMP =
+            mcb_dspace_pwt_front_temp_motor_fr_temp_decode(msgs.dspace_pwt_front_temp.motor_fr_temp);
+    } else if ((RxHeader.StdId == MCB_DSPACE_PWT_REAR_TEMP_FRAME_ID) &&
+               (RxHeader.DLC == MCB_DSPACE_PWT_REAR_TEMP_LENGTH)) {
         mcb_dspace_pwt_rear_temp_unpack(&msgs.dspace_pwt_rear_temp, RxData, MCB_DSPACE_PWT_REAR_TEMP_LENGTH);
-        dashboard_data.INVERTER_RL_TEMP = mcb_dspace_pwt_rear_temp_inverter_rl_temp_decode(msgs.dspace_pwt_rear_temp.inverter_rl_temp);
-        dashboard_data.INVERTER_RR_TEMP = mcb_dspace_pwt_rear_temp_inverter_rr_temp_decode(msgs.dspace_pwt_rear_temp.inverter_rr_temp);
-        dashboard_data.MOTOR_RL_TEMP = mcb_dspace_pwt_rear_temp_motor_rl_temp_decode(msgs.dspace_pwt_rear_temp.motor_rl_temp);
-        dashboard_data.MOTOR_RR_TEMP = mcb_dspace_pwt_rear_temp_motor_rr_temp_decode(msgs.dspace_pwt_rear_temp.motor_rr_temp);
+        dashboard_data.INVERTER_RL_TEMP =
+            mcb_dspace_pwt_rear_temp_inverter_rl_temp_decode(msgs.dspace_pwt_rear_temp.inverter_rl_temp);
+        dashboard_data.INVERTER_RR_TEMP =
+            mcb_dspace_pwt_rear_temp_inverter_rr_temp_decode(msgs.dspace_pwt_rear_temp.inverter_rr_temp);
+        dashboard_data.MOTOR_RL_TEMP =
+            mcb_dspace_pwt_rear_temp_motor_rl_temp_decode(msgs.dspace_pwt_rear_temp.motor_rl_temp);
+        dashboard_data.MOTOR_RR_TEMP =
+            mcb_dspace_pwt_rear_temp_motor_rr_temp_decode(msgs.dspace_pwt_rear_temp.motor_rr_temp);
     }
 }
 
@@ -335,7 +344,7 @@ void UpdateCockpitLed(uint32_t delay_100us) {
 
         } else {
             HAL_GPIO_WritePin(
-                AMS_ERR_LED_nCMD_GPIO_OUT_GPIO_Port, AMS_ERR_LED_nCMD_GPIO_OUT_Pin, !dashboard_data.BMS_ERR);
+                AMS_ERR_LED_nCMD_GPIO_OUT_GPIO_Port, AMS_ERR_LED_nCMD_GPIO_OUT_Pin, dashboard_data.BMS_ERR);
             HAL_GPIO_WritePin(TS_OFF_LED_CMD_GPIO_OUT_GPIO_Port, TS_OFF_LED_CMD_GPIO_OUT_Pin, dashboard_data.TS_OFF);
             HAL_GPIO_WritePin(
                 IMD_ERR_LED_nCMD_GPIO_OUT_GPIO_Port, IMD_ERR_LED_nCMD_GPIO_OUT_Pin, dashboard_data.IMD_ERR);
@@ -505,7 +514,7 @@ void RTD_fsm(uint32_t delay_100us) {
     }
 }
 
-uint8_t AMS_detection(uint8_t AMS_ERR_TLB,
+uint8_t AMS_detection(uint8_t ams_err_tlb,
                       uint8_t hvb_diag_bat_vlt_sna,
                       uint8_t hvb_diag_inv_vlt_sna,
                       uint8_t hvb_diag_bat_curr_sna,
@@ -520,11 +529,11 @@ uint8_t AMS_detection(uint8_t AMS_ERR_TLB,
                       uint8_t hvb_diag_bat_curr_oc) {
     static uint8_t ams_err_prev = 0;
 
-    if (ams_err_prev && AMS_ERR_TLB) {
+    if (ams_err_prev && ams_err_tlb) {
         return ams_err_prev;
     }
 
-    if (!AMS_ERR_TLB) {  // ams_err_prev &
+    if (!ams_err_tlb) {  // ams_err_prev &
         ams_err_prev = 0;
         return ams_err_prev;
     }
@@ -532,7 +541,7 @@ uint8_t AMS_detection(uint8_t AMS_ERR_TLB,
     ams_err_prev = (hvb_diag_bat_vlt_sna || hvb_diag_inv_vlt_sna || hvb_diag_bat_curr_sna || hvb_diag_vcu_can_sna ||
                     hvb_diag_cell_sna || hvb_diag_bat_uv || hvb_diag_cell_ov || hvb_diag_cell_uv || hvb_diag_cell_ot ||
                     hvb_diag_cell_ut || hvb_diag_inv_vlt_ov || hvb_diag_bat_curr_oc) &
-                   AMS_ERR_TLB;
+                   ams_err_tlb;
 
     return ams_err_prev;
 }
@@ -564,7 +573,7 @@ void Dashboard_Loop(void) {
 
     // ams_err_check
     if (HAL_GetTick() >= cnt10ms + 10U) {
-        dashboard_data.BMS_ERR = AMS_detection(dashboard_data.AMS_ERR_TLB,
+        dashboard_data.BMS_ERR = AMS_detection(dashboard_data.ams_err_tlb,
                                                dashboard_data.hvb_diag_bat_vlt_sna,
                                                dashboard_data.hvb_diag_inv_vlt_sna,
                                                dashboard_data.hvb_diag_bat_curr_sna,
