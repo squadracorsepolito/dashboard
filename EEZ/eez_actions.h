@@ -43,6 +43,7 @@ void EEZ_ACT_set_lbl_float(float new_value, lv_obj_t *screen, lv_obj_t *obj);
 void EEZ_ACT_set_lbl_uint8(uint8_t new_value, lv_obj_t *screen, lv_obj_t *obj);
 void EEZ_ACT_set_lbl_color(enum EEZ_Colors new_color, lv_obj_t *screen, lv_obj_t *obj);
 void EEZ_ACT_set_panel_color(enum EEZ_Colors new_color, lv_obj_t *screen, lv_obj_t *obj_sx, lv_obj_t *obj_dx);
+void EEZ_ACT_set_lbl_str(char* new_value, lv_obj_t *screen, lv_obj_t *obj);
 /* ---------- Private types --------------------------------------------------*/
 
 /* ---------- Private variables ----------------------------------------------*/

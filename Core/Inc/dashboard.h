@@ -23,6 +23,9 @@ struct RGB_Led_t {
 /* Data structure to group all dashboard-related variables */
 typedef struct {
     volatile uint8_t HV_BAT_SOC;                  // High voltage battery state of charge
+    
+    volatile uint8_t AS_MISSION;                  //Autonomous Mission Code
+
     volatile double INVERTER_FL_TEMP;
     volatile double INVERTER_FR_TEMP;
     volatile double INVERTER_RL_TEMP;

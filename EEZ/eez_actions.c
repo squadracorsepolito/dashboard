@@ -76,6 +76,17 @@ void EEZ_ACT_set_lbl_uint8(uint8_t new_value, lv_obj_t *screen, lv_obj_t *obj) {
     }
 }
 
+void EEZ_ACT_set_lbl_str(char* new_value, lv_obj_t *screen, lv_obj_t *obj) {
+    char new_value_str[16];
+    snprintf(new_value_str, sizeof(new_value_str), "%s", new_value);
+
+    if (screen == EEZ_ACT_get_curr_screen()) {
+        if (obj != NULL) {
+            lv_label_set_text(obj, new_value_str);
+        }
+    }
+}
+
 /**
  * @brief Sets the text color of a label object.
  *

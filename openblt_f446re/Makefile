@@ -78,7 +78,8 @@ Core/Src/BLT/timer.c \
 Core/Src/BLT/usb.c \
 Core/Src/BLT/xcp.c \
 Core/Src/sysmem.c \
-Core/Src/syscalls.c
+Core/Src/syscalls.c \
+Core/Src/mission.c
 
 # ASM sources
 ASM_SOURCES =  \

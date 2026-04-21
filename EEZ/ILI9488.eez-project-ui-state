@@ -25,8 +25,7 @@
           },
           {
             "type": "border",
-            "selected": 0,
-            "size": 366.5,
+            "size": 526.5,
             "location": "right",
             "children": [
               {
@@ -81,7 +80,6 @@
           },
           {
             "type": "border",
-            "selected": 0,
             "size": 86.5,
             "location": "bottom",
             "children": [
@@ -463,6 +461,88 @@
                       "id": "DEBUGGER_LOGS",
                       "name": "Logs",
                       "component": "logs",
+                      "enableClose": false,
+                      "icon": "svg:log"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "rootDockerSimulator": {
+      "version": 1,
+      "json": {
+        "global": {
+          "splitterSize": 4,
+          "splitterExtra": 4,
+          "tabEnableRename": false,
+          "borderEnableAutoHide": true
+        },
+        "borders": [],
+        "layout": {
+          "type": "row",
+          "id": "#864b9b7e-11e4-46ab-b898-29581a8cc8d3",
+          "children": [
+            {
+              "type": "tabset",
+              "id": "#00e473c5-bec0-4c71-8317-37dbaa24033e",
+              "weight": 70,
+              "enableDrop": false,
+              "enableDrag": false,
+              "enableClose": false,
+              "enableTabStrip": true,
+              "children": [
+                {
+                  "type": "tab",
+                  "id": "DOCKER_SIMULATOR_PREVIEW",
+                  "name": "Preview",
+                  "component": "dockerSimulatorPreview",
+                  "enableClose": false,
+                  "icon": "material:computer"
+                }
+              ]
+            },
+            {
+              "type": "row",
+              "id": "#fcbbcaff-6f74-4dd5-88e7-7ff5caa045f2",
+              "weight": 30,
+              "children": [
+                {
+                  "type": "tabset",
+                  "id": "#ce8e0416-fb12-451a-9b99-a09512d8cd6b",
+                  "weight": 50,
+                  "enableDrop": false,
+                  "enableDrag": false,
+                  "enableClose": false,
+                  "enableTabStrip": true,
+                  "children": [
+                    {
+                      "type": "tab",
+                      "id": "DOCKER_SIMULATOR_LOGS",
+                      "name": "Build Logs",
+                      "component": "dockerSimulatorLogs",
+                      "enableClose": false,
+                      "icon": "svg:log"
+                    }
+                  ]
+                },
+                {
+                  "type": "tabset",
+                  "id": "#2d03879b-25fa-41ce-bd67-246ea9e3ffb7",
+                  "weight": 50,
+                  "enableDrop": false,
+                  "enableDrag": false,
+                  "enableClose": false,
+                  "enableTabStrip": true,
+                  "children": [
+                    {
+                      "type": "tab",
+                      "id": "DOCKER_SIMULATOR_PREVIEW_LOGS",
+                      "name": "Preview Logs",
+                      "component": "dockerSimulatorPreviewLogs",
                       "enableClose": false,
                       "icon": "svg:log"
                     }
@@ -968,6 +1048,15 @@
         "position": 0,
         "secondToPx": 200,
         "scrollLeft": 0
+      },
+      "selectionFront": {},
+      "selectionBack": {
+        "0": {
+          "0": {
+            "8": {}
+          },
+          "1": {}
+        }
       }
     },
     "[ILI9488.eez-project]:/lvglStyles/styles[tree-state]": {
@@ -980,9 +1069,7 @@
         "5": {},
         "6": {},
         "9": {},
-        "10": {
-          "$selected": true
-        }
+        "10": {}
       },
       "1": {},
       "2": {
@@ -1187,7 +1274,7 @@
   "searchMatchWholeWord": false,
   "replaceEnabled": false,
   "replaceText": "",
-  "pageRuntimeFrontFace": false,
+  "pageRuntimeFrontFace": true,
   "breakpoints": {},
   "watchExpressions": [],
   "showComponentDescriptions": true,

@@ -62,6 +62,7 @@ Core/Src/usart.c \
 Core/Src/system_stm32f4xx.c \
 Core/Src/sysmem.c \
 Core/Src/syscalls.c \
+Core/Src/mission.c \
 Core/Src/utils.c \
 Core/Src/dashboard.c \
 Core/Src/button.c \
@@ -93,8 +94,8 @@ Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_spi.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c \
-Lib/SCan/SC25/artifacts/MCB/c_source/mcb.c \
-Lib/SCan/SC25/artifacts/HVCB/c_source/hvcb.c \
+Lib/SCan/SC26/artifacts/MCB/c_source/mcb.c \
+Lib/SCan/SC26/artifacts/HVCB/c_source/hvcb.c \
 Lib/LVGL/lvgl_utils.c \
 Drivers/ILI9488/ili9488.c \
 EEZ/eez_utils.c \
@@ -170,8 +171,8 @@ C_INCLUDES =  \
 -IDrivers/STM32F4xx_HAL_Driver/Inc/Legacy \
 -IDrivers/CMSIS/Device/ST/STM32F4xx/Include \
 -IDrivers/CMSIS/Include \
--ILib/SCan/SC25/artifacts/MCB/c_source \
--ILib/SCan/SC25/artifacts/HVCB/c_source \
+-ILib/SCan/SC26/artifacts/MCB/c_source \
+-ILib/SCan/SC26/artifacts/HVCB/c_source \
 -ILib/LVGL/lvgl \
 -ILib/LVGL \
 -IDrivers/ILI9488 \

@@ -31,7 +31,7 @@
 /* USER CODE BEGIN Includes */
 #include "bsp.h"
 #include "dashboard.h"
-
+#include "lvgl.h"
 #include <stdio.h>
 /* USER CODE END Includes */
 

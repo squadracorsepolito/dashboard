@@ -6,14 +6,25 @@
 #include <string.h>
 
 objects_t objects;
+
+//
+// Event handlers
+//
+
 lv_obj_t *tick_value_change_obj;
-uint32_t active_theme_index = 0;
+
+//
+// Screens
+//
 
 void create_screen_main() {
     lv_obj_t *obj = lv_obj_create(0);
     objects.main = obj;
     lv_obj_set_pos(obj, 0, 0);
     lv_obj_set_size(obj, 480, 320);
+    lv_obj_set_style_bg_color(obj, lv_color_hex(0xffffffff), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(obj, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_main_opa(obj, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     {
         lv_obj_t *parent_obj = obj;
         {
@@ -100,31 +111,40 @@ void create_screen_main() {
                     // pg_main_lc
                     lv_obj_t *obj = lv_label_create(parent_obj);
                     objects.pg_main_lc = obj;
-                    lv_obj_set_pos(obj, -101, 114);
+                    lv_obj_set_pos(obj, -117, 117);
                     lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
                     add_style_label_basic_f40_style(obj);
-                    lv_obj_set_style_text_color(obj, lv_color_hex(0xffffffff), LV_PART_MAIN | LV_STATE_DEFAULT);
+                    lv_obj_set_style_text_color(obj, lv_color_hex(0xff000000), LV_PART_MAIN | LV_STATE_DEFAULT);
                     lv_label_set_text(obj, "LC");
                 }
                 {
                     // pg_main_tc
                     lv_obj_t *obj = lv_label_create(parent_obj);
                     objects.pg_main_tc = obj;
-                    lv_obj_set_pos(obj, -5, 115);
+                    lv_obj_set_pos(obj, 0, 117);
                     lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
                     add_style_label_basic_f40_style(obj);
-                    lv_obj_set_style_text_color(obj, lv_color_hex(0xffffffff), LV_PART_MAIN | LV_STATE_DEFAULT);
+                    lv_obj_set_style_text_color(obj, lv_color_hex(0xff000000), LV_PART_MAIN | LV_STATE_DEFAULT);
                     lv_label_set_text(obj, "TC");
                 }
                 {
                     // pg_main_tv
                     lv_obj_t *obj = lv_label_create(parent_obj);
                     objects.pg_main_tv = obj;
-                    lv_obj_set_pos(obj, 91, 117);
+                    lv_obj_set_pos(obj, 117, 117);
                     lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
                     add_style_label_basic_f40_style(obj);
-                    lv_obj_set_style_text_color(obj, lv_color_hex(0xffffffff), LV_PART_MAIN | LV_STATE_DEFAULT);
+                    lv_obj_set_style_text_color(obj, lv_color_hex(0xff000000), LV_PART_MAIN | LV_STATE_DEFAULT);
                     lv_label_set_text(obj, "TV");
+                }
+                {
+                    // mission_name
+                    lv_obj_t *obj = lv_label_create(parent_obj);
+                    objects.mission_name = obj;
+                    lv_obj_set_pos(obj, 0, -135);
+                    lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+                    add_style_label_basic_f32_style(obj);
+                    lv_label_set_text(obj, "AS Off");
                 }
             }
         }
@@ -143,40 +163,35 @@ void create_screen_main() {
             {
                 lv_obj_t *parent_obj = obj;
                 {
+                    // inv_label
                     lv_obj_t *obj = lv_label_create(parent_obj);
-                    lv_obj_set_pos(obj, -113, -76);
+                    objects.inv_label = obj;
+                    lv_obj_set_pos(obj, -112, -81);
                     lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
                     add_style_label_basic_f18_style(obj);
-                    lv_label_set_text(obj, "Inv FL");
+                    lv_label_set_text(obj, "Inverters");
                 }
                 {
                     // pg_main_inv_temp_fl
                     lv_obj_t *obj = lv_label_create(parent_obj);
                     objects.pg_main_inv_temp_fl = obj;
-                    lv_obj_set_pos(obj, -55, -77);
+                    lv_obj_set_pos(obj, -138, -51);
                     lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
                     add_style_label_basic_f18_style(obj);
                     lv_label_set_text(obj, "0.0");
-                }
-                {
-                    lv_obj_t *obj = lv_label_create(parent_obj);
-                    lv_obj_set_pos(obj, -112, -54);
-                    lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
-                    add_style_label_basic_f18_style(obj);
-                    lv_label_set_text(obj, "Inv FR");
                 }
                 {
                     // pg_main_inv_temp_fr
                     lv_obj_t *obj = lv_label_create(parent_obj);
                     objects.pg_main_inv_temp_fr = obj;
-                    lv_obj_set_pos(obj, -56, -55);
+                    lv_obj_set_pos(obj, -56, -51);
                     lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
                     add_style_label_basic_f18_style(obj);
                     lv_label_set_text(obj, "0.0");
                 }
                 {
                     lv_obj_t *obj = lv_label_create(parent_obj);
-                    lv_obj_set_pos(obj, -90, -5);
+                    lv_obj_set_pos(obj, -90, 37);
                     lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
                     add_style_label_basic_f18_style(obj);
                     lv_label_set_text(obj, "Cool press L");
@@ -185,14 +200,14 @@ void create_screen_main() {
                     // pg_main_cool_press_l
                     lv_obj_t *obj = lv_label_create(parent_obj);
                     objects.pg_main_cool_press_l = obj;
-                    lv_obj_set_pos(obj, -12, -6);
+                    lv_obj_set_pos(obj, -12, 37);
                     lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
                     add_style_label_basic_f18_style(obj);
                     lv_label_set_text(obj, "0.0");
                 }
                 {
                     lv_obj_t *obj = lv_label_create(parent_obj);
-                    lv_obj_set_pos(obj, -90, 17);
+                    lv_obj_set_pos(obj, -89, 72);
                     lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
                     add_style_label_basic_f18_style(obj);
                     lv_label_set_text(obj, "Cool press R");
@@ -201,118 +216,85 @@ void create_screen_main() {
                     // pg_main_cool_press_r
                     lv_obj_t *obj = lv_label_create(parent_obj);
                     objects.pg_main_cool_press_r = obj;
-                    lv_obj_set_pos(obj, -11, 17);
+                    lv_obj_set_pos(obj, -12, 72);
                     lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
                     add_style_label_basic_f18_style(obj);
                     lv_label_set_text(obj, "0.0");
                 }
                 {
                     lv_obj_t *obj = lv_label_create(parent_obj);
-                    lv_obj_set_pos(obj, -20, -77);
+                    lv_obj_set_pos(obj, -102, -51);
                     lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
                     add_style_label_basic_f18_style(obj);
                     lv_label_set_text(obj, "°C");
                 }
                 {
                     lv_obj_t *obj = lv_label_create(parent_obj);
-                    lv_obj_set_pos(obj, -20, -54);
+                    lv_obj_set_pos(obj, -102, -12);
                     lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
                     add_style_label_basic_f18_style(obj);
                     lv_label_set_text(obj, "°C");
-                }
-                {
-                    lv_obj_t *obj = lv_label_create(parent_obj);
-                    lv_obj_set_pos(obj, 46, -76);
-                    lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
-                    add_style_label_basic_f18_style(obj);
-                    lv_label_set_text(obj, "Inv RL");
                 }
                 {
                     // pg_main_inv_temp_rl
                     lv_obj_t *obj = lv_label_create(parent_obj);
                     objects.pg_main_inv_temp_rl = obj;
-                    lv_obj_set_pos(obj, 105, -75);
+                    lv_obj_set_pos(obj, -138, -12);
                     lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
                     add_style_label_basic_f18_style(obj);
                     lv_label_set_text(obj, "0.0");
-                }
-                {
-                    lv_obj_t *obj = lv_label_create(parent_obj);
-                    lv_obj_set_pos(obj, 46, -54);
-                    lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
-                    add_style_label_basic_f18_style(obj);
-                    lv_label_set_text(obj, "Inv RR");
                 }
                 {
                     // pg_main_inv_temp_rr
                     lv_obj_t *obj = lv_label_create(parent_obj);
                     objects.pg_main_inv_temp_rr = obj;
-                    lv_obj_set_pos(obj, 105, -53);
+                    lv_obj_set_pos(obj, -56, -12);
                     lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
                     add_style_label_basic_f18_style(obj);
                     lv_label_set_text(obj, "0.0");
                 }
                 {
                     lv_obj_t *obj = lv_label_create(parent_obj);
-                    lv_obj_set_pos(obj, 143, -75);
+                    lv_obj_set_pos(obj, -20, -51);
                     lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
                     add_style_label_basic_f18_style(obj);
                     lv_label_set_text(obj, "°C");
                 }
                 {
                     lv_obj_t *obj = lv_label_create(parent_obj);
-                    lv_obj_set_pos(obj, 143, -52);
+                    lv_obj_set_pos(obj, -20, -12);
                     lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
                     add_style_label_basic_f18_style(obj);
                     lv_label_set_text(obj, "°C");
                 }
                 {
                     lv_obj_t *obj = lv_label_create(parent_obj);
-                    lv_obj_set_pos(obj, 26, -6);
+                    lv_obj_set_pos(obj, 26, 37);
                     lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
                     add_style_label_basic_f18_style(obj);
                     lv_label_set_text(obj, "Bar");
                 }
                 {
                     lv_obj_t *obj = lv_label_create(parent_obj);
-                    lv_obj_set_pos(obj, 26, 17);
+                    lv_obj_set_pos(obj, 26, 72);
                     lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
                     add_style_label_basic_f18_style(obj);
                     lv_label_set_text(obj, "Bar");
                 }
                 {
+                    // mot_label
                     lv_obj_t *obj = lv_label_create(parent_obj);
-                    lv_obj_set_pos(obj, -109, 57);
+                    objects.mot_label = obj;
+                    lv_obj_set_pos(obj, 45, -81);
                     lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
                     add_style_label_basic_f18_style(obj);
-                    lv_label_set_text(obj, "Mot FL");
-                }
-                {
-                    lv_obj_t *obj = lv_label_create(parent_obj);
-                    lv_obj_set_pos(obj, -109, 80);
-                    lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
-                    add_style_label_basic_f18_style(obj);
-                    lv_label_set_text(obj, "Mot FR");
-                }
-                {
-                    lv_obj_t *obj = lv_label_create(parent_obj);
-                    lv_obj_set_pos(obj, 49, 58);
-                    lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
-                    add_style_label_basic_f18_style(obj);
-                    lv_label_set_text(obj, "Mot RL");
-                }
-                {
-                    lv_obj_t *obj = lv_label_create(parent_obj);
-                    lv_obj_set_pos(obj, 49, 81);
-                    lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
-                    add_style_label_basic_f18_style(obj);
-                    lv_label_set_text(obj, "Mot RR");
+                    lv_label_set_text(obj, "Motors");
                 }
                 {
                     // pg_main_motor_temp_fl
                     lv_obj_t *obj = lv_label_create(parent_obj);
                     objects.pg_main_motor_temp_fl = obj;
-                    lv_obj_set_pos(obj, -55, 57);
+                    lv_obj_set_pos(obj, 28, -51);
                     lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
                     add_style_label_basic_f18_style(obj);
                     lv_label_set_text(obj, "0.0");
@@ -321,21 +303,21 @@ void create_screen_main() {
                     // pg_main_motor_temp_fr
                     lv_obj_t *obj = lv_label_create(parent_obj);
                     objects.pg_main_motor_temp_fr = obj;
-                    lv_obj_set_pos(obj, -56, 79);
+                    lv_obj_set_pos(obj, 112, -51);
                     lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
                     add_style_label_basic_f18_style(obj);
                     lv_label_set_text(obj, "0.0");
                 }
                 {
                     lv_obj_t *obj = lv_label_create(parent_obj);
-                    lv_obj_set_pos(obj, -20, 57);
+                    lv_obj_set_pos(obj, 65, -51);
                     lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
                     add_style_label_basic_f18_style(obj);
                     lv_label_set_text(obj, "°C");
                 }
                 {
                     lv_obj_t *obj = lv_label_create(parent_obj);
-                    lv_obj_set_pos(obj, -20, 80);
+                    lv_obj_set_pos(obj, 65, -12);
                     lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
                     add_style_label_basic_f18_style(obj);
                     lv_label_set_text(obj, "°C");
@@ -344,7 +326,7 @@ void create_screen_main() {
                     // pg_main_motor_temp_rl
                     lv_obj_t *obj = lv_label_create(parent_obj);
                     objects.pg_main_motor_temp_rl = obj;
-                    lv_obj_set_pos(obj, 105, 58);
+                    lv_obj_set_pos(obj, 28, -12);
                     lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
                     add_style_label_basic_f18_style(obj);
                     lv_label_set_text(obj, "0.0");
@@ -353,21 +335,21 @@ void create_screen_main() {
                     // pg_main_motor_temp_rr
                     lv_obj_t *obj = lv_label_create(parent_obj);
                     objects.pg_main_motor_temp_rr = obj;
-                    lv_obj_set_pos(obj, 105, 80);
+                    lv_obj_set_pos(obj, 112, -12);
                     lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
                     add_style_label_basic_f18_style(obj);
                     lv_label_set_text(obj, "0.0");
                 }
                 {
                     lv_obj_t *obj = lv_label_create(parent_obj);
-                    lv_obj_set_pos(obj, 143, 58);
+                    lv_obj_set_pos(obj, 149, -51);
                     lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
                     add_style_label_basic_f18_style(obj);
                     lv_label_set_text(obj, "°C");
                 }
                 {
                     lv_obj_t *obj = lv_label_create(parent_obj);
-                    lv_obj_set_pos(obj, 143, 81);
+                    lv_obj_set_pos(obj, 149, -12);
                     lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
                     add_style_label_basic_f18_style(obj);
                     lv_label_set_text(obj, "°C");
@@ -382,8 +364,6 @@ void create_screen_main() {
 void tick_screen_main() {
 }
 
-
-
 typedef void (*tick_screen_func_t)();
 tick_screen_func_t tick_screen_funcs[] = {
     tick_screen_main,
@@ -396,9 +376,13 @@ void tick_screen_by_id(enum ScreensEnum screenId) {
 }
 
 void create_screens() {
-    lv_disp_t *dispp = lv_disp_get_default();
+
+// Set default LVGL theme
+    lv_display_t *dispp = lv_display_get_default();
     lv_theme_t *theme = lv_theme_default_init(dispp, lv_palette_main(LV_PALETTE_BLUE), lv_palette_main(LV_PALETTE_RED), false, LV_FONT_DEFAULT);
-    lv_disp_set_theme(dispp, theme);
+    lv_display_set_theme(dispp, theme);
     
+    // Initialize screens
+    // Create screens
     create_screen_main();
 }

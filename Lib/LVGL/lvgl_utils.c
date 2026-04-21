@@ -28,9 +28,10 @@ void LVGL_init(void) {
     lv_init();
     lv_tick_set_cb(HAL_GetTick);
     lv_display_t *display = lv_display_create(ILI9488_HORIZONTAL_RES, ILI9488_VERTICAL_RES);
+
     lv_display_set_buffers(display, DISP_buffer, NULL, DISP_BUFFER_SIZE, LV_DISPLAY_RENDER_MODE_PARTIAL);
     lv_display_set_flush_cb(display, LVGL_flush_clbk);
-
+    
     lv_theme_t *theme = lv_theme_default_init(
         display, lv_palette_main(LV_PALETTE_BLUE), lv_palette_main(LV_PALETTE_RED), true, LV_FONT_DEFAULT);
     lv_disp_set_theme(display, theme);

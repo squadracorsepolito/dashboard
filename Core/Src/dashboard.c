@@ -98,6 +98,7 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
         struct mcb_sb_rear_analog_device_t sb_rear_analog_device;
         struct mcb_dspace_pwt_front_temp_t dspace_pwt_front_temp;
         struct mcb_dspace_pwt_rear_temp_t dspace_pwt_rear_temp;
+        struct mcb_dspace_autonomous_mission_t ami_state;
 
     } msgs = {};
 
@@ -152,6 +153,17 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
         dashboard_data.DAC_PUMPS_PERCENTAGE =
             ((msgs.per_ctrl.cool_pumps_speed_ctrl > 100 ? 100 : msgs.per_ctrl.cool_pumps_speed_ctrl) / 100.0 * 256U);
         //HAL_DAC_SetValue(&PUMPS_DAC,PUMPS_DAC_CHANNEL,DAC_ALIGN_8B_R,(uint8_t)DAC_PUMPS_PERCENTAGE);
+    }
+
+    /*
+     *
+     * AUTONOMOUS SYSTEM
+     *
+    */
+    else if((RxHeader.StdId == MCB_DSPACE_AUTONOMOUS_MISSION_FRAME_ID) &&
+            (RxHeader.DLC == MCB_DSPACE_AUTONOMOUS_MISSION_LENGTH)) {
+        mcb_dspace_autonomous_mission_unpack(&msgs.ami_state, RxData, MCB_DSPACE_AUTONOMOUS_MISSION_LENGTH);
+        dashboard_data.AS_MISSION = msgs.ami_state.autonomous_mission_state;
     }
 
     /*

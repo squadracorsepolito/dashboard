@@ -20,7 +20,7 @@ void init_style_label_basic_style_MAIN_DEFAULT(lv_style_t *style) {
 lv_style_t *get_style_label_basic_style_MAIN_DEFAULT() {
     static lv_style_t *style;
     if (!style) {
-        style = lv_malloc(sizeof(lv_style_t));
+        style = (lv_style_t *)lv_malloc(sizeof(lv_style_t));
         lv_style_init(style);
         init_style_label_basic_style_MAIN_DEFAULT(style);
     }
@@ -51,7 +51,7 @@ void init_style_label_basic_f40_style_MAIN_DEFAULT(lv_style_t *style) {
 lv_style_t *get_style_label_basic_f40_style_MAIN_DEFAULT() {
     static lv_style_t *style;
     if (!style) {
-        style = lv_malloc(sizeof(lv_style_t));
+        style = (lv_style_t *)lv_malloc(sizeof(lv_style_t));
         lv_style_init(style);
         init_style_label_basic_f40_style_MAIN_DEFAULT(style);
     }
@@ -82,7 +82,7 @@ void init_style_label_basic_f38_style_MAIN_DEFAULT(lv_style_t *style) {
 lv_style_t *get_style_label_basic_f38_style_MAIN_DEFAULT() {
     static lv_style_t *style;
     if (!style) {
-        style = lv_malloc(sizeof(lv_style_t));
+        style = (lv_style_t *)lv_malloc(sizeof(lv_style_t));
         lv_style_init(style);
         init_style_label_basic_f38_style_MAIN_DEFAULT(style);
     }
@@ -113,7 +113,7 @@ void init_style_label_basic_f32_style_MAIN_DEFAULT(lv_style_t *style) {
 lv_style_t *get_style_label_basic_f32_style_MAIN_DEFAULT() {
     static lv_style_t *style;
     if (!style) {
-        style = lv_malloc(sizeof(lv_style_t));
+        style = (lv_style_t *)lv_malloc(sizeof(lv_style_t));
         lv_style_init(style);
         init_style_label_basic_f32_style_MAIN_DEFAULT(style);
     }
@@ -144,7 +144,7 @@ void init_style_label_basic_f30_style_MAIN_DEFAULT(lv_style_t *style) {
 lv_style_t *get_style_label_basic_f30_style_MAIN_DEFAULT() {
     static lv_style_t *style;
     if (!style) {
-        style = lv_malloc(sizeof(lv_style_t));
+        style = (lv_style_t *)lv_malloc(sizeof(lv_style_t));
         lv_style_init(style);
         init_style_label_basic_f30_style_MAIN_DEFAULT(style);
     }
@@ -175,7 +175,7 @@ void init_style_label_basic_f28_style_MAIN_DEFAULT(lv_style_t *style) {
 lv_style_t *get_style_label_basic_f28_style_MAIN_DEFAULT() {
     static lv_style_t *style;
     if (!style) {
-        style = lv_malloc(sizeof(lv_style_t));
+        style = (lv_style_t *)lv_malloc(sizeof(lv_style_t));
         lv_style_init(style);
         init_style_label_basic_f28_style_MAIN_DEFAULT(style);
     }
@@ -206,7 +206,7 @@ void init_style_label_basic_f26_style_MAIN_DEFAULT(lv_style_t *style) {
 lv_style_t *get_style_label_basic_f26_style_MAIN_DEFAULT() {
     static lv_style_t *style;
     if (!style) {
-        style = lv_malloc(sizeof(lv_style_t));
+        style = (lv_style_t *)lv_malloc(sizeof(lv_style_t));
         lv_style_init(style);
         init_style_label_basic_f26_style_MAIN_DEFAULT(style);
     }
@@ -237,7 +237,7 @@ void init_style_label_basic_f24_style_MAIN_DEFAULT(lv_style_t *style) {
 lv_style_t *get_style_label_basic_f24_style_MAIN_DEFAULT() {
     static lv_style_t *style;
     if (!style) {
-        style = lv_malloc(sizeof(lv_style_t));
+        style = (lv_style_t *)lv_malloc(sizeof(lv_style_t));
         lv_style_init(style);
         init_style_label_basic_f24_style_MAIN_DEFAULT(style);
     }
@@ -268,7 +268,7 @@ void init_style_label_basic_f22_style_MAIN_DEFAULT(lv_style_t *style) {
 lv_style_t *get_style_label_basic_f22_style_MAIN_DEFAULT() {
     static lv_style_t *style;
     if (!style) {
-        style = lv_malloc(sizeof(lv_style_t));
+        style = (lv_style_t *)lv_malloc(sizeof(lv_style_t));
         lv_style_init(style);
         init_style_label_basic_f22_style_MAIN_DEFAULT(style);
     }
@@ -299,7 +299,7 @@ void init_style_label_basic_f20_style_MAIN_DEFAULT(lv_style_t *style) {
 lv_style_t *get_style_label_basic_f20_style_MAIN_DEFAULT() {
     static lv_style_t *style;
     if (!style) {
-        style = lv_malloc(sizeof(lv_style_t));
+        style = (lv_style_t *)lv_malloc(sizeof(lv_style_t));
         lv_style_init(style);
         init_style_label_basic_f20_style_MAIN_DEFAULT(style);
     }
@@ -330,7 +330,7 @@ void init_style_label_basic_f18_style_MAIN_DEFAULT(lv_style_t *style) {
 lv_style_t *get_style_label_basic_f18_style_MAIN_DEFAULT() {
     static lv_style_t *style;
     if (!style) {
-        style = lv_malloc(sizeof(lv_style_t));
+        style = (lv_style_t *)lv_malloc(sizeof(lv_style_t));
         lv_style_init(style);
         init_style_label_basic_f18_style_MAIN_DEFAULT(style);
     }
@@ -361,7 +361,7 @@ void init_style_label_basic_f16_style_MAIN_DEFAULT(lv_style_t *style) {
 lv_style_t *get_style_label_basic_f16_style_MAIN_DEFAULT() {
     static lv_style_t *style;
     if (!style) {
-        style = lv_malloc(sizeof(lv_style_t));
+        style = (lv_style_t *)lv_malloc(sizeof(lv_style_t));
         lv_style_init(style);
         init_style_label_basic_f16_style_MAIN_DEFAULT(style);
     }
@@ -393,7 +393,7 @@ void init_style_container_basic_style_MAIN_DEFAULT(lv_style_t *style) {
 lv_style_t *get_style_container_basic_style_MAIN_DEFAULT() {
     static lv_style_t *style;
     if (!style) {
-        style = lv_malloc(sizeof(lv_style_t));
+        style = (lv_style_t *)lv_malloc(sizeof(lv_style_t));
         lv_style_init(style);
         init_style_container_basic_style_MAIN_DEFAULT(style);
     }
@@ -453,4 +453,3 @@ void remove_style(lv_obj_t *obj, int32_t styleIndex) {
     };
     remove_style_funcs[styleIndex](obj);
 }
-
