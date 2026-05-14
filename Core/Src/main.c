@@ -77,7 +77,7 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
-
+  int flag_AS_emergency = 0;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -122,7 +122,7 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
     while (1) {
-        Dashboard_Loop();
+        Dashboard_Loop(&flag_AS_emergency);
         Display_Loop();
     /* USER CODE END WHILE */
 

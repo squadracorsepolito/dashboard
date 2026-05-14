@@ -1,8 +1,8 @@
 /**
  * @file mission.h
- * @author Ethan Paonessa (s322056@studenti.polito.it)
- * @brief Handles the autonomous mission selection (and the AMI lights not yet).
- * @date 2026-03-17
+ * @author Ethan Paonessa (ethan.paonessa@squadracorsepolito.com)
+ * @brief Handles the autonomous mission selection and the ASSI lights.
+ * @date 2026-04-28
  */
 
 #pragma once
@@ -26,6 +26,15 @@ typedef enum
     INSPECT,
     MANUAL,
 } mission_t;
+
+typedef enum
+{
+    AS_OFF,
+    AS_READY,
+    AS_DRIVING,
+    AS_EMERGENCY,
+    AS_FINISHED,
+} assi_t;
 
 /**
  * @brief Setups callback functions for the mission select button
@@ -59,3 +68,5 @@ void mission_set(mission_t mission);
 void mission_run();
 
 char* mission_convert(uint8_t mission);
+
+assi_t assi_convert(int assi);

@@ -27,6 +27,7 @@
 #include "eez_actions.h"
 #include "bsp.h"
 #include "screens.h"
+#include "mission.h"
 
 /* ---------- Exported types -------------------------------------------------*/
 /* ---------- Exported constants ---------------------------------------------*/
