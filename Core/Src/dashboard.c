@@ -1,6 +1,7 @@
 /*INCLUDE*/
 
-#include "dashboard.h"
+#ifndef _DASHBOARD_H_
+#define _DASHBOARD_H_
 
 #include "bsp.h"
 #include "button.h"
@@ -539,7 +540,7 @@ void AS_SDC_check(void){
     }
 }
 
-void ASSI_state(uint32_t delay_100us){
+void ASSI_state(uint32_t delay_100us, int time){
     static uint32_t blink_delay_last = 0;
     switch(dashboard_data.ASSI_CODE){
         case AS_READY:
@@ -619,7 +620,7 @@ void Dashboard_Loop(int *flag) {
     // Blink green led to signal activity
     static uint32_t led_blink = 0;
     static uint32_t cnt10ms   = 0;
-    int time;
+    uint32_t time;
     //static uint32_t imd_err_blink = 0;
 
     LedBlinking(STAT1_LED_GPIO_OUT_GPIO_Port, STAT1_LED_GPIO_OUT_Pin, &led_blink, 2000);
@@ -662,14 +663,14 @@ void Dashboard_Loop(int *flag) {
 
     AS_SDC_check();
 
-    if(dashboard_data.ASSI_CODE == AS_EMERGENCY  && *flag == 0){
+    if(dashboard_data.ASSI_CODE == AS_EMERGENCY && *flag == 0){
         *flag = 1;
         time = HAL_GetTick();
     }
 
-    ASSI_state(1000);
+    ASSI_state(1000, time);
 
-    if(dashboard_data.ASSI_CODE != AS_EMERGENCY  && *flag == 1){
+    if(dashboard_data.ASSI_CODE != AS_EMERGENCY && *flag == 1){
         *flag = 0;
     }
 
@@ -690,3 +691,5 @@ void Dashboard_Loop(int *flag) {
     // Send current state via CAN
     can_send_state(500);
 }
+
+#endif      /*_DASHBOARD_H_*/

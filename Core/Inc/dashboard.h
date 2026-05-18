@@ -26,7 +26,7 @@ typedef struct {
     
     volatile uint8_t AS_MISSION;                  //Autonomous Mission Code
     volatile int ASSI_CODE;                       //Autonomous System Status Indicator
-    volatile int AS_RELAY;                    //AS Relay command (Inverse Logic!)
+    volatile int AS_RELAY;                        //AS Relay command (Inverse Logic!)
 
     volatile double INVERTER_FL_TEMP;
     volatile double INVERTER_FR_TEMP;
@@ -97,7 +97,7 @@ void can_send_state(uint32_t delay_100us);
 void UpdateCockpitLed(uint32_t delay_100us);
 void RTD_fsm(uint32_t delay_100us);
 void AS_SDC_check(void);
-void ASSI_state(uint32_t delay_100us);
+void ASSI_state(uint32_t delay_100us, int time);
 
 void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan);
 void HAL_CAN_RxFifo1MsgPendingCallback(CAN_HandleTypeDef *hcan);
