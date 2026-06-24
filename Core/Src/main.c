@@ -75,9 +75,9 @@ void SystemClock_Config(void);
   */
 int main(void)
 {
-
   /* USER CODE BEGIN 1 */
-  int flag_AS_emergency = 0;
+  uint32_t AS_EM_time;
+  int AS_EM_flag = 1;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -122,8 +122,9 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
     while (1) {
-        Dashboard_Loop(&flag_AS_emergency);
-        Display_Loop();
+      HAL_GPIO_TogglePin(STAT3_LED_GPIO_OUT_GPIO_Port, STAT3_LED_GPIO_OUT_Pin);
+      Dashboard_Loop(&AS_EM_time, &AS_EM_flag);
+      Display_Loop();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

@@ -60,8 +60,9 @@ DashboardData_t dashboard_data = {
     .PWM_RADIATOR_FAN      = 0,
     .DAC_PUMPS_PERCENTAGE  = 0,
     .RTD_BUTTON            = false,
-    .ASSI_CODE             = 0,
-    .AS_RELAY              =1,
+    .ASSI_CODE             = AS_OFF,
+    .AS_RELAY              = 1,
+    .AS_MISSION            = MISSION_NO,
 };
 
 /* State change triggers */
@@ -92,6 +93,7 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
         struct mcb_dspace_fsm_states_t rtd_ack;
         struct mcb_dspace_peripherals_ctrl_t per_ctrl;
         struct mcb_dspace_signals_t dspace_signals;
+        struct mcb_dv_system_status_t driving_status;
         struct mcb_tlb_bat_signals_status_t tsal_status;
         struct mcb_tlb_bat_sd_csensing_status_t shut_status;
         struct mcb_dspace_dash_leds_color_rgb_t rgb_status;
@@ -164,10 +166,11 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
      * AUTONOMOUS SYSTEM
      *
     */
-    else if((RxHeader.StdId == MCB_DSPACE_AUTONOMOUS_MISSION_FRAME_ID) &&
-            (RxHeader.DLC == MCB_DSPACE_AUTONOMOUS_MISSION_LENGTH)) {
-        mcb_dspace_autonomous_mission_unpack(&msgs.ami_state, RxData, MCB_DSPACE_AUTONOMOUS_MISSION_LENGTH);
-        dashboard_data.AS_MISSION = msgs.ami_state.autonomous_mission_state;
+    else if((RxHeader.StdId == MCB_DV_SYSTEM_STATUS_FRAME_ID) &&
+            (RxHeader.DLC == MCB_DV_SYSTEM_STATUS_LENGTH)) {
+        mcb_dv_system_status_unpack(&msgs.driving_status, RxData, MCB_DV_SYSTEM_STATUS_LENGTH);
+        dashboard_data.ASSI_CODE = msgs.driving_status.assi_status;
+        dashboard_data.AS_MISSION = msgs.driving_status.ami_state;
     }
 
     /*
@@ -211,7 +214,6 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
     } else if ((RxHeader.StdId == MCB_DSPACE_SIGNALS_FRAME_ID) && (RxHeader.DLC == MCB_DSPACE_SIGNALS_LENGTH)) {
         mcb_dspace_signals_unpack(&msgs.dspace_signals, RxData, MCB_DSPACE_SIGNALS_LENGTH);
         dashboard_data.HV_BAT_SOC = msgs.dspace_signals.hvbat_soc;
-        dashboard_data.ASSI_CODE = msgs.dspace_signals.assi_command;
     } else if ((RxHeader.StdId == MCB_BMS_LV_LV_BAT_GENERAL_FRAME_ID) &&
                (RxHeader.DLC == MCB_BMS_LV_LV_BAT_GENERAL_LENGTH)) {
         mcb_bms_lv_lv_bat_general_unpack(&msgs.lv_bat_general, RxData, MCB_BMS_LV_LV_BAT_GENERAL_LENGTH);
@@ -540,35 +542,40 @@ void AS_SDC_check(void){
     }
 }
 
-void ASSI_state(uint32_t delay_100us, int time){
+void ASSI_state(uint32_t delay_100us, uint32_t *time, int *flag){
     static uint32_t blink_delay_last = 0;
     switch(dashboard_data.ASSI_CODE){
         case AS_READY:
-            HAL_GPIO_WritePin(ASSI_BLUE_OUT_GPIO_Port, ASSI_BLUE_OUT_Pin, GPIO_PIN_RESET);
-            HAL_GPIO_WritePin(ASSI_YELLOW_OUT_GPIO_Port, ASSI_YELLOW_OUT_Pin, GPIO_PIN_SET);
+            HAL_GPIO_WritePin(ASSI_BLUE_OUT_GPIO_Port, ASSI_BLUE_OUT_Pin, GPIO_PIN_SET);
+            HAL_GPIO_WritePin(ASSI_YELLOW_OUT_GPIO_Port, ASSI_YELLOW_OUT_Pin, GPIO_PIN_RESET);
             break;
         case AS_DRIVING:
-            HAL_GPIO_WritePin(ASSI_BLUE_OUT_GPIO_Port, ASSI_BLUE_OUT_Pin, GPIO_PIN_RESET);
+            HAL_GPIO_WritePin(ASSI_BLUE_OUT_GPIO_Port, ASSI_BLUE_OUT_Pin, GPIO_PIN_SET);
             LedBlinking(ASSI_YELLOW_OUT_GPIO_Port, ASSI_YELLOW_OUT_Pin, &blink_delay_last, delay_100us);
             break;
         case AS_EMERGENCY:
-            HAL_GPIO_WritePin(ASSI_YELLOW_OUT_GPIO_Port, ASSI_YELLOW_OUT_Pin, GPIO_PIN_RESET);
+            HAL_GPIO_WritePin(ASSI_YELLOW_OUT_GPIO_Port, ASSI_YELLOW_OUT_Pin, GPIO_PIN_SET);
             LedBlinking(ASSI_BLUE_OUT_GPIO_Port, ASSI_BLUE_OUT_Pin, &blink_delay_last, delay_100us);
-            HAL_GPIO_WritePin(AS_BUZZER_GPIO_Port, AS_BUZZER_Pin, GPIO_PIN_SET);
-                if (HAL_GetTick() - time > 8000) {
-                    HAL_GPIO_WritePin(AS_BUZZER_GPIO_Port, AS_BUZZER_Pin, GPIO_PIN_RESET);
-                }
+            if (*flag == 1) {
+                *time = HAL_GetTick();
+                HAL_GPIO_WritePin(AS_BUZZER_GPIO_Port, AS_BUZZER_Pin, GPIO_PIN_RESET);
+                *flag = 0;
+            }
+            if (HAL_GetTick() - *time > 8000 && *flag == 0) {
+                    HAL_GPIO_WritePin(AS_BUZZER_GPIO_Port, AS_BUZZER_Pin, GPIO_PIN_SET);
+                    *flag = 2;
+            }
             break;
         case AS_FINISHED:
-            HAL_GPIO_WritePin(ASSI_YELLOW_OUT_GPIO_Port, ASSI_YELLOW_OUT_Pin, GPIO_PIN_RESET);
-            HAL_GPIO_WritePin(ASSI_BLUE_OUT_GPIO_Port, ASSI_BLUE_OUT_Pin, GPIO_PIN_SET);
+            HAL_GPIO_WritePin(ASSI_YELLOW_OUT_GPIO_Port, ASSI_YELLOW_OUT_Pin, GPIO_PIN_SET);
+            HAL_GPIO_WritePin(ASSI_BLUE_OUT_GPIO_Port, ASSI_BLUE_OUT_Pin, GPIO_PIN_RESET);
             break;
         default:
-            if(HAL_GPIO_ReadPin(ASSI_BLUE_OUT_GPIO_Port, ASSI_BLUE_OUT_Pin) == GPIO_PIN_SET){
-                HAL_GPIO_WritePin(ASSI_BLUE_OUT_GPIO_Port, ASSI_BLUE_OUT_Pin, GPIO_PIN_RESET);
+            if(HAL_GPIO_ReadPin(ASSI_BLUE_OUT_GPIO_Port, ASSI_BLUE_OUT_Pin) == GPIO_PIN_RESET){
+                HAL_GPIO_WritePin(ASSI_BLUE_OUT_GPIO_Port, ASSI_BLUE_OUT_Pin, GPIO_PIN_SET);
             }
-            if(HAL_GPIO_ReadPin(ASSI_YELLOW_OUT_GPIO_Port, ASSI_YELLOW_OUT_Pin) == GPIO_PIN_SET){
-                HAL_GPIO_WritePin(ASSI_YELLOW_OUT_GPIO_Port, ASSI_YELLOW_OUT_Pin, GPIO_PIN_RESET);
+            if(HAL_GPIO_ReadPin(ASSI_YELLOW_OUT_GPIO_Port, ASSI_YELLOW_OUT_Pin) == GPIO_PIN_RESET){
+                HAL_GPIO_WritePin(ASSI_YELLOW_OUT_GPIO_Port, ASSI_YELLOW_OUT_Pin, GPIO_PIN_SET);
             }
     }
 }
@@ -616,11 +623,10 @@ uint8_t AMS_detection(uint8_t ams_err_tlb,
 /**
     * @brief Dash main loop
  */
-void Dashboard_Loop(int *flag) {
+void Dashboard_Loop(uint32_t *time, int *flag) {
     // Blink green led to signal activity
     static uint32_t led_blink = 0;
     static uint32_t cnt10ms   = 0;
-    uint32_t time;
     //static uint32_t imd_err_blink = 0;
 
     LedBlinking(STAT1_LED_GPIO_OUT_GPIO_Port, STAT1_LED_GPIO_OUT_Pin, &led_blink, 2000);
@@ -663,16 +669,7 @@ void Dashboard_Loop(int *flag) {
 
     AS_SDC_check();
 
-    if(dashboard_data.ASSI_CODE == AS_EMERGENCY && *flag == 0){
-        *flag = 1;
-        time = HAL_GetTick();
-    }
-
-    ASSI_state(1000, time);
-
-    if(dashboard_data.ASSI_CODE != AS_EMERGENCY && *flag == 1){
-        *flag = 0;
-    }
+    ASSI_state(1000, time, flag);
 
     // Run the AS FSM
     // mission_run();

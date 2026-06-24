@@ -91,13 +91,13 @@ extern DashboardData_t dashboard_data;
 
 void Dashboard_Setup(void);
 void Display_Setup(void);
-void Dashboard_Loop(int *flag);
+void Dashboard_Loop(uint32_t *time, int *flag);
 void Display_Loop(void);
 void can_send_state(uint32_t delay_100us);
 void UpdateCockpitLed(uint32_t delay_100us);
 void RTD_fsm(uint32_t delay_100us);
 void AS_SDC_check(void);
-void ASSI_state(uint32_t delay_100us, int time);
+void ASSI_state(uint32_t delay_100us, uint32_t *time, int *flag);
 
 void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan);
 void HAL_CAN_RxFifo1MsgPendingCallback(CAN_HandleTypeDef *hcan);

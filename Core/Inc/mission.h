@@ -20,16 +20,16 @@ typedef enum
     MISSION_NO,
     ACCEL,
     SKIDPAD,
-    AUTOX,
     TRACKDRIVE,
     EBSTEST,
     INSPECT,
+    AUTOX,
     MANUAL,
 } mission_t;
 
 typedef enum
 {
-    AS_OFF,
+    AS_OFF = 1,
     AS_READY,
     AS_DRIVING,
     AS_EMERGENCY,
