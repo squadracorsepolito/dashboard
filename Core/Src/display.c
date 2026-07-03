@@ -57,23 +57,23 @@ void DISP_init(void) {
 void DISP_update_routine(void) {
     EEZ_ACT_set_lbl_float(dashboard_data.LV_BAT_mV / 1000.0, objects.main, objects.pg_main_lv_bat_v);
     EEZ_ACT_set_lbl_uint8(dashboard_data.HV_BAT_SOC, objects.main, objects.pg_main_hv_soc_est);
-    EEZ_ACT_set_lbl_uint8(ROT_SW_getState(ROT_SW_Device1), objects.main, objects.pg_main_sx_map);
-    EEZ_ACT_set_lbl_uint8(ROT_SW_getState(ROT_SW_Device2), objects.main, objects.pg_main_dx_map);
+    EEZ_ACT_set_lbl_uint8(dashboard_data.ROT_SW_1_STATE, objects.main, objects.pg_main_sx_map);
+    EEZ_ACT_set_lbl_uint8(dashboard_data.ROT_SW_2_STATE, objects.main, objects.pg_main_dx_map);
     EEZ_ACT_set_lbl_str(mission_convert(dashboard_data.AS_MISSION), objects.main, objects.mission_name);
 
-    if (!BTN_getStatus(BTN_LC)) {
+    if (dashboard_data.LC_BTN_STATE == 0) {
         EEZ_ACT_set_lbl_color(EEZ_COLOR_WHITE, objects.main, objects.pg_main_lc);
     } else {
         EEZ_ACT_set_lbl_color(EEZ_COLOR_GREEN, objects.main, objects.pg_main_lc);
     }
 
-    if (!BTN_getStatus(BTN_TC)) {
+    if (dashboard_data.TC_BTN_STATE == 0) {
         EEZ_ACT_set_lbl_color(EEZ_COLOR_WHITE, objects.main, objects.pg_main_tc);
     } else {
         EEZ_ACT_set_lbl_color(EEZ_COLOR_GREEN, objects.main, objects.pg_main_tc);
     }
 
-    if (!BTN_getStatus(BTN_TV)) {
+    if (dashboard_data.TV_BTN_STATE == 0) {
         EEZ_ACT_set_lbl_color(EEZ_COLOR_WHITE, objects.main, objects.pg_main_tv);
     } else {
         EEZ_ACT_set_lbl_color(EEZ_COLOR_GREEN, objects.main, objects.pg_main_tv);

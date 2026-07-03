@@ -79,7 +79,7 @@ void MX_GPIO_Init(void)
 
   /*Configure GPIO pins : PEPin PEPin PEPin PEPin
                            PEPin */
-  GPIO_InitStruct.Pin = nBTN_TV_IN_GPIO_IN_Pin|nBTN_TC_IN_GPIO_IN_Pin|nBTN_LC_IN_GPIO_IN_Pin|nRTD_BTN_IN_GPIO_IN_Pin
+  GPIO_InitStruct.Pin = nBTN_TS_ON_IN_GPIO_IN_Pin|nBTN_TC_IN_GPIO_IN_Pin|nBTN_LC_IN_GPIO_IN_Pin|nRTD_BTN_IN_GPIO_IN_Pin
                           |nBTN_GENERAL_IN_GPIO_IN_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;

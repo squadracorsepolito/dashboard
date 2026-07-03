@@ -19,7 +19,7 @@
 #include <stdio.h>
 
 /* Initialize the dashboard data structure */
-DashboardData_t dashboard_data = {
+volatile DashboardData_t dashboard_data = {
     .INVERTER_FL_TEMP      = 0.0,
     .INVERTER_FR_TEMP      = 0.0,
     .INVERTER_RL_TEMP      = 0.0,
@@ -63,6 +63,13 @@ DashboardData_t dashboard_data = {
     .ASSI_CODE             = AS_OFF,
     .AS_RELAY              = 1,
     .AS_MISSION            = MISSION_NO,
+    .ASB_EBS_RELAYS        = NONE,
+    .TV_BTN_STATE          = 0,
+    .TC_BTN_STATE          = 0,
+    .LC_BTN_STATE          = 0,
+    .ROT_SW_1_STATE        = 0,
+    .ROT_SW_2_STATE        = 0,
+    .ROT_SW_3_STATE        = 0,
 };
 
 /* State change triggers */
@@ -103,7 +110,9 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
         struct mcb_sb_rear_analog_device_t sb_rear_analog_device;
         struct mcb_dspace_pwt_front_temp_t dspace_pwt_front_temp;
         struct mcb_dspace_pwt_rear_temp_t dspace_pwt_rear_temp;
-        struct mcb_dspace_autonomous_mission_t ami_state;
+        struct mcb_dspace_autonomous_mission_t ami_state;       //redundant message for AMI
+        struct mcb_asb_ebs_cmd_on_t ebs_state;
+        struct mcb_steering_hmi_devices_state_t dev_states;
 
     } msgs = {};
 
@@ -165,12 +174,33 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
      *
      * AUTONOMOUS SYSTEM
      *
-    */
+     */
     else if((RxHeader.StdId == MCB_DV_SYSTEM_STATUS_FRAME_ID) &&
             (RxHeader.DLC == MCB_DV_SYSTEM_STATUS_LENGTH)) {
         mcb_dv_system_status_unpack(&msgs.driving_status, RxData, MCB_DV_SYSTEM_STATUS_LENGTH);
         dashboard_data.ASSI_CODE = msgs.driving_status.assi_status;
         dashboard_data.AS_MISSION = msgs.driving_status.ami_state;
+    }
+    else if((RxHeader.StdId == MCB_ASB_EBS_CMD_ON_FRAME_ID) &&
+            (RxHeader.DLC == MCB_ASB_EBS_CMD_ON_LENGTH)) {
+        mcb_asb_ebs_cmd_on_unpack(&msgs.ebs_state, RxData, MCB_ASB_EBS_CMD_ON_LENGTH);
+        dashboard_data.ASB_EBS_RELAYS = msgs.ebs_state.asb_valves_cmd;
+    }
+
+    /*
+     *
+     *BUTTONS AND ROT SW
+     * 
+     */
+    else if((RxHeader.StdId == MCB_STEERING_HMI_DEVICES_STATE_FRAME_ID) &&
+            (RxHeader.DLC == MCB_STEERING_HMI_DEVICES_STATE_LENGTH)) {
+        mcb_steering_hmi_devices_state_unpack(&msgs.dev_states, RxData, MCB_STEERING_HMI_DEVICES_STATE_LENGTH);
+        dashboard_data.TV_BTN_STATE = msgs.dev_states.btn_1_is_pressed;
+        dashboard_data.TC_BTN_STATE = msgs.dev_states.btn_2_is_pressed;
+        dashboard_data.LC_BTN_STATE = msgs.dev_states.btn_1_is_pressed;
+        dashboard_data.ROT_SW_1_STATE = msgs.dev_states.rot_sw_1_state;
+        dashboard_data.ROT_SW_2_STATE = msgs.dev_states.rot_sw_2_state;
+        dashboard_data.ROT_SW_3_STATE = msgs.dev_states.rot_sw_3_state;
     }
 
     /*
@@ -544,6 +574,8 @@ void AS_SDC_check(void){
 
 void ASSI_state(uint32_t delay_100us, uint32_t *time, int *flag){
     static uint32_t blink_delay_last = 0;
+    static uint32_t blink_delay_yellow = 0;
+    static uint32_t blink_delay_blue = 0;
     switch(dashboard_data.ASSI_CODE){
         case AS_READY:
             HAL_GPIO_WritePin(ASSI_BLUE_OUT_GPIO_Port, ASSI_BLUE_OUT_Pin, GPIO_PIN_SET);
@@ -551,18 +583,18 @@ void ASSI_state(uint32_t delay_100us, uint32_t *time, int *flag){
             break;
         case AS_DRIVING:
             HAL_GPIO_WritePin(ASSI_BLUE_OUT_GPIO_Port, ASSI_BLUE_OUT_Pin, GPIO_PIN_SET);
-            LedBlinking(ASSI_YELLOW_OUT_GPIO_Port, ASSI_YELLOW_OUT_Pin, &blink_delay_last, delay_100us);
+            LedBlinking(ASSI_YELLOW_OUT_GPIO_Port, ASSI_YELLOW_OUT_Pin, &blink_delay_yellow, delay_100us);
             break;
         case AS_EMERGENCY:
             HAL_GPIO_WritePin(ASSI_YELLOW_OUT_GPIO_Port, ASSI_YELLOW_OUT_Pin, GPIO_PIN_SET);
-            LedBlinking(ASSI_BLUE_OUT_GPIO_Port, ASSI_BLUE_OUT_Pin, &blink_delay_last, delay_100us);
+            LedBlinking(ASSI_BLUE_OUT_GPIO_Port, ASSI_BLUE_OUT_Pin, &blink_delay_blue, delay_100us);
             if (*flag == 1) {
                 *time = HAL_GetTick();
-                HAL_GPIO_WritePin(AS_BUZZER_GPIO_Port, AS_BUZZER_Pin, GPIO_PIN_RESET);
+                HAL_GPIO_WritePin(AS_BUZZER_GPIO_Port, AS_BUZZER_Pin, GPIO_PIN_SET);
                 *flag = 0;
             }
             if (HAL_GetTick() - *time > 8000 && *flag == 0) {
-                    HAL_GPIO_WritePin(AS_BUZZER_GPIO_Port, AS_BUZZER_Pin, GPIO_PIN_SET);
+                    HAL_GPIO_WritePin(AS_BUZZER_GPIO_Port, AS_BUZZER_Pin, GPIO_PIN_RESET);
                     *flag = 2;
             }
             break;
@@ -570,13 +602,54 @@ void ASSI_state(uint32_t delay_100us, uint32_t *time, int *flag){
             HAL_GPIO_WritePin(ASSI_YELLOW_OUT_GPIO_Port, ASSI_YELLOW_OUT_Pin, GPIO_PIN_SET);
             HAL_GPIO_WritePin(ASSI_BLUE_OUT_GPIO_Port, ASSI_BLUE_OUT_Pin, GPIO_PIN_RESET);
             break;
-        default:
+        case AS_OFF:
             if(HAL_GPIO_ReadPin(ASSI_BLUE_OUT_GPIO_Port, ASSI_BLUE_OUT_Pin) == GPIO_PIN_RESET){
                 HAL_GPIO_WritePin(ASSI_BLUE_OUT_GPIO_Port, ASSI_BLUE_OUT_Pin, GPIO_PIN_SET);
             }
             if(HAL_GPIO_ReadPin(ASSI_YELLOW_OUT_GPIO_Port, ASSI_YELLOW_OUT_Pin) == GPIO_PIN_RESET){
                 HAL_GPIO_WritePin(ASSI_YELLOW_OUT_GPIO_Port, ASSI_YELLOW_OUT_Pin, GPIO_PIN_SET);
             }
+            break;
+        default:
+            //Error state visual check
+            LedBlinking(STAT1_LED_GPIO_OUT_GPIO_Port, STAT1_LED_GPIO_OUT_Pin, &blink_delay_last, 100);
+    }
+}
+
+void ASB_EBS_state_check(void){
+    static uint32_t blink_delay_last = 0;
+    switch(dashboard_data.ASB_EBS_RELAYS){
+        case OLLIO:
+            if(HAL_GPIO_ReadPin(EBS_VALVE_1_OUT_GPIO_Port, EBS_VALVE_1_OUT_Pin) == GPIO_PIN_SET){
+                HAL_GPIO_WritePin(EBS_VALVE_1_OUT_GPIO_Port, EBS_VALVE_1_OUT_Pin, GPIO_PIN_RESET);
+            }
+            break;
+        case STANLIO:
+            if(HAL_GPIO_ReadPin(EBS_VALVE_2_OUT_GPIO_Port, EBS_VALVE_2_OUT_Pin) == GPIO_PIN_SET){
+                HAL_GPIO_WritePin(EBS_VALVE_2_OUT_GPIO_Port, EBS_VALVE_2_OUT_Pin, GPIO_PIN_RESET);
+            }
+            break;
+        case BOTH:
+            if(HAL_GPIO_ReadPin(EBS_VALVE_1_OUT_GPIO_Port, EBS_VALVE_1_OUT_Pin) == GPIO_PIN_SET){
+                HAL_GPIO_WritePin(EBS_VALVE_1_OUT_GPIO_Port, EBS_VALVE_1_OUT_Pin, GPIO_PIN_RESET);
+            }
+            break;
+            if(HAL_GPIO_ReadPin(EBS_VALVE_2_OUT_GPIO_Port, EBS_VALVE_2_OUT_Pin) == GPIO_PIN_SET){
+                HAL_GPIO_WritePin(EBS_VALVE_2_OUT_GPIO_Port, EBS_VALVE_2_OUT_Pin, GPIO_PIN_RESET);
+            }
+            break;
+        case NONE:
+            if(HAL_GPIO_ReadPin(EBS_VALVE_1_OUT_GPIO_Port, EBS_VALVE_1_OUT_Pin) == GPIO_PIN_RESET){
+                HAL_GPIO_WritePin(EBS_VALVE_1_OUT_GPIO_Port, EBS_VALVE_1_OUT_Pin, GPIO_PIN_SET);
+            }
+            break;
+            if(HAL_GPIO_ReadPin(EBS_VALVE_2_OUT_GPIO_Port, EBS_VALVE_2_OUT_Pin) == GPIO_PIN_RESET){
+                HAL_GPIO_WritePin(EBS_VALVE_2_OUT_GPIO_Port, EBS_VALVE_2_OUT_Pin, GPIO_PIN_SET);
+            }
+            break;
+        default:
+            //Error state visual check
+            LedBlinking(STAT2_LED_GPIO_OUT_GPIO_Port, STAT2_LED_GPIO_OUT_Pin, &blink_delay_last, 100);
     }
 }
 
@@ -629,7 +702,7 @@ void Dashboard_Loop(uint32_t *time, int *flag) {
     static uint32_t cnt10ms   = 0;
     //static uint32_t imd_err_blink = 0;
 
-    LedBlinking(STAT1_LED_GPIO_OUT_GPIO_Port, STAT1_LED_GPIO_OUT_Pin, &led_blink, 2000);
+    //LedBlinking(STAT1_LED_GPIO_OUT_GPIO_Port, STAT1_LED_GPIO_OUT_Pin, &led_blink, 2000);
 
     if (dashboard_data.IMD_ERR) {
         // LedBlinking(BUZZER_CMD_GPIO_OUT_GPIO_Port, BUZZER_CMD_GPIO_OUT_Pin, &imd_err_blink, 2500);
@@ -670,6 +743,8 @@ void Dashboard_Loop(uint32_t *time, int *flag) {
     AS_SDC_check();
 
     ASSI_state(1000, time, flag);
+
+    ASB_EBS_state_check();
 
     // Run the AS FSM
     // mission_run();

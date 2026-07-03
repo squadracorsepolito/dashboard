@@ -175,6 +175,48 @@ void MX_CAN1_Init(void)
         Error_Handler();
     }
 
+    sFilterConfig.FilterBank           = 8;
+    sFilterConfig.FilterMode           = CAN_FILTERMODE_IDLIST;
+    sFilterConfig.FilterScale          = CAN_FILTERSCALE_16BIT;
+    sFilterConfig.FilterIdHigh         = (MCB_DV_SYSTEM_STATUS_FRAME_ID << 5);
+    sFilterConfig.FilterIdLow          = (MCB_DV_SYSTEM_STATUS_FRAME_ID << 5);
+    sFilterConfig.FilterFIFOAssignment = CAN_RX_FIFO0;
+    sFilterConfig.FilterActivation     = ENABLE;
+    sFilterConfig.SlaveStartFilterBank = 14;
+
+    if (HAL_CAN_ConfigFilter(&hcan1, &sFilterConfig) != HAL_OK) {
+        /* Filter configuration Error */
+        Error_Handler();
+    }
+
+    sFilterConfig.FilterBank           = 9;
+    sFilterConfig.FilterMode           = CAN_FILTERMODE_IDLIST;
+    sFilterConfig.FilterScale          = CAN_FILTERSCALE_16BIT;
+    sFilterConfig.FilterIdHigh         = (MCB_ASB_EBS_CMD_ON_FRAME_ID << 5);
+    sFilterConfig.FilterIdLow          = (MCB_ASB_EBS_CMD_ON_FRAME_ID << 5);
+    sFilterConfig.FilterFIFOAssignment = CAN_RX_FIFO0;
+    sFilterConfig.FilterActivation     = ENABLE;
+    sFilterConfig.SlaveStartFilterBank = 14;
+
+    if (HAL_CAN_ConfigFilter(&hcan1, &sFilterConfig) != HAL_OK) {
+        /* Filter configuration Error */
+        Error_Handler();
+    }
+
+    sFilterConfig.FilterBank           = 10;
+    sFilterConfig.FilterMode           = CAN_FILTERMODE_IDLIST;
+    sFilterConfig.FilterScale          = CAN_FILTERSCALE_16BIT;
+    sFilterConfig.FilterIdHigh         = (MCB_STEERING_HMI_DEVICES_STATE_FRAME_ID << 5);
+    sFilterConfig.FilterIdLow          = (MCB_STEERING_HMI_DEVICES_STATE_FRAME_ID << 5);
+    sFilterConfig.FilterFIFOAssignment = CAN_RX_FIFO0;
+    sFilterConfig.FilterActivation     = ENABLE;
+    sFilterConfig.SlaveStartFilterBank = 14;
+
+    if (HAL_CAN_ConfigFilter(&hcan1, &sFilterConfig) != HAL_OK) {
+        /* Filter configuration Error */
+        Error_Handler();
+    }
+
     if (HAL_CAN_ActivateNotification(&hcan1,
                                      CAN_IT_BUSOFF | CAN_IT_ERROR | CAN_IT_ERROR_PASSIVE | CAN_IT_ERROR_WARNING |
                                          CAN_IT_RX_FIFO0_MSG_PENDING) != HAL_OK) {

@@ -75,6 +75,7 @@ void SystemClock_Config(void);
   */
 int main(void)
 {
+
   /* USER CODE BEGIN 1 */
   uint32_t AS_EM_time;
   int AS_EM_flag = 1;
@@ -122,7 +123,6 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
     while (1) {
-      HAL_GPIO_TogglePin(STAT3_LED_GPIO_OUT_GPIO_Port, STAT3_LED_GPIO_OUT_Pin);
       Dashboard_Loop(&AS_EM_time, &AS_EM_flag);
       Display_Loop();
     /* USER CODE END WHILE */

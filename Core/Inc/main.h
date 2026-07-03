@@ -57,8 +57,8 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define nBTN_TV_IN_GPIO_IN_Pin GPIO_PIN_2
-#define nBTN_TV_IN_GPIO_IN_GPIO_Port GPIOE
+#define nBTN_TS_ON_IN_GPIO_IN_Pin GPIO_PIN_2
+#define nBTN_TS_ON_IN_GPIO_IN_GPIO_Port GPIOE
 #define nBTN_TC_IN_GPIO_IN_Pin GPIO_PIN_3
 #define nBTN_TC_IN_GPIO_IN_GPIO_Port GPIOE
 #define nBTN_LC_IN_GPIO_IN_Pin GPIO_PIN_4

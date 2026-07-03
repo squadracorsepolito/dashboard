@@ -29,12 +29,22 @@ typedef enum
 
 typedef enum
 {
-    AS_OFF = 1,
+    AS_ERR,
+    AS_OFF,
     AS_READY,
     AS_DRIVING,
     AS_EMERGENCY,
     AS_FINISHED,
 } assi_t;
+
+typedef enum
+{
+    ERR,
+    OLLIO,
+    STANLIO,
+    BOTH,
+    NONE,
+} asb_ebs_t;
 
 /**
  * @brief Setups callback functions for the mission select button

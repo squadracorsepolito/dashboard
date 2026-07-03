@@ -25,8 +25,17 @@ typedef struct {
     volatile uint8_t HV_BAT_SOC;                  // High voltage battery state of charge
     
     volatile uint8_t AS_MISSION;                  //Autonomous Mission Code
-    volatile int ASSI_CODE;                       //Autonomous System Status Indicator
+    volatile uint8_t ASSI_CODE;                   //Autonomous System Status Indicator
     volatile int AS_RELAY;                        //AS Relay command (Inverse Logic!)
+    volatile uint8_t ASB_EBS_RELAYS;              //ASB EBS Relays command (known as Stanlio and Ollio)
+    
+    volatile uint8_t TV_BTN_STATE;                //Three of the steering buttons state
+    volatile uint8_t TC_BTN_STATE;
+    volatile uint8_t LC_BTN_STATE;
+    
+    volatile uint8_t ROT_SW_1_STATE;              //Steering rotary switches state
+    volatile uint8_t ROT_SW_2_STATE;
+    volatile uint8_t ROT_SW_3_STATE;
 
     volatile double INVERTER_FL_TEMP;
     volatile double INVERTER_FR_TEMP;
@@ -85,7 +94,7 @@ typedef struct {
 } DashboardData_t;
 
 /* Declare the dashboard data structure */
-extern DashboardData_t dashboard_data;
+extern volatile DashboardData_t dashboard_data;
 
 /*CUSTOM FUNCTIONS PROTOTYPES*/
 
@@ -98,6 +107,7 @@ void UpdateCockpitLed(uint32_t delay_100us);
 void RTD_fsm(uint32_t delay_100us);
 void AS_SDC_check(void);
 void ASSI_state(uint32_t delay_100us, uint32_t *time, int *flag);
+void ASB_EBS_state_check(void);
 
 void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan);
 void HAL_CAN_RxFifo1MsgPendingCallback(CAN_HandleTypeDef *hcan);
