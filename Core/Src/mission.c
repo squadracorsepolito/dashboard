@@ -7,7 +7,7 @@
 #define PERIOD_2HZ_100us 2500 // Duty cycle time to get 2Hz (toggle at 4Hz)
 
 static bool confirmed = false;
-static mission_t current_mission = MISSION_NO;
+static uint8_t current_mission;
 static bool mission_changed = false;
 static int current_assi = 0;
 
@@ -16,43 +16,37 @@ char* mission_convert(uint8_t mission){
 
     switch(current_mission){
         
-        case MISSION_NO: return "MISSION NO";
+        case MISSION_NO: {
+            return "MISSION NO";
+        }
         
-        case ACCEL: return "ACCELERATION";
+        case ACCEL: {
+            return "ACCELERATION";
+        }
         
-        case SKIDPAD: return "SKIDPAD";
+        case SKIDPAD: {
+            return "SKIDPAD";
+        }
         
-        case AUTOX: return "AUTOCROSS";
+        case AUTOX: {
+            return "AUTOCROSS";
+        }
         
-        case TRACKDRIVE: return "TRACKDRIVE";
+        case TRACKDRIVE: {
+            return "TRACKDRIVE";
+        }
         
-        case EBSTEST: return "EBS TEST";
+        case EBSTEST: {
+            return "EBS TEST";
+        }
         
-        case INSPECT: return "INSPECT";
+        case INSPECT: {
+            return "INSPECT";
+        }
         
-        case MANUAL: return "MAN MODE";
-        
-        default: return "MISSION NO";
-    }
-}
-
-assi_t assi_convert(int assi){
-    current_assi = assi;
-    
-    switch (current_assi)
-    {
-    
-        case 0: return AS_OFF;
-    
-        case 1: return AS_READY;
-    
-        case 2: return AS_DRIVING;
-    
-        case 3: return AS_EMERGENCY;
-    
-        case 4: return AS_FINISHED;
-    
-        default: return AS_OFF;
+        case MANUAL: {
+            return "MAN MODE";
+        }
     }
 }
 

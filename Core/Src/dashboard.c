@@ -70,6 +70,9 @@ volatile DashboardData_t dashboard_data = {
     .ROT_SW_1_STATE        = 0,
     .ROT_SW_2_STATE        = 0,
     .ROT_SW_3_STATE        = 0,
+    .EBS_TEST_STATE        = 0,
+    .ROLLING               = 7,
+    .PREV_ROLL             = 6
 };
 
 /* State change triggers */
@@ -110,7 +113,6 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
         struct mcb_sb_rear_analog_device_t sb_rear_analog_device;
         struct mcb_dspace_pwt_front_temp_t dspace_pwt_front_temp;
         struct mcb_dspace_pwt_rear_temp_t dspace_pwt_rear_temp;
-        struct mcb_dspace_autonomous_mission_t ami_state;       //redundant message for AMI
         struct mcb_asb_ebs_cmd_on_t ebs_state;
         struct mcb_steering_hmi_devices_state_t dev_states;
 
@@ -179,12 +181,15 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
             (RxHeader.DLC == MCB_DV_SYSTEM_STATUS_LENGTH)) {
         mcb_dv_system_status_unpack(&msgs.driving_status, RxData, MCB_DV_SYSTEM_STATUS_LENGTH);
         dashboard_data.ASSI_CODE = msgs.driving_status.assi_status;
-        dashboard_data.AS_MISSION = msgs.driving_status.ami_state;
+        dashboard_data.AS_MISSION = mcb_dv_system_status_ami_state_decode(msgs.driving_status.ami_state);
     }
     else if((RxHeader.StdId == MCB_ASB_EBS_CMD_ON_FRAME_ID) &&
             (RxHeader.DLC == MCB_ASB_EBS_CMD_ON_LENGTH)) {
         mcb_asb_ebs_cmd_on_unpack(&msgs.ebs_state, RxData, MCB_ASB_EBS_CMD_ON_LENGTH);
         dashboard_data.ASB_EBS_RELAYS = msgs.ebs_state.asb_valves_cmd;
+        dashboard_data.PREV_ROLL = dashboard_data.ROLLING;
+        dashboard_data.ROLLING = msgs.ebs_state.rolling_counter;
+        dashboard_data.EBS_TEST_STATE = msgs.ebs_state.test_ebs;
     }
 
     /*
@@ -243,55 +248,12 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
         dashboard_data.LED4.B = mcb_dspace_dash_leds_color_rgb_led_4_blue_decode(msgs.rgb_status.led_4_blue);
     } else if ((RxHeader.StdId == MCB_DSPACE_SIGNALS_FRAME_ID) && (RxHeader.DLC == MCB_DSPACE_SIGNALS_LENGTH)) {
         mcb_dspace_signals_unpack(&msgs.dspace_signals, RxData, MCB_DSPACE_SIGNALS_LENGTH);
-        dashboard_data.HV_BAT_SOC = msgs.dspace_signals.hvbat_soc;
+        dashboard_data.HV_BAT_SOC = mcb_dspace_signals_hvbat_soc_decode(msgs.dspace_signals.hvbat_soc);
     } else if ((RxHeader.StdId == MCB_BMS_LV_LV_BAT_GENERAL_FRAME_ID) &&
                (RxHeader.DLC == MCB_BMS_LV_LV_BAT_GENERAL_LENGTH)) {
         mcb_bms_lv_lv_bat_general_unpack(&msgs.lv_bat_general, RxData, MCB_BMS_LV_LV_BAT_GENERAL_LENGTH);
         dashboard_data.LV_BAT_mV =
             mcb_bms_lv_lv_bat_general_lv_bat_summed_voltage_decode(msgs.lv_bat_general.lv_bat_summed_voltage);
-    }
-
-    /*
-     *
-     * TMPS Front Wheels And Rear Wheels
-     *
-     */
-    else if ((RxHeader.StdId == MCB_TPMS_FRONT_WHEELS_PRESSURE_FRAME_ID) &&
-             (RxHeader.DLC == MCB_TPMS_FRONT_WHEELS_PRESSURE_LENGTH)) {
-        mcb_tpms_front_wheels_pressure_unpack(&msgs.front_wheels_status, RxData, MCB_TPMS_FRONT_WHEELS_PRESSURE_LENGTH);
-        dashboard_data.TIRE_FL_TEMP =
-            mcb_tpms_front_wheels_pressure_tire_fl_temperature_decode(msgs.front_wheels_status.tire_fl_temperature);
-        dashboard_data.TIRE_FR_TEMP =
-            mcb_tpms_front_wheels_pressure_tire_fr_temperature_decode(msgs.front_wheels_status.tire_fr_temperature);
-        dashboard_data.TIRE_FL_PRESSURE =
-            mcb_tpms_front_wheels_pressure_tire_fl_pressure_decode(msgs.front_wheels_status.tire_fl_pressure);
-        dashboard_data.TIRE_FR_PRESSURE =
-            mcb_tpms_front_wheels_pressure_tire_fr_pressure_decode(msgs.front_wheels_status.tire_fr_pressure);
-    } else if ((RxHeader.StdId == MCB_TPMS_REAR_WHEELS_PRESSURE_FRAME_ID) &&
-               (RxHeader.DLC == MCB_TPMS_REAR_WHEELS_PRESSURE_LENGTH)) {
-        mcb_tpms_rear_wheels_pressure_unpack(&msgs.rear_wheels_status, RxData, MCB_TPMS_REAR_WHEELS_PRESSURE_LENGTH);
-        dashboard_data.TIRE_RL_TEMP =
-            mcb_tpms_rear_wheels_pressure_tire_rl_temperature_decode(msgs.rear_wheels_status.tire_rl_temperature);
-        dashboard_data.TIRE_RR_TEMP =
-            mcb_tpms_rear_wheels_pressure_tire_rr_temperature_decode(msgs.rear_wheels_status.tire_rr_temperature);
-        dashboard_data.TIRE_RL_PRESSURE =
-            mcb_tpms_rear_wheels_pressure_tire_rl_pressure_decode(msgs.rear_wheels_status.tire_rl_pressure);
-        dashboard_data.TIRE_RR_PRESSURE =
-            mcb_tpms_rear_wheels_pressure_tire_rr_pressure_decode(msgs.rear_wheels_status.tire_rr_pressure);
-    }
-
-    /*
-     *
-     * SB REAR analog device
-     *
-     */
-    else if ((RxHeader.StdId == MCB_SB_REAR_ANALOG_DEVICE_FRAME_ID) &&
-             (RxHeader.DLC == MCB_SB_REAR_ANALOG_DEVICE_LENGTH)) {
-        mcb_sb_rear_analog_device_unpack(&msgs.sb_rear_analog_device, RxData, MCB_SB_REAR_ANALOG_DEVICE_LENGTH);
-        dashboard_data.COOL_PRESS_LEFT_mV = mcb_sb_rear_analog_device_cool_press_left_voltage_decode(
-            msgs.sb_rear_analog_device.cool_press_left_voltage);
-        dashboard_data.COOL_PRESS_RIGHT_mV = mcb_sb_rear_analog_device_cool_press_right_voltage_decode(
-            msgs.sb_rear_analog_device.cool_press_right_voltage);
     }
 
     /*
@@ -565,10 +527,10 @@ void RTD_fsm(uint32_t delay_100us) {
 
 void AS_SDC_check(void){
     if(dashboard_data.AS_RELAY == 1 && HAL_GPIO_ReadPin(AS_RELAY_GPIO_Port, AS_RELAY_Pin) == GPIO_PIN_SET){
-        HAL_GPIO_TogglePin(AS_RELAY_GPIO_Port, AS_RELAY_Pin);
+        HAL_GPIO_WritePin(AS_RELAY_GPIO_Port, AS_RELAY_Pin, GPIO_PIN_RESET);
     }
     if(dashboard_data.AS_RELAY == 0 && HAL_GPIO_ReadPin(AS_RELAY_GPIO_Port, AS_RELAY_Pin) == GPIO_PIN_RESET){
-        HAL_GPIO_TogglePin(AS_RELAY_GPIO_Port, AS_RELAY_Pin);
+        HAL_GPIO_WritePin(AS_RELAY_GPIO_Port, AS_RELAY_Pin, GPIO_PIN_SET);
     }
 }
 
@@ -593,10 +555,6 @@ void ASSI_state(uint32_t delay_100us, uint32_t *time, int *flag){
                 HAL_GPIO_WritePin(AS_BUZZER_GPIO_Port, AS_BUZZER_Pin, GPIO_PIN_SET);
                 *flag = 0;
             }
-            if (HAL_GetTick() - *time > 8000 && *flag == 0) {
-                    HAL_GPIO_WritePin(AS_BUZZER_GPIO_Port, AS_BUZZER_Pin, GPIO_PIN_RESET);
-                    *flag = 2;
-            }
             break;
         case AS_FINISHED:
             HAL_GPIO_WritePin(ASSI_YELLOW_OUT_GPIO_Port, ASSI_YELLOW_OUT_Pin, GPIO_PIN_SET);
@@ -614,39 +572,63 @@ void ASSI_state(uint32_t delay_100us, uint32_t *time, int *flag){
             //Error state visual check
             LedBlinking(STAT1_LED_GPIO_OUT_GPIO_Port, STAT1_LED_GPIO_OUT_Pin, &blink_delay_last, 100);
     }
+    if (HAL_GetTick() - *time > 8000 && *flag == 0) {
+        HAL_GPIO_WritePin(AS_BUZZER_GPIO_Port, AS_BUZZER_Pin, GPIO_PIN_RESET);
+        *flag = 2;
+    }
 }
 
-void ASB_EBS_state_check(void){
+void ASB_EBS_state_check(uint32_t *time){
     static uint32_t blink_delay_last = 0;
+    if(HAL_GetTick() - *time >= 75){
+        *time = HAL_GetTick();
+        if((dashboard_data.PREV_ROLL - dashboard_data.ROLLING)%7 == 0){
+            if(dashboard_data.EBS_TEST_STATE == 1){
+                //HAL_GPIO_WritePin(STAT1_LED_GPIO_OUT_GPIO_Port, STAT1_LED_GPIO_OUT_Pin, GPIO_PIN_SET);
+                //MCB_send_msg(MCB_ROLLING_NOT_COMMUTED_FRAME_ID);
+            }
+            else{
+                //HAL_GPIO_WritePin(STAT2_LED_GPIO_OUT_GPIO_Port, STAT2_LED_GPIO_OUT_Pin, GPIO_PIN_SET);
+                /*dashboard_data.ASSI_CODE = AS_EMERGENCY;
+                dashboard_data.ASB_EBS_RELAYS = BOTH;*/
+            }
+        }
+        dashboard_data.PREV_ROLL = dashboard_data.ROLLING;
+    }
+
     switch(dashboard_data.ASB_EBS_RELAYS){
         case OLLIO:
-            if(HAL_GPIO_ReadPin(EBS_VALVE_1_OUT_GPIO_Port, EBS_VALVE_1_OUT_Pin) == GPIO_PIN_SET){
-                HAL_GPIO_WritePin(EBS_VALVE_1_OUT_GPIO_Port, EBS_VALVE_1_OUT_Pin, GPIO_PIN_RESET);
-            }
+
+            //activate first
+            HAL_GPIO_WritePin(EBS_VALVE_1_OUT_GPIO_Port, EBS_VALVE_1_OUT_Pin, GPIO_PIN_SET);
+
+            //deactivate the second
+            HAL_GPIO_WritePin(EBS_VALVE_2_OUT_GPIO_Port, EBS_VALVE_2_OUT_Pin, GPIO_PIN_RESET);
             break;
+
         case STANLIO:
-            if(HAL_GPIO_ReadPin(EBS_VALVE_2_OUT_GPIO_Port, EBS_VALVE_2_OUT_Pin) == GPIO_PIN_SET){
-                HAL_GPIO_WritePin(EBS_VALVE_2_OUT_GPIO_Port, EBS_VALVE_2_OUT_Pin, GPIO_PIN_RESET);
-            }
+
+            //activate the second
+            HAL_GPIO_WritePin(EBS_VALVE_2_OUT_GPIO_Port, EBS_VALVE_2_OUT_Pin, GPIO_PIN_SET);
+
+            //check if needed to deactivate the first
+            HAL_GPIO_WritePin(EBS_VALVE_1_OUT_GPIO_Port, EBS_VALVE_1_OUT_Pin, GPIO_PIN_RESET);
             break;
+
         case BOTH:
-            if(HAL_GPIO_ReadPin(EBS_VALVE_1_OUT_GPIO_Port, EBS_VALVE_1_OUT_Pin) == GPIO_PIN_SET){
-                HAL_GPIO_WritePin(EBS_VALVE_1_OUT_GPIO_Port, EBS_VALVE_1_OUT_Pin, GPIO_PIN_RESET);
-            }
+            
+        HAL_GPIO_WritePin(EBS_VALVE_1_OUT_GPIO_Port, EBS_VALVE_1_OUT_Pin, GPIO_PIN_SET);
+            
+            HAL_GPIO_WritePin(EBS_VALVE_2_OUT_GPIO_Port, EBS_VALVE_2_OUT_Pin, GPIO_PIN_SET);
             break;
-            if(HAL_GPIO_ReadPin(EBS_VALVE_2_OUT_GPIO_Port, EBS_VALVE_2_OUT_Pin) == GPIO_PIN_SET){
-                HAL_GPIO_WritePin(EBS_VALVE_2_OUT_GPIO_Port, EBS_VALVE_2_OUT_Pin, GPIO_PIN_RESET);
-            }
-            break;
+
         case NONE:
-            if(HAL_GPIO_ReadPin(EBS_VALVE_1_OUT_GPIO_Port, EBS_VALVE_1_OUT_Pin) == GPIO_PIN_RESET){
-                HAL_GPIO_WritePin(EBS_VALVE_1_OUT_GPIO_Port, EBS_VALVE_1_OUT_Pin, GPIO_PIN_SET);
-            }
+            
+            HAL_GPIO_WritePin(EBS_VALVE_1_OUT_GPIO_Port, EBS_VALVE_1_OUT_Pin, GPIO_PIN_RESET);
+            
+            HAL_GPIO_WritePin(EBS_VALVE_2_OUT_GPIO_Port, EBS_VALVE_2_OUT_Pin, GPIO_PIN_RESET);
             break;
-            if(HAL_GPIO_ReadPin(EBS_VALVE_2_OUT_GPIO_Port, EBS_VALVE_2_OUT_Pin) == GPIO_PIN_RESET){
-                HAL_GPIO_WritePin(EBS_VALVE_2_OUT_GPIO_Port, EBS_VALVE_2_OUT_Pin, GPIO_PIN_SET);
-            }
-            break;
+
         default:
             //Error state visual check
             LedBlinking(STAT2_LED_GPIO_OUT_GPIO_Port, STAT2_LED_GPIO_OUT_Pin, &blink_delay_last, 100);
@@ -696,18 +678,20 @@ uint8_t AMS_detection(uint8_t ams_err_tlb,
 /**
     * @brief Dash main loop
  */
-void Dashboard_Loop(uint32_t *time, int *flag) {
+void Dashboard_Loop(uint32_t *EM_time, int *flag, uint32_t *WD_time) {
     // Blink green led to signal activity
     static uint32_t led_blink = 0;
     static uint32_t cnt10ms   = 0;
     //static uint32_t imd_err_blink = 0;
 
-    //LedBlinking(STAT1_LED_GPIO_OUT_GPIO_Port, STAT1_LED_GPIO_OUT_Pin, &led_blink, 2000);
+    if(dashboard_data.ASSI_CODE != AS_EMERGENCY){
+        HAL_GPIO_WritePin(AS_BUZZER_GPIO_Port, AS_BUZZER_Pin, GPIO_PIN_RESET);
+    }
 
     if (dashboard_data.IMD_ERR) {
         // LedBlinking(BUZZER_CMD_GPIO_OUT_GPIO_Port, BUZZER_CMD_GPIO_OUT_Pin, &imd_err_blink, 2500);
     } else if (dashboard_data.RTD_FSM_State != STATE_RTD_SOUND) {
-        HAL_GPIO_WritePin(BUZZER_CMD_GPIO_OUT_GPIO_Port, BUZZER_CMD_GPIO_OUT_Pin, GPIO_PIN_RESET);
+        HAL_GPIO_WritePin(BUZZER_CMD_GPIO_OUT_GPIO_Port, BUZZER_CMD_GPIO_OUT_Pin, GPIO_PIN_SET);
     }
 
     // ams_err_check
@@ -742,9 +726,9 @@ void Dashboard_Loop(uint32_t *time, int *flag) {
 
     AS_SDC_check();
 
-    ASSI_state(1000, time, flag);
+    ASSI_state(1000, EM_time, flag);
 
-    ASB_EBS_state_check();
+    ASB_EBS_state_check(WD_time);
 
     // Run the AS FSM
     // mission_run();

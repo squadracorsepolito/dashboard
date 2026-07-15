@@ -492,6 +492,7 @@ void MCB_send_msg(uint32_t id) {
     union {
         struct mcb_dash_hello_t hello;
         struct mcb_dash_hmi_devices_state_t hmi_devices_state;
+        struct mcb_rolling_not_commuted_t notify;
     } msg = {};
 
     CAN_TxHeaderTypeDef tx_header = {.RTR = CAN_RTR_DATA, .IDE = CAN_ID_STD};
@@ -510,6 +511,7 @@ void MCB_send_msg(uint32_t id) {
             tx_header.DLC = mcb_dash_hello_pack(buffer, &msg.hello, 8);
 
             break;
+
         case MCB_DASH_HMI_DEVICES_STATE_FRAME_ID:
 
             // clang-format off
@@ -521,6 +523,18 @@ void MCB_send_msg(uint32_t id) {
                 mcb_dash_hmi_devices_state_pack(buffer, &msg.hmi_devices_state, MCB_DASH_HMI_DEVICES_STATE_LENGTH);
 
             break;
+
+        case MCB_ROLLING_NOT_COMMUTED_FRAME_ID:
+
+            // clang-format off
+            msg.notify.no_counter_change_notify = mcb_rolling_not_commuted_no_counter_change_notify_encode(1);
+            // clang-format on
+
+            tx_header.DLC =
+                mcb_rolling_not_commuted_pack(buffer, &msg.notify, MCB_ROLLING_NOT_COMMUTED_LENGTH);
+
+            break;
+            
         default:
             return;
     };

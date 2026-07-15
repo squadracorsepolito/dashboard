@@ -77,7 +77,8 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
-  uint32_t AS_EM_time;
+  uint32_t AS_EM_time = 0;
+  uint32_t WD_time = 0;
   int AS_EM_flag = 1;
   /* USER CODE END 1 */
 
@@ -123,7 +124,7 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
     while (1) {
-      Dashboard_Loop(&AS_EM_time, &AS_EM_flag);
+      Dashboard_Loop(&AS_EM_time, &AS_EM_flag, &WD_time);
       Display_Loop();
     /* USER CODE END WHILE */
 

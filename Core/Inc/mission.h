@@ -78,5 +78,3 @@ void mission_set(mission_t mission);
 void mission_run();
 
 char* mission_convert(uint8_t mission);
-
-assi_t assi_convert(int assi);

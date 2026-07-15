@@ -217,6 +217,34 @@ void MX_CAN1_Init(void)
         Error_Handler();
     }
 
+    sFilterConfig.FilterBank           = 11;
+    sFilterConfig.FilterMode           = CAN_FILTERMODE_IDLIST;
+    sFilterConfig.FilterScale          = CAN_FILTERSCALE_16BIT;
+    sFilterConfig.FilterIdHigh         = (MCB_DSPACE_PWT_FRONT_TEMP_FRAME_ID << 5);
+    sFilterConfig.FilterIdLow          = (MCB_DSPACE_PWT_FRONT_TEMP_FRAME_ID << 5);
+    sFilterConfig.FilterFIFOAssignment = CAN_RX_FIFO0;
+    sFilterConfig.FilterActivation     = ENABLE;
+    sFilterConfig.SlaveStartFilterBank = 14;
+
+    if (HAL_CAN_ConfigFilter(&hcan1, &sFilterConfig) != HAL_OK) {
+        /* Filter configuration Error */
+        Error_Handler();
+    }
+
+    sFilterConfig.FilterBank           = 12;
+    sFilterConfig.FilterMode           = CAN_FILTERMODE_IDLIST;
+    sFilterConfig.FilterScale          = CAN_FILTERSCALE_16BIT;
+    sFilterConfig.FilterIdHigh         = (MCB_DSPACE_PWT_REAR_TEMP_FRAME_ID << 5);
+    sFilterConfig.FilterIdLow          = (MCB_DSPACE_PWT_REAR_TEMP_FRAME_ID << 5);
+    sFilterConfig.FilterFIFOAssignment = CAN_RX_FIFO0;
+    sFilterConfig.FilterActivation     = ENABLE;
+    sFilterConfig.SlaveStartFilterBank = 14;
+
+    if (HAL_CAN_ConfigFilter(&hcan1, &sFilterConfig) != HAL_OK) {
+        /* Filter configuration Error */
+        Error_Handler();
+    }
+
     if (HAL_CAN_ActivateNotification(&hcan1,
                                      CAN_IT_BUSOFF | CAN_IT_ERROR | CAN_IT_ERROR_PASSIVE | CAN_IT_ERROR_WARNING |
                                          CAN_IT_RX_FIFO0_MSG_PENDING) != HAL_OK) {

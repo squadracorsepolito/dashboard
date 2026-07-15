@@ -15,7 +15,7 @@ enum ScreensEnum {
     _SCREEN_ID_LAST = 1
 };
 
-typedef struct _objects_t {
+typedef struct {
     lv_obj_t *main;
     lv_obj_t *pg_main_lv_bat_v;
     lv_obj_t *pg_main_hv_soc_est;

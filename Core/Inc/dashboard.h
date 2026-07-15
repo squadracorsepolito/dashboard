@@ -28,6 +28,9 @@ typedef struct {
     volatile uint8_t ASSI_CODE;                   //Autonomous System Status Indicator
     volatile int AS_RELAY;                        //AS Relay command (Inverse Logic!)
     volatile uint8_t ASB_EBS_RELAYS;              //ASB EBS Relays command (known as Stanlio and Ollio)
+    volatile uint8_t ROLLING;                     //Rolling counter for EBS WD
+    volatile uint8_t PREV_ROLL;                   //Previous counter value to compute the difference
+    volatile uint8_t EBS_TEST_STATE;              //If set to 1 the changes in the rolling counter could not occur
     
     volatile uint8_t TV_BTN_STATE;                //Three of the steering buttons state
     volatile uint8_t TC_BTN_STATE;
@@ -45,7 +48,7 @@ typedef struct {
     volatile double MOTOR_FR_TEMP;
     volatile double MOTOR_RL_TEMP;
     volatile double MOTOR_RR_TEMP;
-    volatile double LV_BAT_mV;                     // Low voltage batter voltage
+    volatile double LV_BAT_mV;                    // Low voltage batter voltage
     volatile double TIRE_FL_TEMP;                 // Front left tire temperature
     volatile double TIRE_FR_TEMP;                 // Front right tire temperature
     volatile double TIRE_RL_TEMP;                 // Rear left tire temperature
@@ -54,15 +57,15 @@ typedef struct {
     volatile double TIRE_FR_PRESSURE;             // Front right tire pressure
     volatile double TIRE_RL_PRESSURE;             // Rear left tire pressure
     volatile double TIRE_RR_PRESSURE;             // Rear right tire pressure
-    volatile double COOL_PRESS_LEFT_mV;            // Cooling pressure left
-    volatile double COOL_PRESS_RIGHT_mV;           // Cooling pressure right
+    volatile double COOL_PRESS_LEFT_mV;           // Cooling pressure left
+    volatile double COOL_PRESS_RIGHT_mV;          // Cooling pressure right
     volatile enum RTD_FSM_State_t RTD_FSM_State;  // RTD finite state machine state
     volatile int8_t Dspace_RTD_State;             // dSPACE RTD state
     volatile GPIO_PinState SD_CLOSED;             // Shutdown circuit closed state
     volatile GPIO_PinState BMS_ERR;               // Battery Management System error state
     volatile GPIO_PinState TS_OFF;                // TS (Tractive System) off state
     volatile GPIO_PinState IMD_ERR;               // Insulation Monitoring Device error state
-    volatile uint8_t ams_err_tlb;                     // AMS (Accumulator Management System) error table
+    volatile uint8_t ams_err_tlb;                 // AMS (Accumulator Management System) error table
     volatile uint8_t btn_press_at_start;          // Button press at start
     volatile uint8_t hvb_diag_bat_vlt_sna;        // HV battery diagnostic: battery voltage signal not available
     volatile uint8_t hvb_diag_inv_vlt_sna;        // HV battery diagnostic: inverter voltage signal not available
@@ -100,14 +103,14 @@ extern volatile DashboardData_t dashboard_data;
 
 void Dashboard_Setup(void);
 void Display_Setup(void);
-void Dashboard_Loop(uint32_t *time, int *flag);
+void Dashboard_Loop(uint32_t *EM_time, int *flag, uint32_t *WD_time);
 void Display_Loop(void);
 void can_send_state(uint32_t delay_100us);
 void UpdateCockpitLed(uint32_t delay_100us);
 void RTD_fsm(uint32_t delay_100us);
 void AS_SDC_check(void);
 void ASSI_state(uint32_t delay_100us, uint32_t *time, int *flag);
-void ASB_EBS_state_check(void);
+void ASB_EBS_state_check(uint32_t *WD_time);
 
 void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan);
 void HAL_CAN_RxFifo1MsgPendingCallback(CAN_HandleTypeDef *hcan);
