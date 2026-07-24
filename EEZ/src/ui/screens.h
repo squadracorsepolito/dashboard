@@ -15,30 +15,26 @@ enum ScreensEnum {
     _SCREEN_ID_LAST = 1
 };
 
-typedef struct {
+typedef struct _objects_t {
     lv_obj_t *main;
     lv_obj_t *pg_main_lv_bat_v;
     lv_obj_t *pg_main_hv_soc_est;
     lv_obj_t *pg_main_sx_status_bar;
     lv_obj_t *pg_main_dx_status_bar;
-    lv_obj_t *pg_main_sx_map;
-    lv_obj_t *pg_main_dx_map;
-    lv_obj_t *pg_main_lc;
+    lv_obj_t *pg_main_rot_1;
+    lv_obj_t *pg_main_rot_2;
+    lv_obj_t *pg_main_rot_3;
+    lv_obj_t *mission_name;
+    lv_obj_t *pg_main_motor_temp_max;
+    lv_obj_t *pg_main_inv_temp_max;
+    lv_obj_t *pg_main_cell_temp_max;
     lv_obj_t *pg_main_tc;
     lv_obj_t *pg_main_tv;
-    lv_obj_t *mission_name;
-    lv_obj_t *inv_label;
-    lv_obj_t *pg_main_inv_temp_fl;
-    lv_obj_t *pg_main_inv_temp_fr;
-    lv_obj_t *pg_main_cool_press_l;
-    lv_obj_t *pg_main_cool_press_r;
-    lv_obj_t *pg_main_inv_temp_rl;
-    lv_obj_t *pg_main_inv_temp_rr;
-    lv_obj_t *mot_label;
-    lv_obj_t *pg_main_motor_temp_fl;
-    lv_obj_t *pg_main_motor_temp_fr;
-    lv_obj_t *pg_main_motor_temp_rl;
-    lv_obj_t *pg_main_motor_temp_rr;
+    lv_obj_t *pg_main_lc;
+    lv_obj_t *pg_main_reg;
+    lv_obj_t *lap_time_actual;
+    lv_obj_t *lap_time_last;
+    lv_obj_t *lap_number;
 } objects_t;
 
 extern objects_t objects;

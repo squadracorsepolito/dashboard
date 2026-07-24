@@ -30,14 +30,6 @@ volatile DashboardData_t dashboard_data = {
     .MOTOR_RR_TEMP         = 0.0,
     .HV_BAT_SOC            = 0,
     .LV_BAT_mV             = 0.0,
-    .TIRE_FL_TEMP          = 0.0,
-    .TIRE_FR_TEMP          = 0.0,
-    .TIRE_RL_TEMP          = 0.0,
-    .TIRE_RR_TEMP          = 0.0,
-    .TIRE_FL_PRESSURE      = 0.0,
-    .TIRE_FR_PRESSURE      = 0.0,
-    .TIRE_RL_PRESSURE      = 0.0,
-    .TIRE_RR_PRESSURE      = 0.0,
     .RTD_FSM_State         = STATE_IDLE,
     .SD_CLOSED             = GPIO_PIN_RESET,
     .BMS_ERR               = GPIO_PIN_RESET,
@@ -182,6 +174,7 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
         mcb_dv_system_status_unpack(&msgs.driving_status, RxData, MCB_DV_SYSTEM_STATUS_LENGTH);
         dashboard_data.ASSI_CODE = msgs.driving_status.assi_status;
         dashboard_data.AS_MISSION = mcb_dv_system_status_ami_state_decode(msgs.driving_status.ami_state);
+        dashboard_data.LAPS = mcb_dv_system_status_lap_counter_decode(msgs.driving_status.lap_counter);
     }
     else if((RxHeader.StdId == MCB_ASB_EBS_CMD_ON_FRAME_ID) &&
             (RxHeader.DLC == MCB_ASB_EBS_CMD_ON_LENGTH)) {
@@ -200,9 +193,12 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
     else if((RxHeader.StdId == MCB_STEERING_HMI_DEVICES_STATE_FRAME_ID) &&
             (RxHeader.DLC == MCB_STEERING_HMI_DEVICES_STATE_LENGTH)) {
         mcb_steering_hmi_devices_state_unpack(&msgs.dev_states, RxData, MCB_STEERING_HMI_DEVICES_STATE_LENGTH);
+        
         dashboard_data.TV_BTN_STATE = msgs.dev_states.btn_1_is_pressed;
         dashboard_data.TC_BTN_STATE = msgs.dev_states.btn_2_is_pressed;
-        dashboard_data.LC_BTN_STATE = msgs.dev_states.btn_1_is_pressed;
+        dashboard_data.LC_BTN_STATE = msgs.dev_states.btn_3_is_pressed;
+        dashboard_data.REG_BTN_STATE = msgs.dev_states.btn_4_is_pressed;
+
         dashboard_data.ROT_SW_1_STATE = msgs.dev_states.rot_sw_1_state;
         dashboard_data.ROT_SW_2_STATE = msgs.dev_states.rot_sw_2_state;
         dashboard_data.ROT_SW_3_STATE = msgs.dev_states.rot_sw_3_state;
@@ -272,6 +268,21 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
             mcb_dspace_pwt_front_temp_motor_fl_temp_decode(msgs.dspace_pwt_front_temp.motor_fl_temp);
         dashboard_data.MOTOR_FR_TEMP =
             mcb_dspace_pwt_front_temp_motor_fr_temp_decode(msgs.dspace_pwt_front_temp.motor_fr_temp);
+        
+        if(dashboard_data.INVERTER_FL_TEMP > dashboard_data.INVERTER_FR_TEMP){
+            dashboard_data.INVERTER_MAX_TEMP = dashboard_data.INVERTER_FL_TEMP;
+        }
+        else {
+            dashboard_data.INVERTER_MAX_TEMP = dashboard_data.INVERTER_FR_TEMP;
+        }
+
+        if(dashboard_data.MOTOR_FL_TEMP > dashboard_data.MOTOR_FR_TEMP){
+            dashboard_data.MOTOR_MAX_TEMP = dashboard_data.MOTOR_FL_TEMP;
+        }
+        else {
+            dashboard_data.MOTOR_MAX_TEMP = dashboard_data.MOTOR_FR_TEMP;
+        }
+        
     } else if ((RxHeader.StdId == MCB_DSPACE_PWT_REAR_TEMP_FRAME_ID) &&
                (RxHeader.DLC == MCB_DSPACE_PWT_REAR_TEMP_LENGTH)) {
         mcb_dspace_pwt_rear_temp_unpack(&msgs.dspace_pwt_rear_temp, RxData, MCB_DSPACE_PWT_REAR_TEMP_LENGTH);
@@ -283,6 +294,20 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
             mcb_dspace_pwt_rear_temp_motor_rl_temp_decode(msgs.dspace_pwt_rear_temp.motor_rl_temp);
         dashboard_data.MOTOR_RR_TEMP =
             mcb_dspace_pwt_rear_temp_motor_rr_temp_decode(msgs.dspace_pwt_rear_temp.motor_rr_temp);
+        
+        if(dashboard_data.INVERTER_RL_TEMP > dashboard_data.INVERTER_RR_TEMP){
+            dashboard_data.INVERTER_MAX_TEMP = dashboard_data.INVERTER_RL_TEMP;
+        }
+        else {
+            dashboard_data.INVERTER_MAX_TEMP = dashboard_data.INVERTER_RR_TEMP;
+        }
+
+        if(dashboard_data.MOTOR_RL_TEMP > dashboard_data.MOTOR_RR_TEMP){
+            dashboard_data.MOTOR_MAX_TEMP = dashboard_data.MOTOR_RL_TEMP;
+        }
+        else {
+            dashboard_data.MOTOR_MAX_TEMP = dashboard_data.MOTOR_RR_TEMP;
+        }
     }
 }
 
@@ -691,7 +716,7 @@ void Dashboard_Loop(uint32_t *EM_time, int *flag, uint32_t *WD_time) {
     if (dashboard_data.IMD_ERR) {
         // LedBlinking(BUZZER_CMD_GPIO_OUT_GPIO_Port, BUZZER_CMD_GPIO_OUT_Pin, &imd_err_blink, 2500);
     } else if (dashboard_data.RTD_FSM_State != STATE_RTD_SOUND) {
-        HAL_GPIO_WritePin(BUZZER_CMD_GPIO_OUT_GPIO_Port, BUZZER_CMD_GPIO_OUT_Pin, GPIO_PIN_SET);
+        HAL_GPIO_WritePin(BUZZER_CMD_GPIO_OUT_GPIO_Port, BUZZER_CMD_GPIO_OUT_Pin, GPIO_PIN_RESET);
     }
 
     // ams_err_check

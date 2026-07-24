@@ -21,7 +21,7 @@ char* mission_convert(uint8_t mission){
         }
         
         case ACCEL: {
-            return "ACCELERATION";
+            return "ACCEL";
         }
         
         case SKIDPAD: {
