@@ -64,7 +64,8 @@ volatile DashboardData_t dashboard_data = {
     .ROT_SW_3_STATE        = 0,
     .EBS_TEST_STATE        = 0,
     .ROLLING               = 7,
-    .PREV_ROLL             = 6
+    .PREV_ROLL             = 6,
+    .RAW_TIME              = 0
 };
 
 /* State change triggers */
@@ -660,6 +661,16 @@ void ASB_EBS_state_check(uint32_t *time){
     }
 }
 
+char* lap_time_convert(uint32_t base_time){
+    int min = 0; 
+    int sec = 0;
+    char* text;
+    min = base_time % 60;
+    sec = base_time - 60*min;
+    sprintf(text, "%d:%d", min, sec);
+    return text;
+}
+
 uint8_t AMS_detection(uint8_t ams_err_tlb,
                       uint8_t hvb_diag_bat_vlt_sna,
                       uint8_t hvb_diag_inv_vlt_sna,
@@ -718,6 +729,8 @@ void Dashboard_Loop(uint32_t *EM_time, int *flag, uint32_t *WD_time) {
     } else if (dashboard_data.RTD_FSM_State != STATE_RTD_SOUND) {
         HAL_GPIO_WritePin(BUZZER_CMD_GPIO_OUT_GPIO_Port, BUZZER_CMD_GPIO_OUT_Pin, GPIO_PIN_RESET);
     }
+
+    dashboard_data.LAP_TIME = lap_time_convert(dashboard_data.RAW_TIME);
 
     // ams_err_check
     if (HAL_GetTick() >= cnt10ms + 10U) {

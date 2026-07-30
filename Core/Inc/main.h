@@ -59,8 +59,8 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define nBTN_TS_ON_IN_GPIO_IN_Pin GPIO_PIN_2
 #define nBTN_TS_ON_IN_GPIO_IN_GPIO_Port GPIOE
-#define nBTN_TC_IN_GPIO_IN_Pin GPIO_PIN_3
-#define nBTN_TC_IN_GPIO_IN_GPIO_Port GPIOE
+#define nBTN_MIS_SEL_IN_GPIO_IN_Pin GPIO_PIN_3
+#define nBTN_MIS_SEL_IN_GPIO_IN_GPIO_Port GPIOE
 #define nBTN_LC_IN_GPIO_IN_Pin GPIO_PIN_4
 #define nBTN_LC_IN_GPIO_IN_GPIO_Port GPIOE
 #define nRTD_BTN_IN_GPIO_IN_Pin GPIO_PIN_5

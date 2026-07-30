@@ -33,6 +33,9 @@ typedef struct {
     volatile uint8_t ROLLING;                     //Rolling counter for EBS WD
     volatile uint8_t PREV_ROLL;                   //Previous counter value to compute the difference
     volatile uint8_t EBS_TEST_STATE;              //If set to 1 the changes in the rolling counter could not occur
+
+    volatile uint32_t RAW_TIME;
+    volatile char* LAP_TIME;
     
     volatile uint8_t TV_BTN_STATE;                //Four of the steering buttons state
     volatile uint8_t TC_BTN_STATE;
@@ -116,6 +119,7 @@ void RTD_fsm(uint32_t delay_100us);
 void AS_SDC_check(void);
 void ASSI_state(uint32_t delay_100us, uint32_t *time, int *flag);
 void ASB_EBS_state_check(uint32_t *WD_time);
+char* lap_time_convert(uint32_t base_time);
 
 void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan);
 void HAL_CAN_RxFifo1MsgPendingCallback(CAN_HandleTypeDef *hcan);

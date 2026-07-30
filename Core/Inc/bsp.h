@@ -149,6 +149,7 @@ void ROT_SW_Routine(void);
 enum BTN_Device {
     BTN_RTD,       /*!< Ready To Drive Button */
     BTN_TSON,      /*!< TS ON button */
+    BTN_MIS_SEL,   /*!< Mission Selection button */
     BTN_GENERAL,
     BTN_Device_NUM /*!< Number of Button Devices */
 };
