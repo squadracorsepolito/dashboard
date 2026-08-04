@@ -175,6 +175,76 @@ void MX_CAN1_Init(void)
         Error_Handler();
     }
 
+    sFilterConfig.FilterBank           = 8;
+    sFilterConfig.FilterMode           = CAN_FILTERMODE_IDLIST;
+    sFilterConfig.FilterScale          = CAN_FILTERSCALE_16BIT;
+    sFilterConfig.FilterIdHigh         = (MCB_DV_SYSTEM_STATUS_FRAME_ID << 5);
+    sFilterConfig.FilterIdLow          = (MCB_DV_SYSTEM_STATUS_FRAME_ID << 5);
+    sFilterConfig.FilterFIFOAssignment = CAN_RX_FIFO0;
+    sFilterConfig.FilterActivation     = ENABLE;
+    sFilterConfig.SlaveStartFilterBank = 14;
+
+    if (HAL_CAN_ConfigFilter(&hcan1, &sFilterConfig) != HAL_OK) {
+        /* Filter configuration Error */
+        Error_Handler();
+    }
+
+    sFilterConfig.FilterBank           = 9;
+    sFilterConfig.FilterMode           = CAN_FILTERMODE_IDLIST;
+    sFilterConfig.FilterScale          = CAN_FILTERSCALE_16BIT;
+    sFilterConfig.FilterIdHigh         = (MCB_ASB_EBS_CMD_ON_FRAME_ID << 5);
+    sFilterConfig.FilterIdLow          = (MCB_ASB_EBS_CMD_ON_FRAME_ID << 5);
+    sFilterConfig.FilterFIFOAssignment = CAN_RX_FIFO0;
+    sFilterConfig.FilterActivation     = ENABLE;
+    sFilterConfig.SlaveStartFilterBank = 14;
+
+    if (HAL_CAN_ConfigFilter(&hcan1, &sFilterConfig) != HAL_OK) {
+        /* Filter configuration Error */
+        Error_Handler();
+    }
+
+    sFilterConfig.FilterBank           = 10;
+    sFilterConfig.FilterMode           = CAN_FILTERMODE_IDLIST;
+    sFilterConfig.FilterScale          = CAN_FILTERSCALE_16BIT;
+    sFilterConfig.FilterIdHigh         = (MCB_STEERING_HMI_DEVICES_STATE_FRAME_ID << 5);
+    sFilterConfig.FilterIdLow          = (MCB_STEERING_HMI_DEVICES_STATE_FRAME_ID << 5);
+    sFilterConfig.FilterFIFOAssignment = CAN_RX_FIFO0;
+    sFilterConfig.FilterActivation     = ENABLE;
+    sFilterConfig.SlaveStartFilterBank = 14;
+
+    if (HAL_CAN_ConfigFilter(&hcan1, &sFilterConfig) != HAL_OK) {
+        /* Filter configuration Error */
+        Error_Handler();
+    }
+
+    sFilterConfig.FilterBank           = 11;
+    sFilterConfig.FilterMode           = CAN_FILTERMODE_IDLIST;
+    sFilterConfig.FilterScale          = CAN_FILTERSCALE_16BIT;
+    sFilterConfig.FilterIdHigh         = (MCB_DSPACE_PWT_FRONT_TEMP_FRAME_ID << 5);
+    sFilterConfig.FilterIdLow          = (MCB_DSPACE_PWT_FRONT_TEMP_FRAME_ID << 5);
+    sFilterConfig.FilterFIFOAssignment = CAN_RX_FIFO0;
+    sFilterConfig.FilterActivation     = ENABLE;
+    sFilterConfig.SlaveStartFilterBank = 14;
+
+    if (HAL_CAN_ConfigFilter(&hcan1, &sFilterConfig) != HAL_OK) {
+        /* Filter configuration Error */
+        Error_Handler();
+    }
+
+    sFilterConfig.FilterBank           = 12;
+    sFilterConfig.FilterMode           = CAN_FILTERMODE_IDLIST;
+    sFilterConfig.FilterScale          = CAN_FILTERSCALE_16BIT;
+    sFilterConfig.FilterIdHigh         = (MCB_DSPACE_PWT_REAR_TEMP_FRAME_ID << 5);
+    sFilterConfig.FilterIdLow          = (MCB_DSPACE_PWT_REAR_TEMP_FRAME_ID << 5);
+    sFilterConfig.FilterFIFOAssignment = CAN_RX_FIFO0;
+    sFilterConfig.FilterActivation     = ENABLE;
+    sFilterConfig.SlaveStartFilterBank = 14;
+
+    if (HAL_CAN_ConfigFilter(&hcan1, &sFilterConfig) != HAL_OK) {
+        /* Filter configuration Error */
+        Error_Handler();
+    }
+
     if (HAL_CAN_ActivateNotification(&hcan1,
                                      CAN_IT_BUSOFF | CAN_IT_ERROR | CAN_IT_ERROR_PASSIVE | CAN_IT_ERROR_WARNING |
                                          CAN_IT_RX_FIFO0_MSG_PENDING) != HAL_OK) {
@@ -270,7 +340,7 @@ void HAL_CAN_MspInit(CAN_HandleTypeDef* canHandle)
     PA11     ------> CAN1_RX
     PA12     ------> CAN1_TX
     */
-    GPIO_InitStruct.Pin = SN65HVD23x_R_CAN1_RX_Pin|SN65HVD23x_D_CAN1_TX_Pin;
+    GPIO_InitStruct.Pin = GPIO_PIN_11|GPIO_PIN_12;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
@@ -284,8 +354,6 @@ void HAL_CAN_MspInit(CAN_HandleTypeDef* canHandle)
     HAL_NVIC_EnableIRQ(CAN1_RX0_IRQn);
     HAL_NVIC_SetPriority(CAN1_RX1_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(CAN1_RX1_IRQn);
-    HAL_NVIC_SetPriority(CAN1_SCE_IRQn, 0, 0);
-    HAL_NVIC_EnableIRQ(CAN1_SCE_IRQn);
   /* USER CODE BEGIN CAN1_MspInit 1 */
 
   /* USER CODE END CAN1_MspInit 1 */
@@ -307,7 +375,7 @@ void HAL_CAN_MspInit(CAN_HandleTypeDef* canHandle)
     PB12     ------> CAN2_RX
     PB13     ------> CAN2_TX
     */
-    GPIO_InitStruct.Pin = SN65HVD23x_R_CAN2_RX_Pin|SN65HVD23x_D_CAN2_TX_Pin;
+    GPIO_InitStruct.Pin = GPIO_PIN_12|GPIO_PIN_13;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
@@ -321,8 +389,6 @@ void HAL_CAN_MspInit(CAN_HandleTypeDef* canHandle)
     HAL_NVIC_EnableIRQ(CAN2_RX0_IRQn);
     HAL_NVIC_SetPriority(CAN2_RX1_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(CAN2_RX1_IRQn);
-    HAL_NVIC_SetPriority(CAN2_SCE_IRQn, 0, 0);
-    HAL_NVIC_EnableIRQ(CAN2_SCE_IRQn);
   /* USER CODE BEGIN CAN2_MspInit 1 */
 
   /* USER CODE END CAN2_MspInit 1 */
@@ -347,13 +413,12 @@ void HAL_CAN_MspDeInit(CAN_HandleTypeDef* canHandle)
     PA11     ------> CAN1_RX
     PA12     ------> CAN1_TX
     */
-    HAL_GPIO_DeInit(GPIOA, SN65HVD23x_R_CAN1_RX_Pin|SN65HVD23x_D_CAN1_TX_Pin);
+    HAL_GPIO_DeInit(GPIOA, GPIO_PIN_11|GPIO_PIN_12);
 
     /* CAN1 interrupt Deinit */
     HAL_NVIC_DisableIRQ(CAN1_TX_IRQn);
     HAL_NVIC_DisableIRQ(CAN1_RX0_IRQn);
     HAL_NVIC_DisableIRQ(CAN1_RX1_IRQn);
-    HAL_NVIC_DisableIRQ(CAN1_SCE_IRQn);
   /* USER CODE BEGIN CAN1_MspDeInit 1 */
 
   /* USER CODE END CAN1_MspDeInit 1 */
@@ -374,13 +439,12 @@ void HAL_CAN_MspDeInit(CAN_HandleTypeDef* canHandle)
     PB12     ------> CAN2_RX
     PB13     ------> CAN2_TX
     */
-    HAL_GPIO_DeInit(GPIOB, SN65HVD23x_R_CAN2_RX_Pin|SN65HVD23x_D_CAN2_TX_Pin);
+    HAL_GPIO_DeInit(GPIOB, GPIO_PIN_12|GPIO_PIN_13);
 
     /* CAN2 interrupt Deinit */
     HAL_NVIC_DisableIRQ(CAN2_TX_IRQn);
     HAL_NVIC_DisableIRQ(CAN2_RX0_IRQn);
     HAL_NVIC_DisableIRQ(CAN2_RX1_IRQn);
-    HAL_NVIC_DisableIRQ(CAN2_SCE_IRQn);
   /* USER CODE BEGIN CAN2_MspDeInit 1 */
 
   /* USER CODE END CAN2_MspDeInit 1 */

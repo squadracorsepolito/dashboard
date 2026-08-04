@@ -17,6 +17,12 @@
 
 #include "bsp.h"
 
+#include "usart.h"  // Per l'handle UART
+
+#include <stdio.h>
+#include <string.h>
+
+#if 0
 /* SDC_RLY (ShutDown Circuit Relay) ##########################################*/
 
 /*---------- Private define -----------------.--------------------------------*/
@@ -49,6 +55,7 @@ enum SDC_RLY_State SDC_RLY_getState(void) {
 }
 
 /*---------- Private Functions -----------------------------------------------*/
+#endif
 
 /* BTN (Buttons) #############################################################*/
 
@@ -84,14 +91,13 @@ enum SDC_RLY_State SDC_RLY_getState(void) {
 /*---------- Private variables -----------------------------------------------*/
 
 static struct GPIO_Tuple BTN_Device_to_GPIO_Tuple_map[BTN_Device_NUM] = {
-    [BTN_RTD]       = {.GPIO_Port = nRTD_BTN_IN_GPIO_IN_GPIO_Port, .GPIO_Pin = nRTD_BTN_IN_GPIO_IN_Pin},
-    [BTN_Steering1] = {.GPIO_Port = nPUSH_BTN1_IN_GPIO_IN_GPIO_Port, .GPIO_Pin = nPUSH_BTN1_IN_GPIO_IN_Pin},
-    [BTN_Steering2] = {.GPIO_Port = nPUSH_BTN2_IN_GPIO_IN_GPIO_Port, .GPIO_Pin = nPUSH_BTN2_IN_GPIO_IN_Pin},
-    [BTN_Steering3] = {.GPIO_Port = nPUSH_BTN3_IN_GPIO_IN_GPIO_Port, .GPIO_Pin = nPUSH_BTN3_IN_GPIO_IN_Pin},
-    [BTN_Steering4] = {.GPIO_Port = nPUSH_BTN4_IN_GPIO_IN_GPIO_Port, .GPIO_Pin = nPUSH_BTN4_IN_GPIO_IN_Pin}};
+    [BTN_RTD]     = {.GPIO_Port = nRTD_BTN_IN_GPIO_IN_GPIO_Port, .GPIO_Pin = nRTD_BTN_IN_GPIO_IN_Pin},
+    [BTN_TSON]    = {.GPIO_Port = nBTN_TS_ON_IN_GPIO_IN_GPIO_Port, .GPIO_Pin = nBTN_TS_ON_IN_GPIO_IN_Pin},
+    [BTN_MIS_SEL]    = {.GPIO_Port = nBTN_MIS_SEL_IN_GPIO_IN_GPIO_Port, .GPIO_Pin = nBTN_MIS_SEL_IN_GPIO_IN_Pin},
+    [BTN_GENERAL] = {.GPIO_Port = nBTN_GENERAL_IN_GPIO_IN_GPIO_Port, .GPIO_Pin = nBTN_GENERAL_IN_GPIO_IN_Pin}};
 
 static uint8_t BTN_GPIO_invert_vector[BTN_Device_NUM] =
-    {[BTN_RTD] = 1U, [BTN_Steering1] = 1U, [BTN_Steering2] = 1U, [BTN_Steering3] = 1U, [BTN_Steering4] = 1U};
+    {[BTN_RTD] = 1U, [BTN_TSON] = 1U, [BTN_MIS_SEL] = 1U, [BTN_GENERAL] = 1U};
 
 static volatile BTN_Value_t BTN_Device_values[BTN_VALUES_ARR_LEN_U] = {};
 
@@ -280,6 +286,7 @@ void ROT_SW_Routine(void) {
             last_state = curr_state;
         }
 
+#if 0
         if (curr_state != ROT_SW_State_NUM && curr_state >= (last_state)-1 && curr_state <= (last_state) + 1) {
             // if no error and the state progressed correctly, update current state
             ROT_SW_Device_State[i] = curr_state;
@@ -287,7 +294,56 @@ void ROT_SW_Routine(void) {
             // if either in error or the step was not in range keep the same state
             ROT_SW_Device_State[i] = last_state;
         }
+#else
+        // Simplified version: always update state if valid (no stability filter)
+        if (curr_state != ROT_SW_State_NUM) {
+            ROT_SW_Device_State[i] = curr_state;
+        }
+#endif
     }
+}
+
+/* BUZZER ####################################################################*/
+/*---------- Private define --------------------------------------------------*/
+
+/*---------- Private macro ---------------------------------------------------*/
+
+/*---------- Private variables -----------------------------------------------*/
+
+static const struct GPIO_Tuple BUZZER_Device_to_GPIO_Tuple_map[BUZZER_Device_NUM] = {
+    [BUZZER] = {.GPIO_Port = BUZZER_CMD_GPIO_OUT_GPIO_Port, .GPIO_Pin = BUZZER_CMD_GPIO_OUT_Pin},
+};
+
+/*---------- Private function prototypes -------------------------------------*/
+
+/*---------- Exported Variables ----------------------------------------------*/
+
+/*---------- Exported Functions ----------------------------------------------*/
+
+void BUZZER_setState(enum BUZZER_Device device, enum BUZZER_State state) {
+    assert_param(device != BUZZER_Device_NUM);
+    assert_param(state != BUZZER_State_NUM);
+    GPIO_TypeDef *port = BUZZER_Device_to_GPIO_Tuple_map[device].GPIO_Port;
+    uint16_t pin       = BUZZER_Device_to_GPIO_Tuple_map[device].GPIO_Pin;
+
+    HAL_GPIO_WritePin(port, pin, state);
+}
+
+void BUZZER_toggleState(enum BUZZER_Device device, enum BUZZER_State state) {
+    assert_param(device != BUZZER_Device_NUM);
+    assert_param(state != BUZZER_State_NUM);
+    GPIO_TypeDef *port = BUZZER_Device_to_GPIO_Tuple_map[device].GPIO_Port;
+    uint16_t pin       = BUZZER_Device_to_GPIO_Tuple_map[device].GPIO_Pin;
+
+    HAL_GPIO_TogglePin(port, pin);
+}
+
+enum BUZZER_State BUZZER_getState(enum BUZZER_Device device) {
+    assert_param(device != BUZZER_Device_NUM);
+    GPIO_TypeDef *port = BUZZER_Device_to_GPIO_Tuple_map[device].GPIO_Port;
+    uint16_t pin       = BUZZER_Device_to_GPIO_Tuple_map[device].GPIO_Pin;
+
+    return HAL_GPIO_ReadPin(port, pin) == GPIO_PIN_SET ? LED_On : LED_Off;
 }
 
 /* LED MONO (Monochrome Leds) ################################################*/
@@ -308,8 +364,8 @@ static const struct GPIO_Tuple LED_MONO_Device_to_GPIO_Tuple_map[LED_MONO_Device
     [LED_Err]       = {.GPIO_Port = ERR_LED_GPIO_OUT_GPIO_Port, .GPIO_Pin = ERR_LED_GPIO_OUT_Pin}};
 
 static uint8_t LED_MONO_GPIO_invert_vector[LED_MONO_Device_NUM] = {
-    [LED_AMS_Error] = 1U,
-    [LED_IMD_Error] = 1U,
+    [LED_AMS_Error] = 0U,
+    [LED_IMD_Error] = 0U,
     [LED_TS_Off]    = 0U,
     [LED_KeepAlive] = 0U,
     [LED_User1]     = 0U,
@@ -354,36 +410,38 @@ enum LED_MONO_State LED_MONO_getState(enum LED_MONO_Device device) {
     return HAL_GPIO_ReadPin(port, pin) == compareValue ? LED_On : LED_Off;
 }
 /*---------- Private Functions -----------------------------------------------*/
-
 /* LED RGB (RGB Leds) ########################################################*/
-
-#include "i2c.h"
-#include "pca9555.h"
+#include "gpio.h"
+#include "main.h"
 
 /*---------- Private define --------------------------------------------------*/
-
-enum RGB_DEVICE_TO_PCA955_CHNL_Index { RED_Index = 0, GREEN_Index, BLUE_Index, RGB_DEVICE_TO_PCA955_CHNL_Index_NUM };
 
 /*---------- Private macro ---------------------------------------------------*/
 
 /*---------- Private variables -----------------------------------------------*/
 
-#define PCA9555_ADDR_A0 (0U)
-#define PCA9555_ADDR_A1 (0U)
-#define PCA9555_ADDR_A2 (0U)
-#define PCA9555_ADDR    (PCA9555_ADDR_FIXED_PART | (PCA9555_ADDR_A0 << 2U) | (PCA9555_ADDR_A0 << 1U) | PCA9555_ADDR_A0)
-
-struct PCA9555_Handle pca9555Handle = {.hi2c = &hi2c1, .addr = PCA9555_ADDR};
-
 /*
- * @brief This data structure maps RGB devices color channels to the PCA955 channel
+ * @brief This data structure maps RGB devices color channels to the GPIO
  */
-static const uint8_t LED_RGB_Device_to_PCA9555_Chnl[LED_MONO_Device_NUM][RGB_DEVICE_TO_PCA955_CHNL_Index_NUM] = {
-    [LED_RGB1]     = {[RED_Index] = 7, [GREEN_Index] = 6, [BLUE_Index] = 8},
-    [LED_RGB2]     = {[RED_Index] = 10, [GREEN_Index] = 9, [BLUE_Index] = 11},
-    [LED_RGB3]     = {[RED_Index] = 4, [GREEN_Index] = 3, [BLUE_Index] = 5},
-    [LED_RGB_DASH] = {[RED_Index] = 1, [GREEN_Index] = 0, [BLUE_Index] = 2},
-
+static const struct GPIO_Tuple LED_RGB_Device_to_GPIO_Tuples_map[LED_RGB_Device_NUM][RGB_DEVICE_ColorChnl_NUM] = {
+    [LED_RGB1] =
+        {
+            [RGB_DEVICE_ColorChnl_Red]   = {.GPIO_Port = RGB1_RED_CMD_GPIO_Port, .GPIO_Pin = RGB1_RED_CMD_Pin},
+            [RGB_DEVICE_ColorChnl_Green] = {.GPIO_Port = RGB1_GREEN_CMD_GPIO_Port, .GPIO_Pin = RGB1_GREEN_CMD_Pin},
+            [RGB_DEVICE_ColorChnl_Blue]  = {.GPIO_Port = RGB1_BLUE_CMD_GPIO_Port, .GPIO_Pin = RGB1_BLUE_CMD_Pin},
+        },
+    [LED_RGB2] =
+        {
+            [RGB_DEVICE_ColorChnl_Red]   = {.GPIO_Port = RGB2_RED_CMD_GPIO_Port, .GPIO_Pin = RGB2_RED_CMD_Pin},
+            [RGB_DEVICE_ColorChnl_Green] = {.GPIO_Port = RGB2_GREEN_CMD_GPIO_Port, .GPIO_Pin = RGB2_GREEN_CMD_Pin},
+            //[RGB_DEVICE_ColorChnl_Blue]  = {.GPIO_Port = RGB2_BLUE_CMD_GPIO_Port, .GPIO_Pin = RGB2_BLUE_CMD_Pin},
+        },
+    [LED_RGB3] =
+        {
+            [RGB_DEVICE_ColorChnl_Red]   = {.GPIO_Port = RGB3_RED_CMD_GPIO_Port, .GPIO_Pin = RGB3_RED_CMD_Pin},
+            [RGB_DEVICE_ColorChnl_Green] = {.GPIO_Port = RGB3_GREEN_CMD_GPIO_Port, .GPIO_Pin = RGB3_GREEN_CMD_Pin},
+            [RGB_DEVICE_ColorChnl_Blue]  = {.GPIO_Port = RGB3_BLUE_CMD_GPIO_Port, .GPIO_Pin = RGB3_BLUE_CMD_Pin},
+        },
 };
 
 /*---------- Private function prototypes -------------------------------------*/
@@ -395,21 +453,21 @@ static const uint8_t LED_RGB_Device_to_PCA9555_Chnl[LED_MONO_Device_NUM][RGB_DEV
 void LED_RGB_setColor(enum LED_RGB_Device device, uint8_t red, uint8_t green, uint8_t blue) {
     assert_param(device != LED_RGB_Device_NUM);
 
-    uint8_t PCA9555_chnls[RGB_DEVICE_TO_PCA955_CHNL_Index_NUM] = {};
-    PCA9555_chnls[RED_Index]                                   = LED_RGB_Device_to_PCA9555_Chnl[device][RED_Index];
-    PCA9555_chnls[GREEN_Index]                                 = LED_RGB_Device_to_PCA9555_Chnl[device][GREEN_Index];
-    PCA9555_chnls[BLUE_Index]                                  = LED_RGB_Device_to_PCA9555_Chnl[device][BLUE_Index];
+    struct GPIO_Tuple ColorChnl_GPIO[RGB_DEVICE_ColorChnl_NUM] = {};
+    ColorChnl_GPIO[RGB_DEVICE_ColorChnl_Red]   = LED_RGB_Device_to_GPIO_Tuples_map[device][RGB_DEVICE_ColorChnl_Red];
+    ColorChnl_GPIO[RGB_DEVICE_ColorChnl_Green] = LED_RGB_Device_to_GPIO_Tuples_map[device][RGB_DEVICE_ColorChnl_Green];
+    ColorChnl_GPIO[RGB_DEVICE_ColorChnl_Blue]  = LED_RGB_Device_to_GPIO_Tuples_map[device][RGB_DEVICE_ColorChnl_Blue];
 
-    uint8_t PCA9555_chnls_val[RGB_DEVICE_TO_PCA955_CHNL_Index_NUM] = {};
-    PCA9555_chnls_val[RED_Index]                                   = red > 0 ? 1U : 0U;
-    PCA9555_chnls_val[GREEN_Index]                                 = green > 0 ? 1U : 0U;
-    PCA9555_chnls_val[BLUE_Index]                                  = blue > 0 ? 1U : 0U;
-
-    // Invert reading if values on GPIO are inverted
-    PCA9555_digitalWrites(&pca9555Handle, RGB_DEVICE_TO_PCA955_CHNL_Index_NUM, PCA9555_chnls, PCA9555_chnls_val);
+    HAL_GPIO_WritePin(ColorChnl_GPIO[RGB_DEVICE_ColorChnl_Red].GPIO_Port,
+                      ColorChnl_GPIO[RGB_DEVICE_ColorChnl_Red].GPIO_Pin,
+                      red > 0 ? GPIO_PIN_SET : GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(ColorChnl_GPIO[RGB_DEVICE_ColorChnl_Green].GPIO_Port,
+                      ColorChnl_GPIO[RGB_DEVICE_ColorChnl_Green].GPIO_Pin,
+                      green > 0 ? GPIO_PIN_SET : GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(ColorChnl_GPIO[RGB_DEVICE_ColorChnl_Blue].GPIO_Port,
+                      ColorChnl_GPIO[RGB_DEVICE_ColorChnl_Blue].GPIO_Pin,
+                      blue > 0 ? GPIO_PIN_SET : GPIO_PIN_RESET);
 }
-
-/*---------- Private Functions -----------------------------------------------*/
 
 /* Main CAN Bus Comunication #################################################*/
 
@@ -435,6 +493,7 @@ void MCB_send_msg(uint32_t id) {
     union {
         struct mcb_dash_hello_t hello;
         struct mcb_dash_hmi_devices_state_t hmi_devices_state;
+        struct mcb_rolling_not_commuted_t notify;
     } msg = {};
 
     CAN_TxHeaderTypeDef tx_header = {.RTR = CAN_RTR_DATA, .IDE = CAN_ID_STD};
@@ -453,22 +512,31 @@ void MCB_send_msg(uint32_t id) {
             tx_header.DLC = mcb_dash_hello_pack(buffer, &msg.hello, 8);
 
             break;
+
         case MCB_DASH_HMI_DEVICES_STATE_FRAME_ID:
 
             // clang-format off
-            msg.hmi_devices_state.btn_rtd_is_pressed = mcb_dash_hmi_devices_state_btn_rtd_is_pressed_encode(button_get(BUTTON_RTD)); // TODO change this button get
-            msg.hmi_devices_state.btn_1_is_pressed = mcb_dash_hmi_devices_state_btn_1_is_pressed_encode(BTN_getStatus(BTN_Steering1));
-            msg.hmi_devices_state.btn_2_is_pressed = mcb_dash_hmi_devices_state_btn_2_is_pressed_encode(BTN_getStatus(BTN_Steering2));
-            msg.hmi_devices_state.btn_3_is_pressed = mcb_dash_hmi_devices_state_btn_3_is_pressed_encode(BTN_getStatus(BTN_Steering3));
-            msg.hmi_devices_state.btn_4_is_pressed = mcb_dash_hmi_devices_state_btn_4_is_pressed_encode(BTN_getStatus(BTN_Steering4));
-            msg.hmi_devices_state.rot_sw_1_state   = mcb_dash_hmi_devices_state_rot_sw_1_state_encode(ROT_SW_getState(ROT_SW_Device1));
-            msg.hmi_devices_state.rot_sw_2_state   = mcb_dash_hmi_devices_state_rot_sw_2_state_encode(ROT_SW_getState(ROT_SW_Device2));
+            msg.hmi_devices_state.btn_rtd_is_pressed = mcb_dash_hmi_devices_state_btn_rtd_is_pressed_encode(button_get(BTN_RTD)); // TODO change this button get
+            msg.hmi_devices_state.btn_ts_on_is_pressed = mcb_dash_hmi_devices_state_btn_ts_on_is_pressed_encode(BTN_getStatus(BTN_TSON));
+            msg.hmi_devices_state.btn_mis_sel_is_pressed = mcb_dash_hmi_devices_state_btn_mis_sel_is_pressed_encode(BTN_getStatus(BTN_MIS_SEL));
             // clang-format on
 
             tx_header.DLC =
                 mcb_dash_hmi_devices_state_pack(buffer, &msg.hmi_devices_state, MCB_DASH_HMI_DEVICES_STATE_LENGTH);
 
             break;
+
+        case MCB_ROLLING_NOT_COMMUTED_FRAME_ID:
+
+            // clang-format off
+            msg.notify.no_counter_change_notify = mcb_rolling_not_commuted_no_counter_change_notify_encode(1);
+            // clang-format on
+
+            tx_header.DLC =
+                mcb_rolling_not_commuted_pack(buffer, &msg.notify, MCB_ROLLING_NOT_COMMUTED_LENGTH);
+
+            break;
+            
         default:
             return;
     };

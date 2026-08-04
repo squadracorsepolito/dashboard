@@ -100,6 +100,7 @@ enum ROT_SW_State {
     ROT_SW_State_NUM   /*!< Number of Rotary Switch states/positions */
 };
 
+static enum ROT_SW_State ROT_SW_Device_State[ROT_SW_Device_NUM];
 /* ---------- Exported constants ---------------------------------------------*/
 
 // clang-format off
@@ -147,10 +148,9 @@ void ROT_SW_Routine(void);
  */
 enum BTN_Device {
     BTN_RTD,       /*!< Ready To Drive Button */
-    BTN_Steering1, /*!< Steering Wheel button 1 */
-    BTN_Steering2, /*!< Steering Wheel button 2 */
-    BTN_Steering3, /*!< Steering Wheel button 3 */
-    BTN_Steering4, /*!< Steering Wheel button 4 */
+    BTN_TSON,      /*!< TS ON button */
+    BTN_MIS_SEL,   /*!< Mission Selection button */
+    BTN_GENERAL,
     BTN_Device_NUM /*!< Number of Button Devices */
 };
 
@@ -174,6 +174,45 @@ void BTN_Routine(void);
 /* ---------- Private variables ----------------------------------------------*/
 
 /* ---------- Private constants ----------------------------------------------*/
+
+/* BUZZER ####################################################################*/
+
+/* ---------- Includes -------------------------------------------------------*/
+
+/* ---------- Exported types -------------------------------------------------*/
+enum BUZZER_State { BUZZER_Off = 0, BUZZER_On = 1, BUZZER_State_NUM };
+
+/**
+ * @brief Buzzer Device
+ */
+enum BUZZER_Device {
+    BUZZER,
+    BUZZER_Device_NUM /*!< Number of BUZZER Led Devices */
+};
+
+/* ---------- Exported constants ---------------------------------------------*/
+
+/* ---------- Exported variables ---------------------------------------------*/
+
+/* ---------- Exported macros ------------------------------------------------*/
+
+/* ---------- Exported functions ---------------------------------------------*/
+
+void BUZZER_setState(enum BUZZER_Device device, enum BUZZER_State state);
+void BUZZER_toggleState(enum BUZZER_Device device, enum BUZZER_State state);
+enum BUZZER_State BUZZER_getState(enum BUZZER_Device device);
+
+/* ---------- Private types --------------------------------------------------*/
+
+/* ---------- Private variables ----------------------------------------------*/
+
+/* ---------- Private constants ----------------------------------------------*/
+
+/* LED RGB (RGB Leds) ########################################################*/
+
+/* ---------- Includes -------------------------------------------------------*/
+
+/* ---------- Exported types -------------------------------------------------*/
 
 /* LED MONO (Monochrome Leds) ################################################*/
 
@@ -228,20 +267,15 @@ enum LED_RGB_Device {
     LED_RGB1,      /*!< LED RGB number 1*/
     LED_RGB2,      /*!< LED RGB number 2 */
     LED_RGB3,      /*!< LED RGB number 3 */
-    LED_RGB_DASH,  /*!< LED RGB used by Dashboard device */
-    LED_Device_NUM /*!< Number of RGB Leds Devices */
+    LED_RGB_Device_NUM /*!< Number of RGB Leds Devices */
 };
+
+enum RGB_DEVICE_ColorChnl { RGB_DEVICE_ColorChnl_Red = 0, RGB_DEVICE_ColorChnl_Green, RGB_DEVICE_ColorChnl_Blue, RGB_DEVICE_ColorChnl_NUM };
+
 
 /* ---------- Exported constants ---------------------------------------------*/
 
-#define PCA9555_ADDR_A0 (0U)
-#define PCA9555_ADDR_A1 (0U)
-#define PCA9555_ADDR_A2 (0U)
-#define PCA9555_ADDR    (PCA9555_ADDR_FIXED_PART | (PCA9555_ADDR_A0 << 2U) | (PCA9555_ADDR_A0 << 1U) | PCA9555_ADDR_A0)
-
 /* ---------- Exported variables ---------------------------------------------*/
-
-extern struct PCA9555_Handle pca9555Handle;
 
 /* ---------- Exported macros ------------------------------------------------*/
 
@@ -283,11 +317,9 @@ void LED_RGB_setColor(enum LED_RGB_Device device, uint8_t red, uint8_t green, ui
 
 /* ---------- Exported constants ---------------------------------------------*/
 
-#define FAN_BAT_TIM_HANDLE htim3
-#define FAN_BAT_PWM_CH     TIM_CHANNEL_2
+#define FAN_BAT_TIM_HANDLE htim11
+#define FAN_BAT_PWM_CH     TIM_CHANNEL_1
 
-#define RADIATOR_FANS_PWM_TIM htim3
-#define RADIATOR_FANS_PWM_CH  TIM_CHANNEL_1
 
 /* ---------- Exported variables ---------------------------------------------*/
 
@@ -328,3 +360,5 @@ void MCB_send_msg(uint32_t id);
 /* ---------- Private Macros -------------------------------------------------*/
 
 #endif
+
+

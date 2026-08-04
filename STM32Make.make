@@ -6,30 +6,69 @@
 # Generic Makefile (based on gcc)
 #
 # ChangeLog :
-#	2017-02-10 - Several enhancements + project update mode
+#   2024-04-27 - Added env file inclusion. 
+#                Added way to overide: build directory, target name and optimisation.
+#                Added GCC_PATH by env file to not make the makefile machine dependent.
+#                Currently folder structure in build directory is preserved
+#                Switching of debug/release build output folder now happens based on debug flag
+#   2017-02-10 - Several enhancements + project update mode
 #   2015-07-22 - first version
 # ------------------------------------------------
 
 ######################################
-# target
+# Environment Variables
 ######################################
-TARGET = dashboard
-
+# Imports the environment file in which the compiler and other tooling is set
+# for the build machine.
+# This can also be used to overwrite some makefile variables
+file_exists = $(or $(and $(wildcard $(1)),1),0)
+ifeq ($(call file_exists,.stm32env),1)
+  include .stm32env
+endif
 
 ######################################
-# building variables
+# Target
 ######################################
-# debug build?
-DEBUG = 1
-# optimization
-OPT = -Og
-
+# This is the name of the embedded target which will be build
+# The final file name will also have debug or release appended to it.
+TARGET ?= dashboard
 
 #######################################
-# paths
+# Build directories
 #######################################
-# Build path
-BUILD_DIR = build
+# Build path can be overwritten when calling make or setting the environment variable
+# in .stm32env
+
+BUILD_DIRECTORY ?= build
+
+
+######################################
+# Optimization
+######################################
+# Optimization is switched based upon the DEBUG variable. If set to 1
+# it will be build in debug mode with the Og optimization flag (optimized for debugging).
+# If set to 0 (false) then by default the variable is used in the configuration yaml
+# This can also be overwritten using the environment variable or by overwriting it
+# by calling make with the OPTIMIZATION variable e.g.:
+# make -f STM32Make.make -j 16  OPTIMIZATION=Os
+
+# variable which determines if it is a debug build
+DEBUG ?= 1
+
+# debug flags when debug is defined
+OPTIMIZATION ?= -Og
+
+RELEASE_DIRECTORY = $(BUILD_DIRECTORY)/debug
+ifeq ($(DEBUG),1)
+  # Sets debugging optimization -Og and the debug information output
+  OPTIMIZATION_FLAGS += -Og -g -gdwarf -ggdb
+  $(TARGET) := $(TARGET)-debug
+  RELEASE_DIRECTORY := $(BUILD_DIRECTORY)/debug
+else
+  OPTIMIZATION_FLAGS += $(OPTIMIZATION)
+  $(TARGET) := $(TARGET)-release
+  RELEASE_DIRECTORY := $(BUILD_DIRECTORY)/release
+endif
 
 ######################################
 # source
@@ -42,10 +81,9 @@ Core/Src/button.c \
 Core/Src/can.c \
 Core/Src/dac.c \
 Core/Src/dashboard.c \
+Core/Src/display.c \
 Core/Src/dma.c \
 Core/Src/gpio.c \
-Core/Src/i2c.c \
-Core/Src/iwdg.c \
 Core/Src/main.c \
 Core/Src/spi.c \
 Core/Src/stm32f4xx_hal_msp.c \
@@ -57,6 +95,7 @@ Core/Src/tim.c \
 Core/Src/usart.c \
 Core/Src/utils.c \
 Core/Src/wdg.c \
+Drivers/ILI9488/ili9488.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc_ex.c \
@@ -71,9 +110,6 @@ Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ex.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ramfunc.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c \
-Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c \
-Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c_ex.c \
-Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_iwdg.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr_ex.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.c \
@@ -83,44 +119,493 @@ Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_adc.c \
-Lib/PCA9555/pca9555.c \
+EEZ/eez_actions.c \
+EEZ/eez_utils.c \
+EEZ/src/ui/images.c \
+EEZ/src/ui/images/ui_image_squadra_logo.c \
+EEZ/src/ui/screens.c \
+EEZ/src/ui/styles.c \
+EEZ/src/ui/ui.c \
+Lib/LVGL/lvgl/env_support/pikascript/pika_lv_point_t.c \
+Lib/LVGL/lvgl/env_support/pikascript/pika_lv_timer_t.c \
+Lib/LVGL/lvgl/env_support/pikascript/pika_lv_wegit.c \
+Lib/LVGL/lvgl/env_support/pikascript/pika_lvgl.c \
+Lib/LVGL/lvgl/env_support/pikascript/pika_lvgl_indev_t.c \
+Lib/LVGL/lvgl/env_support/pikascript/pika_lvgl_lv_event.c \
+Lib/LVGL/lvgl/env_support/pikascript/pika_lvgl_lv_obj.c \
+Lib/LVGL/lvgl/env_support/pikascript/pika_lvgl_lv_style_t.c \
+Lib/LVGL/lvgl/env_support/rt-thread/lv_rt_thread_port.c \
+Lib/LVGL/lvgl/env_support/rt-thread/squareline/lv_ui_entry.c \
+Lib/LVGL/lvgl/src/core/lv_group.c \
+Lib/LVGL/lvgl/src/core/lv_obj.c \
+Lib/LVGL/lvgl/src/core/lv_obj_class.c \
+Lib/LVGL/lvgl/src/core/lv_obj_draw.c \
+Lib/LVGL/lvgl/src/core/lv_obj_event.c \
+Lib/LVGL/lvgl/src/core/lv_obj_id_builtin.c \
+Lib/LVGL/lvgl/src/core/lv_obj_pos.c \
+Lib/LVGL/lvgl/src/core/lv_obj_property.c \
+Lib/LVGL/lvgl/src/core/lv_obj_scroll.c \
+Lib/LVGL/lvgl/src/core/lv_obj_style.c \
+Lib/LVGL/lvgl/src/core/lv_obj_style_gen.c \
+Lib/LVGL/lvgl/src/core/lv_obj_tree.c \
+Lib/LVGL/lvgl/src/core/lv_refr.c \
+Lib/LVGL/lvgl/src/display/lv_display.c \
+Lib/LVGL/lvgl/src/draw/dma2d/lv_draw_dma2d.c \
+Lib/LVGL/lvgl/src/draw/dma2d/lv_draw_dma2d_fill.c \
+Lib/LVGL/lvgl/src/draw/dma2d/lv_draw_dma2d_img.c \
+Lib/LVGL/lvgl/src/draw/lv_draw.c \
+Lib/LVGL/lvgl/src/draw/lv_draw_arc.c \
+Lib/LVGL/lvgl/src/draw/lv_draw_buf.c \
+Lib/LVGL/lvgl/src/draw/lv_draw_image.c \
+Lib/LVGL/lvgl/src/draw/lv_draw_label.c \
+Lib/LVGL/lvgl/src/draw/lv_draw_line.c \
+Lib/LVGL/lvgl/src/draw/lv_draw_mask.c \
+Lib/LVGL/lvgl/src/draw/lv_draw_rect.c \
+Lib/LVGL/lvgl/src/draw/lv_draw_triangle.c \
+Lib/LVGL/lvgl/src/draw/lv_draw_vector.c \
+Lib/LVGL/lvgl/src/draw/lv_image_decoder.c \
+Lib/LVGL/lvgl/src/draw/nema_gfx/lv_draw_nema_gfx.c \
+Lib/LVGL/lvgl/src/draw/nema_gfx/lv_draw_nema_gfx_arc.c \
+Lib/LVGL/lvgl/src/draw/nema_gfx/lv_draw_nema_gfx_border.c \
+Lib/LVGL/lvgl/src/draw/nema_gfx/lv_draw_nema_gfx_fill.c \
+Lib/LVGL/lvgl/src/draw/nema_gfx/lv_draw_nema_gfx_img.c \
+Lib/LVGL/lvgl/src/draw/nema_gfx/lv_draw_nema_gfx_label.c \
+Lib/LVGL/lvgl/src/draw/nema_gfx/lv_draw_nema_gfx_layer.c \
+Lib/LVGL/lvgl/src/draw/nema_gfx/lv_draw_nema_gfx_line.c \
+Lib/LVGL/lvgl/src/draw/nema_gfx/lv_draw_nema_gfx_stm32_hal.c \
+Lib/LVGL/lvgl/src/draw/nema_gfx/lv_draw_nema_gfx_triangle.c \
+Lib/LVGL/lvgl/src/draw/nema_gfx/lv_draw_nema_gfx_utils.c \
+Lib/LVGL/lvgl/src/draw/nema_gfx/lv_nema_gfx_path.c \
+Lib/LVGL/lvgl/src/draw/nxp/pxp/lv_draw_buf_pxp.c \
+Lib/LVGL/lvgl/src/draw/nxp/pxp/lv_draw_pxp.c \
+Lib/LVGL/lvgl/src/draw/nxp/pxp/lv_draw_pxp_fill.c \
+Lib/LVGL/lvgl/src/draw/nxp/pxp/lv_draw_pxp_img.c \
+Lib/LVGL/lvgl/src/draw/nxp/pxp/lv_draw_pxp_layer.c \
+Lib/LVGL/lvgl/src/draw/nxp/pxp/lv_pxp_cfg.c \
+Lib/LVGL/lvgl/src/draw/nxp/pxp/lv_pxp_osa.c \
+Lib/LVGL/lvgl/src/draw/nxp/pxp/lv_pxp_utils.c \
+Lib/LVGL/lvgl/src/draw/nxp/vglite/lv_draw_buf_vglite.c \
+Lib/LVGL/lvgl/src/draw/nxp/vglite/lv_draw_vglite.c \
+Lib/LVGL/lvgl/src/draw/nxp/vglite/lv_draw_vglite_arc.c \
+Lib/LVGL/lvgl/src/draw/nxp/vglite/lv_draw_vglite_border.c \
+Lib/LVGL/lvgl/src/draw/nxp/vglite/lv_draw_vglite_fill.c \
+Lib/LVGL/lvgl/src/draw/nxp/vglite/lv_draw_vglite_img.c \
+Lib/LVGL/lvgl/src/draw/nxp/vglite/lv_draw_vglite_label.c \
+Lib/LVGL/lvgl/src/draw/nxp/vglite/lv_draw_vglite_layer.c \
+Lib/LVGL/lvgl/src/draw/nxp/vglite/lv_draw_vglite_line.c \
+Lib/LVGL/lvgl/src/draw/nxp/vglite/lv_draw_vglite_triangle.c \
+Lib/LVGL/lvgl/src/draw/nxp/vglite/lv_vglite_buf.c \
+Lib/LVGL/lvgl/src/draw/nxp/vglite/lv_vglite_matrix.c \
+Lib/LVGL/lvgl/src/draw/nxp/vglite/lv_vglite_path.c \
+Lib/LVGL/lvgl/src/draw/nxp/vglite/lv_vglite_utils.c \
+Lib/LVGL/lvgl/src/draw/opengles/lv_draw_opengles.c \
+Lib/LVGL/lvgl/src/draw/renesas/dave2d/lv_draw_dave2d.c \
+Lib/LVGL/lvgl/src/draw/renesas/dave2d/lv_draw_dave2d_arc.c \
+Lib/LVGL/lvgl/src/draw/renesas/dave2d/lv_draw_dave2d_border.c \
+Lib/LVGL/lvgl/src/draw/renesas/dave2d/lv_draw_dave2d_fill.c \
+Lib/LVGL/lvgl/src/draw/renesas/dave2d/lv_draw_dave2d_image.c \
+Lib/LVGL/lvgl/src/draw/renesas/dave2d/lv_draw_dave2d_label.c \
+Lib/LVGL/lvgl/src/draw/renesas/dave2d/lv_draw_dave2d_line.c \
+Lib/LVGL/lvgl/src/draw/renesas/dave2d/lv_draw_dave2d_mask_rectangle.c \
+Lib/LVGL/lvgl/src/draw/renesas/dave2d/lv_draw_dave2d_triangle.c \
+Lib/LVGL/lvgl/src/draw/renesas/dave2d/lv_draw_dave2d_utils.c \
+Lib/LVGL/lvgl/src/draw/sdl/lv_draw_sdl.c \
+Lib/LVGL/lvgl/src/draw/sw/blend/lv_draw_sw_blend.c \
+Lib/LVGL/lvgl/src/draw/sw/blend/lv_draw_sw_blend_to_al88.c \
+Lib/LVGL/lvgl/src/draw/sw/blend/lv_draw_sw_blend_to_argb8888.c \
+Lib/LVGL/lvgl/src/draw/sw/blend/lv_draw_sw_blend_to_i1.c \
+Lib/LVGL/lvgl/src/draw/sw/blend/lv_draw_sw_blend_to_l8.c \
+Lib/LVGL/lvgl/src/draw/sw/blend/lv_draw_sw_blend_to_rgb565.c \
+Lib/LVGL/lvgl/src/draw/sw/blend/lv_draw_sw_blend_to_rgb888.c \
+Lib/LVGL/lvgl/src/draw/sw/lv_draw_sw.c \
+Lib/LVGL/lvgl/src/draw/sw/lv_draw_sw_arc.c \
+Lib/LVGL/lvgl/src/draw/sw/lv_draw_sw_border.c \
+Lib/LVGL/lvgl/src/draw/sw/lv_draw_sw_box_shadow.c \
+Lib/LVGL/lvgl/src/draw/sw/lv_draw_sw_fill.c \
+Lib/LVGL/lvgl/src/draw/sw/lv_draw_sw_gradient.c \
+Lib/LVGL/lvgl/src/draw/sw/lv_draw_sw_img.c \
+Lib/LVGL/lvgl/src/draw/sw/lv_draw_sw_letter.c \
+Lib/LVGL/lvgl/src/draw/sw/lv_draw_sw_line.c \
+Lib/LVGL/lvgl/src/draw/sw/lv_draw_sw_mask.c \
+Lib/LVGL/lvgl/src/draw/sw/lv_draw_sw_mask_rect.c \
+Lib/LVGL/lvgl/src/draw/sw/lv_draw_sw_transform.c \
+Lib/LVGL/lvgl/src/draw/sw/lv_draw_sw_triangle.c \
+Lib/LVGL/lvgl/src/draw/sw/lv_draw_sw_utils.c \
+Lib/LVGL/lvgl/src/draw/sw/lv_draw_sw_vector.c \
+Lib/LVGL/lvgl/src/draw/vg_lite/lv_draw_buf_vg_lite.c \
+Lib/LVGL/lvgl/src/draw/vg_lite/lv_draw_vg_lite.c \
+Lib/LVGL/lvgl/src/draw/vg_lite/lv_draw_vg_lite_arc.c \
+Lib/LVGL/lvgl/src/draw/vg_lite/lv_draw_vg_lite_border.c \
+Lib/LVGL/lvgl/src/draw/vg_lite/lv_draw_vg_lite_box_shadow.c \
+Lib/LVGL/lvgl/src/draw/vg_lite/lv_draw_vg_lite_fill.c \
+Lib/LVGL/lvgl/src/draw/vg_lite/lv_draw_vg_lite_img.c \
+Lib/LVGL/lvgl/src/draw/vg_lite/lv_draw_vg_lite_label.c \
+Lib/LVGL/lvgl/src/draw/vg_lite/lv_draw_vg_lite_layer.c \
+Lib/LVGL/lvgl/src/draw/vg_lite/lv_draw_vg_lite_line.c \
+Lib/LVGL/lvgl/src/draw/vg_lite/lv_draw_vg_lite_mask_rect.c \
+Lib/LVGL/lvgl/src/draw/vg_lite/lv_draw_vg_lite_triangle.c \
+Lib/LVGL/lvgl/src/draw/vg_lite/lv_draw_vg_lite_vector.c \
+Lib/LVGL/lvgl/src/draw/vg_lite/lv_vg_lite_decoder.c \
+Lib/LVGL/lvgl/src/draw/vg_lite/lv_vg_lite_grad.c \
+Lib/LVGL/lvgl/src/draw/vg_lite/lv_vg_lite_math.c \
+Lib/LVGL/lvgl/src/draw/vg_lite/lv_vg_lite_path.c \
+Lib/LVGL/lvgl/src/draw/vg_lite/lv_vg_lite_pending.c \
+Lib/LVGL/lvgl/src/draw/vg_lite/lv_vg_lite_stroke.c \
+Lib/LVGL/lvgl/src/draw/vg_lite/lv_vg_lite_utils.c \
+Lib/LVGL/lvgl/src/drivers/display/drm/lv_linux_drm.c \
+Lib/LVGL/lvgl/src/drivers/display/fb/lv_linux_fbdev.c \
+Lib/LVGL/lvgl/src/drivers/display/ili9341/lv_ili9341.c \
+Lib/LVGL/lvgl/src/drivers/display/lcd/lv_lcd_generic_mipi.c \
+Lib/LVGL/lvgl/src/drivers/display/renesas_glcdc/lv_renesas_glcdc.c \
+Lib/LVGL/lvgl/src/drivers/display/st7735/lv_st7735.c \
+Lib/LVGL/lvgl/src/drivers/display/st7789/lv_st7789.c \
+Lib/LVGL/lvgl/src/drivers/display/st7796/lv_st7796.c \
+Lib/LVGL/lvgl/src/drivers/display/st_ltdc/lv_st_ltdc.c \
+Lib/LVGL/lvgl/src/drivers/evdev/lv_evdev.c \
+Lib/LVGL/lvgl/src/drivers/glfw/lv_glfw_window.c \
+Lib/LVGL/lvgl/src/drivers/glfw/lv_opengles_debug.c \
+Lib/LVGL/lvgl/src/drivers/glfw/lv_opengles_driver.c \
+Lib/LVGL/lvgl/src/drivers/glfw/lv_opengles_texture.c \
+Lib/LVGL/lvgl/src/drivers/libinput/lv_libinput.c \
+Lib/LVGL/lvgl/src/drivers/libinput/lv_xkb.c \
+Lib/LVGL/lvgl/src/drivers/nuttx/lv_nuttx_cache.c \
+Lib/LVGL/lvgl/src/drivers/nuttx/lv_nuttx_entry.c \
+Lib/LVGL/lvgl/src/drivers/nuttx/lv_nuttx_fbdev.c \
+Lib/LVGL/lvgl/src/drivers/nuttx/lv_nuttx_image_cache.c \
+Lib/LVGL/lvgl/src/drivers/nuttx/lv_nuttx_lcd.c \
+Lib/LVGL/lvgl/src/drivers/nuttx/lv_nuttx_libuv.c \
+Lib/LVGL/lvgl/src/drivers/nuttx/lv_nuttx_profiler.c \
+Lib/LVGL/lvgl/src/drivers/nuttx/lv_nuttx_touchscreen.c \
+Lib/LVGL/lvgl/src/drivers/qnx/lv_qnx.c \
+Lib/LVGL/lvgl/src/drivers/sdl/lv_sdl_keyboard.c \
+Lib/LVGL/lvgl/src/drivers/sdl/lv_sdl_mouse.c \
+Lib/LVGL/lvgl/src/drivers/sdl/lv_sdl_mousewheel.c \
+Lib/LVGL/lvgl/src/drivers/sdl/lv_sdl_window.c \
+Lib/LVGL/lvgl/src/drivers/wayland/lv_wayland.c \
+Lib/LVGL/lvgl/src/drivers/wayland/lv_wayland_smm.c \
+Lib/LVGL/lvgl/src/drivers/windows/lv_windows_context.c \
+Lib/LVGL/lvgl/src/drivers/windows/lv_windows_display.c \
+Lib/LVGL/lvgl/src/drivers/windows/lv_windows_input.c \
+Lib/LVGL/lvgl/src/drivers/x11/lv_x11_display.c \
+Lib/LVGL/lvgl/src/drivers/x11/lv_x11_input.c \
+Lib/LVGL/lvgl/src/font/lv_binfont_loader.c \
+Lib/LVGL/lvgl/src/font/lv_font.c \
+Lib/LVGL/lvgl/src/font/lv_font_dejavu_16_persian_hebrew.c \
+Lib/LVGL/lvgl/src/font/lv_font_fmt_txt.c \
+Lib/LVGL/lvgl/src/font/lv_font_montserrat_10.c \
+Lib/LVGL/lvgl/src/font/lv_font_montserrat_12.c \
+Lib/LVGL/lvgl/src/font/lv_font_montserrat_14.c \
+Lib/LVGL/lvgl/src/font/lv_font_montserrat_16.c \
+Lib/LVGL/lvgl/src/font/lv_font_montserrat_18.c \
+Lib/LVGL/lvgl/src/font/lv_font_montserrat_20.c \
+Lib/LVGL/lvgl/src/font/lv_font_montserrat_22.c \
+Lib/LVGL/lvgl/src/font/lv_font_montserrat_24.c \
+Lib/LVGL/lvgl/src/font/lv_font_montserrat_26.c \
+Lib/LVGL/lvgl/src/font/lv_font_montserrat_28.c \
+Lib/LVGL/lvgl/src/font/lv_font_montserrat_28_compressed.c \
+Lib/LVGL/lvgl/src/font/lv_font_montserrat_30.c \
+Lib/LVGL/lvgl/src/font/lv_font_montserrat_32.c \
+Lib/LVGL/lvgl/src/font/lv_font_montserrat_34.c \
+Lib/LVGL/lvgl/src/font/lv_font_montserrat_36.c \
+Lib/LVGL/lvgl/src/font/lv_font_montserrat_38.c \
+Lib/LVGL/lvgl/src/font/lv_font_montserrat_40.c \
+Lib/LVGL/lvgl/src/font/lv_font_montserrat_42.c \
+Lib/LVGL/lvgl/src/font/lv_font_montserrat_44.c \
+Lib/LVGL/lvgl/src/font/lv_font_montserrat_46.c \
+Lib/LVGL/lvgl/src/font/lv_font_montserrat_48.c \
+Lib/LVGL/lvgl/src/font/lv_font_montserrat_8.c \
+Lib/LVGL/lvgl/src/font/lv_font_simsun_14_cjk.c \
+Lib/LVGL/lvgl/src/font/lv_font_simsun_16_cjk.c \
+Lib/LVGL/lvgl/src/font/lv_font_unscii_16.c \
+Lib/LVGL/lvgl/src/font/lv_font_unscii_8.c \
+Lib/LVGL/lvgl/src/indev/lv_indev.c \
+Lib/LVGL/lvgl/src/indev/lv_indev_gesture.c \
+Lib/LVGL/lvgl/src/indev/lv_indev_scroll.c \
+Lib/LVGL/lvgl/src/layouts/flex/lv_flex.c \
+Lib/LVGL/lvgl/src/layouts/grid/lv_grid.c \
+Lib/LVGL/lvgl/src/layouts/lv_layout.c \
+Lib/LVGL/lvgl/src/libs/barcode/code128.c \
+Lib/LVGL/lvgl/src/libs/barcode/lv_barcode.c \
+Lib/LVGL/lvgl/src/libs/bin_decoder/lv_bin_decoder.c \
+Lib/LVGL/lvgl/src/libs/bmp/lv_bmp.c \
+Lib/LVGL/lvgl/src/libs/expat/xmlparse.c \
+Lib/LVGL/lvgl/src/libs/expat/xmlrole.c \
+Lib/LVGL/lvgl/src/libs/expat/xmltok.c \
+Lib/LVGL/lvgl/src/libs/expat/xmltok_impl.c \
+Lib/LVGL/lvgl/src/libs/expat/xmltok_ns.c \
+Lib/LVGL/lvgl/src/libs/ffmpeg/lv_ffmpeg.c \
+Lib/LVGL/lvgl/src/libs/freetype/lv_freetype.c \
+Lib/LVGL/lvgl/src/libs/freetype/lv_freetype_glyph.c \
+Lib/LVGL/lvgl/src/libs/freetype/lv_freetype_image.c \
+Lib/LVGL/lvgl/src/libs/freetype/lv_freetype_outline.c \
+Lib/LVGL/lvgl/src/libs/freetype/lv_ftsystem.c \
+Lib/LVGL/lvgl/src/libs/fsdrv/lv_fs_cbfs.c \
+Lib/LVGL/lvgl/src/libs/fsdrv/lv_fs_fatfs.c \
+Lib/LVGL/lvgl/src/libs/fsdrv/lv_fs_littlefs.c \
+Lib/LVGL/lvgl/src/libs/fsdrv/lv_fs_memfs.c \
+Lib/LVGL/lvgl/src/libs/fsdrv/lv_fs_posix.c \
+Lib/LVGL/lvgl/src/libs/fsdrv/lv_fs_stdio.c \
+Lib/LVGL/lvgl/src/libs/fsdrv/lv_fs_win32.c \
+Lib/LVGL/lvgl/src/libs/gif/gifdec.c \
+Lib/LVGL/lvgl/src/libs/gif/lv_gif.c \
+Lib/LVGL/lvgl/src/libs/libjpeg_turbo/lv_libjpeg_turbo.c \
+Lib/LVGL/lvgl/src/libs/libpng/lv_libpng.c \
+Lib/LVGL/lvgl/src/libs/lodepng/lodepng.c \
+Lib/LVGL/lvgl/src/libs/lodepng/lv_lodepng.c \
+Lib/LVGL/lvgl/src/libs/lz4/lz4.c \
+Lib/LVGL/lvgl/src/libs/qrcode/lv_qrcode.c \
+Lib/LVGL/lvgl/src/libs/qrcode/qrcodegen.c \
+Lib/LVGL/lvgl/src/libs/rle/lv_rle.c \
+Lib/LVGL/lvgl/src/libs/rlottie/lv_rlottie.c \
+Lib/LVGL/lvgl/src/libs/svg/lv_svg.c \
+Lib/LVGL/lvgl/src/libs/svg/lv_svg_parser.c \
+Lib/LVGL/lvgl/src/libs/svg/lv_svg_render.c \
+Lib/LVGL/lvgl/src/libs/svg/lv_svg_token.c \
+Lib/LVGL/lvgl/src/libs/tiny_ttf/lv_tiny_ttf.c \
+Lib/LVGL/lvgl/src/libs/tjpgd/lv_tjpgd.c \
+Lib/LVGL/lvgl/src/libs/tjpgd/tjpgd.c \
+Lib/LVGL/lvgl/src/lv_init.c \
+Lib/LVGL/lvgl/src/misc/cache/lv_cache.c \
+Lib/LVGL/lvgl/src/misc/cache/lv_cache_entry.c \
+Lib/LVGL/lvgl/src/misc/cache/lv_cache_lru_rb.c \
+Lib/LVGL/lvgl/src/misc/cache/lv_image_cache.c \
+Lib/LVGL/lvgl/src/misc/cache/lv_image_header_cache.c \
+Lib/LVGL/lvgl/src/misc/lv_anim.c \
+Lib/LVGL/lvgl/src/misc/lv_anim_timeline.c \
+Lib/LVGL/lvgl/src/misc/lv_area.c \
+Lib/LVGL/lvgl/src/misc/lv_array.c \
+Lib/LVGL/lvgl/src/misc/lv_async.c \
+Lib/LVGL/lvgl/src/misc/lv_bidi.c \
+Lib/LVGL/lvgl/src/misc/lv_circle_buf.c \
+Lib/LVGL/lvgl/src/misc/lv_color.c \
+Lib/LVGL/lvgl/src/misc/lv_color_op.c \
+Lib/LVGL/lvgl/src/misc/lv_event.c \
+Lib/LVGL/lvgl/src/misc/lv_fs.c \
+Lib/LVGL/lvgl/src/misc/lv_iter.c \
+Lib/LVGL/lvgl/src/misc/lv_ll.c \
+Lib/LVGL/lvgl/src/misc/lv_log.c \
+Lib/LVGL/lvgl/src/misc/lv_lru.c \
+Lib/LVGL/lvgl/src/misc/lv_math.c \
+Lib/LVGL/lvgl/src/misc/lv_matrix.c \
+Lib/LVGL/lvgl/src/misc/lv_palette.c \
+Lib/LVGL/lvgl/src/misc/lv_profiler_builtin.c \
+Lib/LVGL/lvgl/src/misc/lv_rb.c \
+Lib/LVGL/lvgl/src/misc/lv_style.c \
+Lib/LVGL/lvgl/src/misc/lv_style_gen.c \
+Lib/LVGL/lvgl/src/misc/lv_templ.c \
+Lib/LVGL/lvgl/src/misc/lv_text.c \
+Lib/LVGL/lvgl/src/misc/lv_text_ap.c \
+Lib/LVGL/lvgl/src/misc/lv_timer.c \
+Lib/LVGL/lvgl/src/misc/lv_tree.c \
+Lib/LVGL/lvgl/src/misc/lv_utils.c \
+Lib/LVGL/lvgl/src/osal/lv_cmsis_rtos2.c \
+Lib/LVGL/lvgl/src/osal/lv_freertos.c \
+Lib/LVGL/lvgl/src/osal/lv_mqx.c \
+Lib/LVGL/lvgl/src/osal/lv_os.c \
+Lib/LVGL/lvgl/src/osal/lv_pthread.c \
+Lib/LVGL/lvgl/src/osal/lv_rtthread.c \
+Lib/LVGL/lvgl/src/osal/lv_sdl2.c \
+Lib/LVGL/lvgl/src/osal/lv_windows.c \
+Lib/LVGL/lvgl/src/others/file_explorer/lv_file_explorer.c \
+Lib/LVGL/lvgl/src/others/font_manager/lv_font_manager.c \
+Lib/LVGL/lvgl/src/others/font_manager/lv_font_manager_recycle.c \
+Lib/LVGL/lvgl/src/others/font_manager/lv_font_manager_utils.c \
+Lib/LVGL/lvgl/src/others/fragment/lv_fragment.c \
+Lib/LVGL/lvgl/src/others/fragment/lv_fragment_manager.c \
+Lib/LVGL/lvgl/src/others/gridnav/lv_gridnav.c \
+Lib/LVGL/lvgl/src/others/ime/lv_ime_pinyin.c \
+Lib/LVGL/lvgl/src/others/imgfont/lv_imgfont.c \
+Lib/LVGL/lvgl/src/others/monkey/lv_monkey.c \
+Lib/LVGL/lvgl/src/others/observer/lv_observer.c \
+Lib/LVGL/lvgl/src/others/snapshot/lv_snapshot.c \
+Lib/LVGL/lvgl/src/others/sysmon/lv_sysmon.c \
+Lib/LVGL/lvgl/src/others/vg_lite_tvg/vg_lite_matrix.c \
+Lib/LVGL/lvgl/src/others/xml/lv_xml.c \
+Lib/LVGL/lvgl/src/others/xml/lv_xml_base_types.c \
+Lib/LVGL/lvgl/src/others/xml/lv_xml_component.c \
+Lib/LVGL/lvgl/src/others/xml/lv_xml_parser.c \
+Lib/LVGL/lvgl/src/others/xml/lv_xml_style.c \
+Lib/LVGL/lvgl/src/others/xml/lv_xml_utils.c \
+Lib/LVGL/lvgl/src/others/xml/lv_xml_widget.c \
+Lib/LVGL/lvgl/src/others/xml/parsers/lv_xml_button_parser.c \
+Lib/LVGL/lvgl/src/others/xml/parsers/lv_xml_chart_parser.c \
+Lib/LVGL/lvgl/src/others/xml/parsers/lv_xml_image_parser.c \
+Lib/LVGL/lvgl/src/others/xml/parsers/lv_xml_label_parser.c \
+Lib/LVGL/lvgl/src/others/xml/parsers/lv_xml_obj_parser.c \
+Lib/LVGL/lvgl/src/others/xml/parsers/lv_xml_slider_parser.c \
+Lib/LVGL/lvgl/src/others/xml/parsers/lv_xml_tabview_parser.c \
+Lib/LVGL/lvgl/src/stdlib/builtin/lv_mem_core_builtin.c \
+Lib/LVGL/lvgl/src/stdlib/builtin/lv_sprintf_builtin.c \
+Lib/LVGL/lvgl/src/stdlib/builtin/lv_string_builtin.c \
+Lib/LVGL/lvgl/src/stdlib/builtin/lv_tlsf.c \
+Lib/LVGL/lvgl/src/stdlib/clib/lv_mem_core_clib.c \
+Lib/LVGL/lvgl/src/stdlib/clib/lv_sprintf_clib.c \
+Lib/LVGL/lvgl/src/stdlib/clib/lv_string_clib.c \
+Lib/LVGL/lvgl/src/stdlib/lv_mem.c \
+Lib/LVGL/lvgl/src/stdlib/micropython/lv_mem_core_micropython.c \
+Lib/LVGL/lvgl/src/stdlib/rtthread/lv_mem_core_rtthread.c \
+Lib/LVGL/lvgl/src/stdlib/rtthread/lv_sprintf_rtthread.c \
+Lib/LVGL/lvgl/src/stdlib/rtthread/lv_string_rtthread.c \
+Lib/LVGL/lvgl/src/themes/default/lv_theme_default.c \
+Lib/LVGL/lvgl/src/themes/lv_theme.c \
+Lib/LVGL/lvgl/src/themes/mono/lv_theme_mono.c \
+Lib/LVGL/lvgl/src/themes/simple/lv_theme_simple.c \
+Lib/LVGL/lvgl/src/tick/lv_tick.c \
+Lib/LVGL/lvgl/src/widgets/animimage/lv_animimage.c \
+Lib/LVGL/lvgl/src/widgets/arc/lv_arc.c \
+Lib/LVGL/lvgl/src/widgets/bar/lv_bar.c \
+Lib/LVGL/lvgl/src/widgets/button/lv_button.c \
+Lib/LVGL/lvgl/src/widgets/buttonmatrix/lv_buttonmatrix.c \
+Lib/LVGL/lvgl/src/widgets/calendar/lv_calendar.c \
+Lib/LVGL/lvgl/src/widgets/calendar/lv_calendar_chinese.c \
+Lib/LVGL/lvgl/src/widgets/calendar/lv_calendar_header_arrow.c \
+Lib/LVGL/lvgl/src/widgets/calendar/lv_calendar_header_dropdown.c \
+Lib/LVGL/lvgl/src/widgets/canvas/lv_canvas.c \
+Lib/LVGL/lvgl/src/widgets/chart/lv_chart.c \
+Lib/LVGL/lvgl/src/widgets/checkbox/lv_checkbox.c \
+Lib/LVGL/lvgl/src/widgets/dropdown/lv_dropdown.c \
+Lib/LVGL/lvgl/src/widgets/image/lv_image.c \
+Lib/LVGL/lvgl/src/widgets/imagebutton/lv_imagebutton.c \
+Lib/LVGL/lvgl/src/widgets/keyboard/lv_keyboard.c \
+Lib/LVGL/lvgl/src/widgets/label/lv_label.c \
+Lib/LVGL/lvgl/src/widgets/led/lv_led.c \
+Lib/LVGL/lvgl/src/widgets/line/lv_line.c \
+Lib/LVGL/lvgl/src/widgets/list/lv_list.c \
+Lib/LVGL/lvgl/src/widgets/lottie/lv_lottie.c \
+Lib/LVGL/lvgl/src/widgets/menu/lv_menu.c \
+Lib/LVGL/lvgl/src/widgets/msgbox/lv_msgbox.c \
+Lib/LVGL/lvgl/src/widgets/objx_templ/lv_objx_templ.c \
+Lib/LVGL/lvgl/src/widgets/property/lv_dropdown_properties.c \
+Lib/LVGL/lvgl/src/widgets/property/lv_image_properties.c \
+Lib/LVGL/lvgl/src/widgets/property/lv_keyboard_properties.c \
+Lib/LVGL/lvgl/src/widgets/property/lv_label_properties.c \
+Lib/LVGL/lvgl/src/widgets/property/lv_obj_properties.c \
+Lib/LVGL/lvgl/src/widgets/property/lv_roller_properties.c \
+Lib/LVGL/lvgl/src/widgets/property/lv_style_properties.c \
+Lib/LVGL/lvgl/src/widgets/property/lv_textarea_properties.c \
+Lib/LVGL/lvgl/src/widgets/roller/lv_roller.c \
+Lib/LVGL/lvgl/src/widgets/scale/lv_scale.c \
+Lib/LVGL/lvgl/src/widgets/slider/lv_slider.c \
+Lib/LVGL/lvgl/src/widgets/span/lv_span.c \
+Lib/LVGL/lvgl/src/widgets/spinbox/lv_spinbox.c \
+Lib/LVGL/lvgl/src/widgets/spinner/lv_spinner.c \
+Lib/LVGL/lvgl/src/widgets/switch/lv_switch.c \
+Lib/LVGL/lvgl/src/widgets/table/lv_table.c \
+Lib/LVGL/lvgl/src/widgets/tabview/lv_tabview.c \
+Lib/LVGL/lvgl/src/widgets/textarea/lv_textarea.c \
+Lib/LVGL/lvgl/src/widgets/tileview/lv_tileview.c \
+Lib/LVGL/lvgl/src/widgets/win/lv_win.c \
+Lib/LVGL/lvgl_utils.c \
 Lib/SCan/SC24/artifacts/HVCB/c_source/hvcb.c \
-Lib/SCan/SC24/artifacts/MCB/c_source/mcb.c \
-Lib/STM32_HAL_ST7032_LCD_LIBRARY/STM32_ST7032.c
+Lib/SCan/SC24/artifacts/MCB/c_source/mcb.c
 
 
-CPP_SOURCES = \
+CXX_SOURCES = \
+Lib/LVGL/lvgl/src/drivers/display/tft_espi/lv_tft_espi.cpp \
+Lib/LVGL/lvgl/src/libs/fsdrv/lv_fs_arduino_esp_littlefs.cpp \
+Lib/LVGL/lvgl/src/libs/fsdrv/lv_fs_arduino_sd.cpp \
+Lib/LVGL/lvgl/src/libs/thorvg/tvgAccessor.cpp \
+Lib/LVGL/lvgl/src/libs/thorvg/tvgAnimation.cpp \
+Lib/LVGL/lvgl/src/libs/thorvg/tvgCanvas.cpp \
+Lib/LVGL/lvgl/src/libs/thorvg/tvgCapi.cpp \
+Lib/LVGL/lvgl/src/libs/thorvg/tvgCompressor.cpp \
+Lib/LVGL/lvgl/src/libs/thorvg/tvgFill.cpp \
+Lib/LVGL/lvgl/src/libs/thorvg/tvgGlCanvas.cpp \
+Lib/LVGL/lvgl/src/libs/thorvg/tvgInitializer.cpp \
+Lib/LVGL/lvgl/src/libs/thorvg/tvgLoader.cpp \
+Lib/LVGL/lvgl/src/libs/thorvg/tvgLottieAnimation.cpp \
+Lib/LVGL/lvgl/src/libs/thorvg/tvgLottieBuilder.cpp \
+Lib/LVGL/lvgl/src/libs/thorvg/tvgLottieExpressions.cpp \
+Lib/LVGL/lvgl/src/libs/thorvg/tvgLottieInterpolator.cpp \
+Lib/LVGL/lvgl/src/libs/thorvg/tvgLottieLoader.cpp \
+Lib/LVGL/lvgl/src/libs/thorvg/tvgLottieModel.cpp \
+Lib/LVGL/lvgl/src/libs/thorvg/tvgLottieModifier.cpp \
+Lib/LVGL/lvgl/src/libs/thorvg/tvgLottieParser.cpp \
+Lib/LVGL/lvgl/src/libs/thorvg/tvgLottieParserHandler.cpp \
+Lib/LVGL/lvgl/src/libs/thorvg/tvgMath.cpp \
+Lib/LVGL/lvgl/src/libs/thorvg/tvgPaint.cpp \
+Lib/LVGL/lvgl/src/libs/thorvg/tvgPicture.cpp \
+Lib/LVGL/lvgl/src/libs/thorvg/tvgRawLoader.cpp \
+Lib/LVGL/lvgl/src/libs/thorvg/tvgRender.cpp \
+Lib/LVGL/lvgl/src/libs/thorvg/tvgSaver.cpp \
+Lib/LVGL/lvgl/src/libs/thorvg/tvgScene.cpp \
+Lib/LVGL/lvgl/src/libs/thorvg/tvgShape.cpp \
+Lib/LVGL/lvgl/src/libs/thorvg/tvgStr.cpp \
+Lib/LVGL/lvgl/src/libs/thorvg/tvgSvgCssStyle.cpp \
+Lib/LVGL/lvgl/src/libs/thorvg/tvgSvgLoader.cpp \
+Lib/LVGL/lvgl/src/libs/thorvg/tvgSvgPath.cpp \
+Lib/LVGL/lvgl/src/libs/thorvg/tvgSvgSceneBuilder.cpp \
+Lib/LVGL/lvgl/src/libs/thorvg/tvgSvgUtil.cpp \
+Lib/LVGL/lvgl/src/libs/thorvg/tvgSwCanvas.cpp \
+Lib/LVGL/lvgl/src/libs/thorvg/tvgSwFill.cpp \
+Lib/LVGL/lvgl/src/libs/thorvg/tvgSwImage.cpp \
+Lib/LVGL/lvgl/src/libs/thorvg/tvgSwMath.cpp \
+Lib/LVGL/lvgl/src/libs/thorvg/tvgSwMemPool.cpp \
+Lib/LVGL/lvgl/src/libs/thorvg/tvgSwPostEffect.cpp \
+Lib/LVGL/lvgl/src/libs/thorvg/tvgSwRaster.cpp \
+Lib/LVGL/lvgl/src/libs/thorvg/tvgSwRenderer.cpp \
+Lib/LVGL/lvgl/src/libs/thorvg/tvgSwRle.cpp \
+Lib/LVGL/lvgl/src/libs/thorvg/tvgSwShape.cpp \
+Lib/LVGL/lvgl/src/libs/thorvg/tvgSwStroke.cpp \
+Lib/LVGL/lvgl/src/libs/thorvg/tvgTaskScheduler.cpp \
+Lib/LVGL/lvgl/src/libs/thorvg/tvgText.cpp \
+Lib/LVGL/lvgl/src/libs/thorvg/tvgWgCanvas.cpp \
+Lib/LVGL/lvgl/src/libs/thorvg/tvgXmlParser.cpp \
+Lib/LVGL/lvgl/src/others/vg_lite_tvg/vg_lite_tvg.cpp
 
 
 # ASM sources
 ASM_SOURCES =  \
+Lib/LVGL/lvgl/src/draw/sw/blend/helium/lv_blend_helium.S \
+Lib/LVGL/lvgl/src/draw/sw/blend/neon/lv_blend_neon.S \
 startup_stm32f446xx.s
 
 
-
 #######################################
-# binaries
+# Tools
 #######################################
-PREFIX = arm-none-eabi-
+ARM_PREFIX = arm-none-eabi-
 POSTFIX = "
-# The gcc compiler bin path can be either defined in make command via GCC_PATH variable (> make GCC_PATH=xxx)
-# either it can be added to the PATH environment variable.
-GCC_PATH="/usr/bin
-ifdef GCC_PATH
-CXX = $(GCC_PATH)/$(PREFIX)g++$(POSTFIX)
-CC = $(GCC_PATH)/$(PREFIX)gcc$(POSTFIX)
-AS = $(GCC_PATH)/$(PREFIX)gcc$(POSTFIX) -x assembler-with-cpp
-CP = $(GCC_PATH)/$(PREFIX)objcopy$(POSTFIX)
-SZ = $(GCC_PATH)/$(PREFIX)size$(POSTFIX)
+PREFIX = "
+# The gcc compiler bin path can be defined in the make command via ARM_GCC_PATH variable (e.g.: make ARM_GCC_PATH=xxx)
+# or it can be added to the PATH environment variable.
+# By default the variable be used from the environment file: .stm32env.
+# if it is not defined
+
+ifdef ARM_GCC_PATH
+    CC = $(PREFIX)$(ARM_GCC_PATH)/$(ARM_PREFIX)gcc$(POSTFIX)
+    CXX = $(PREFIX)$(ARM_GCC_PATH)/$(ARM_PREFIX)g++$(POSTFIX)
+    AS = $(PREFIX)$(ARM_GCC_PATH)/$(ARM_PREFIX)gcc$(POSTFIX) -x assembler-with-cpp
+    CP = $(PREFIX)$(ARM_GCC_PATH)/$(ARM_PREFIX)objcopy$(POSTFIX)
+    SZ = $(PREFIX)$(ARM_GCC_PATH)/$(ARM_PREFIX)size$(POSTFIX)
+    DP = $(PREFIX)$(ARM_GCC_PATH)/$(ARM_PREFIX)objdump$(POSTFIX)
 else
-CXX = $(PREFIX)g++
-CC = $(PREFIX)gcc
-AS = $(PREFIX)gcc -x assembler-with-cpp
-CP = $(PREFIX)objcopy
-SZ = $(PREFIX)size
+  CC ?= $(ARM_PREFIX)gcc
+  CXX ?= $(ARM_PREFIX)g++$
+  AS ?= $(ARM_PREFIX)gcc -x assembler-with-cpp
+  CP ?= $(ARM_PREFIX)objcopy
+  SZ ?= $(ARM_PREFIX)size
+  DP ?= $(ARM_PREFIX)objdump
 endif
+
 HEX = $(CP) -O ihex
 BIN = $(CP) -O binary -S
+LSS = $(DP) -h -S
+
+
+REMOVE_DIRECTORY_COMMAND = rm -fR
+mkdir_function = mkdir -p $(1)
+ifeq ($(OS),Windows_NT)
+  convert_to_windows_path = $(strip $(subst /,\,$(patsubst %/,%,$(1))))
+  REMOVE_DIRECTORY_COMMAND = cmd /c rd /s /q
+  mkdir_function = cmd /e:on /c if not exist $(call convert_to_windows_path,$(1)) md $(call convert_to_windows_path,$(1))
+endif
+
+
+# Flash and debug tools
+# Default is openocd however will be gotten from the env file when existing
+OPENOCD ?= openocd
+
 
 #######################################
 # CFLAGS
@@ -143,6 +628,7 @@ AS_DEFS =
 
 # C defines
 C_DEFS =  \
+-DLV_LVGL_H_INCLUDE_SIMPLE \
 -DSTM32F446xx \
 -DUSE_HAL_DRIVER
 
@@ -161,26 +647,25 @@ C_INCLUDES =  \
 -ICore/Inc \
 -IDrivers/CMSIS/Device/ST/STM32F4xx/Include \
 -IDrivers/CMSIS/Include \
+-IDrivers/ILI9488 \
 -IDrivers/STM32F4xx_HAL_Driver/Inc \
 -IDrivers/STM32F4xx_HAL_Driver/Inc/Legacy \
--ILib/PCA9555 \
+-IEEZ \
+-IEEZ/src/ui \
+-ILib/LVGL \
+-ILib/LVGL/lvgl \
+-ILib/LVGL/lvgl/src \
 -ILib/SCan/SC24/artifacts/HVCB/c_source \
--ILib/SCan/SC24/artifacts/MCB/c_source \
--ILib/STM32_HAL_ST7032_LCD_LIBRARY
+-ILib/SCan/SC24/artifacts/MCB/c_source
 
 
 
 # compile gcc flags
-ASFLAGS = $(MCU) $(AS_DEFS) $(AS_INCLUDES) $(OPT) -Wall -fdata-sections -ffunction-sections
+ASFLAGS = $(MCU) $(AS_DEFS) $(AS_INCLUDES) $(C_INCLUDES) $(C_DEFS) $(OPTIMIZATION_FLAGS) 
 
-CFLAGS = $(MCU) $(C_DEFS) $(C_INCLUDES) $(OPT) -Wall -fdata-sections -ffunction-sections
+CFLAGS = $(MCU) $(C_DEFS) $(C_INCLUDES) $(OPTIMIZATION_FLAGS)
 
-CXXFLAGS = $(MCU) $(CXX_DEFS) $(C_INCLUDES) $(OPT) -Wall -fdata-sections -ffunction-sections -feliminate-unused-debug-types
-
-ifeq ($(DEBUG), 1)
-CFLAGS += -g -gdwarf -ggdb
-CXXFLAGS += -g -gdwarf -ggdb
-endif
+CXXFLAGS = $(MCU) $(CXX_DEFS) $(C_INCLUDES) $(OPTIMIZATION_FLAGS)
 
 # Add additional flags
 CFLAGS += -Wall -fdata-sections -ffunction-sections 
@@ -191,6 +676,12 @@ CXXFLAGS +=
 CFLAGS += -MMD -MP -MF"$(@:%.o=%.d)"
 CXXFLAGS += -MMD -MP -MF"$(@:%.o=%.d)"
 
+# Output a list file for the compiled source file.
+# This is a representative of the source code in assembly
+ASSEMBLER_LIST_OUTPUT_FLAG = -Wa,-a,-ad,-alms=$(call add_release_directory,$<,lst)
+CFLAGS += $(ASSEMBLER_LIST_OUTPUT_FLAG)
+CXXFLAGS += $(ASSEMBLER_LIST_OUTPUT_FLAG)
+
 #######################################
 # LDFLAGS
 #######################################
@@ -200,98 +691,125 @@ LDSCRIPT = STM32F446RETx_FLASH.ld
 # libraries
 LIBS = -lc -lm -lnosys 
 LIBDIR = \
--L# \
--LAdditional \
--LFlags \
--LLD \
--Lconfig \
--Lfile \
--Lfrom
 
 
 # Additional LD Flags from config file
 ADDITIONALLDFLAGS = -specs=nano.specs -u_printf_float 
 
-LDFLAGS = $(MCU) $(ADDITIONALLDFLAGS) -T$(LDSCRIPT) $(LIBDIR) $(LIBS) -Wl,-Map=$(BUILD_DIR)/$(TARGET).map,--cref -Wl,--gc-sections
-
-# default action: build all
-all: $(BUILD_DIR)/$(TARGET).elf $(BUILD_DIR)/$(TARGET).hex $(BUILD_DIR)/$(TARGET).bin
-
+LDFLAGS = $(MCU) $(ADDITIONALLDFLAGS) -T$(LDSCRIPT) $(LIBDIR) $(LIBS) -Wl,-Map=$(BUILD_DIRECTORY)/$(TARGET).map,--cref -Wl,--gc-sections
 
 #######################################
 # build the application
 #######################################
-# list of cpp program objects
-OBJECTS = $(addprefix $(BUILD_DIR)/,$(notdir $(CPP_SOURCES:.cpp=.o)))
-vpath %.cpp $(sort $(dir $(CPP_SOURCES)))
+add_release_directory = $(sort $(addprefix $(RELEASE_DIRECTORY)/,$(addsuffix .$(2),$(basename $(notdir $(1))))))
 
-# list of C objects
-OBJECTS += $(addprefix $(BUILD_DIR)/,$(notdir $(C_SOURCES:.c=.o)))
+
+
+OBJECTS = $(call add_release_directory,$(C_SOURCES),o)
+OBJECTS += $(call add_release_directory,$(CXX_SOURCES),o)
+OBJECTS += $(call add_release_directory,$(ASM_SOURCES),o)
 vpath %.c $(sort $(dir $(C_SOURCES)))
-
-# list of ASM program objects
-UPPER_CASE_ASM_SOURCES = $(filter %.S,$(ASM_SOURCES))
-LOWER_CASE_ASM_SOURCES = $(filter %.s,$(ASM_SOURCES))
-
-OBJECTS += $(addprefix $(BUILD_DIR)/,$(notdir $(UPPER_CASE_ASM_SOURCES:.S=.o)))
-OBJECTS += $(addprefix $(BUILD_DIR)/,$(notdir $(LOWER_CASE_ASM_SOURCES:.s=.o)))
+vpath %.cc $(sort $(dir $(CXX_SOURCES)))
+vpath %.cp $(sort $(dir $(CXX_SOURCES)))
+vpath %.cxx $(sort $(dir $(CXX_SOURCES)))
+vpath %.cpp $(sort $(dir $(CXX_SOURCES)))
+vpath %.c++ $(sort $(dir $(CXX_SOURCES)))
+vpath %.C $(sort $(dir $(CXX_SOURCES)))
+vpath %.CPP $(sort $(dir $(CXX_SOURCES)))
 vpath %.s $(sort $(dir $(ASM_SOURCES)))
+vpath %.S $(sort $(dir $(ASM_SOURCES)))
 
-$(BUILD_DIR)/%.o: %.cpp STM32Make.make | $(BUILD_DIR) 
-	$(CXX) -c $(CXXFLAGS) -Wa,-a,-ad,-alms=$(BUILD_DIR)/$(notdir $(<:.cpp=.lst)) $< -o $@
+#######################################
+# all
+#######################################
+# note needs to be located as the first rule to be the default build rule
+# default action: build all
+all: $(RELEASE_DIRECTORY)/$(TARGET).elf $(RELEASE_DIRECTORY)/$(TARGET).hex $(RELEASE_DIRECTORY)/$(TARGET).bin $(RELEASE_DIRECTORY)/$(TARGET).lss 
 
-$(BUILD_DIR)/%.o: %.cxx STM32Make.make | $(BUILD_DIR) 
-	$(CXX) -c $(CXXFLAGS) -Wa,-a,-ad,-alms=$(BUILD_DIR)/$(notdir $(<:.cxx=.lst)) $< -o $@
 
-$(BUILD_DIR)/%.o: %.c STM32Make.make | $(BUILD_DIR) 
-	$(CC) -c $(CFLAGS) -Wa,-a,-ad,-alms=$(BUILD_DIR)/$(notdir $(<:.c=.lst)) $< -o $@
+# C build
+$(RELEASE_DIRECTORY)/%.o: %.c STM32Make.make | $(RELEASE_DIRECTORY)
+	$(CC) -c $(CFLAGS) $< -o $@
 
-$(BUILD_DIR)/%.o: %.s STM32Make.make | $(BUILD_DIR)
-	$(AS) -c $(CFLAGS) $< -o $@
+# C++ build 
+$(RELEASE_DIRECTORY)/%.o: %.cc STM32Make.make | $(RELEASE_DIRECTORY)
+	$(CXX) -c $(CXXFLAGS) $< -o $@
 
-$(BUILD_DIR)/%.o: %.S STM32Make.make | $(BUILD_DIR)
-	$(AS) -c $(CFLAGS) $< -o $@
+$(RELEASE_DIRECTORY)/%.o: %.cp STM32Make.make | $(RELEASE_DIRECTORY)
+	$(CXX) -c $(CXXFLAGS) $< -o $@
 
-$(BUILD_DIR)/$(TARGET).elf: $(OBJECTS) STM32Make.make
-	$(CC) $(OBJECTS) $(LDFLAGS) -o $@
+$(RELEASE_DIRECTORY)/%.o: %.cxx STM32Make.make | $(RELEASE_DIRECTORY)
+	$(CXX) -c $(CXXFLAGS) $< -o $@
+
+$(RELEASE_DIRECTORY)/%.o: %.cpp STM32Make.make | $(RELEASE_DIRECTORY)
+	$(CXX) -c $(CXXFLAGS) $< -o $@
+
+$(RELEASE_DIRECTORY)/%.o: %.c++ STM32Make.make | $(RELEASE_DIRECTORY)
+	$(CXX) -c $(CXXFLAGS) $< -o $@
+
+$(RELEASE_DIRECTORY)/%.o: %.C STM32Make.make | $(RELEASE_DIRECTORY)
+	$(CXX) -c $(CXXFLAGS) $< -o $@
+
+$(RELEASE_DIRECTORY)/%.o: %.CPP STM32Make.make | $(RELEASE_DIRECTORY)
+	$(CXX) -c $(CXXFLAGS) $< -o $@
+
+#Assembly build
+$(RELEASE_DIRECTORY)/%.o: %.s STM32Make.make | $(RELEASE_DIRECTORY)
+	$(AS) -c $(ASFLAGS) $< -o $@
+
+$(RELEASE_DIRECTORY)/%.o: %.S STM32Make.make | $(RELEASE_DIRECTORY)
+	$(AS) -c $(ASFLAGS) $< -o $@
+
+$(RELEASE_DIRECTORY)/%.o: %.sx STM32Make.make | $(RELEASE_DIRECTORY)
+	$(AS) -c $(ASFLAGS) $< -o $@
+
+$(RELEASE_DIRECTORY)/$(TARGET).elf: $(OBJECTS) STM32Make.make | $(RELEASE_DIRECTORY)
+	@echo $(OBJECTS) > $@.in
+	$(CC) @$@.in $(LDFLAGS) -o $@
 	$(SZ) $@
 
-$(BUILD_DIR)/%.hex: $(BUILD_DIR)/%.elf | $(BUILD_DIR)
+$(RELEASE_DIRECTORY)/%.hex: $(RELEASE_DIRECTORY)/%.elf | $(RELEASE_DIRECTORY)
 	$(HEX) $< $@
 
-$(BUILD_DIR)/%.bin: $(BUILD_DIR)/%.elf | $(BUILD_DIR)
+$(RELEASE_DIRECTORY)/%.bin: $(RELEASE_DIRECTORY)/%.elf | $(RELEASE_DIRECTORY)
 	$(BIN) $< $@
 
-$(BUILD_DIR):
-	mkdir $@
+$(RELEASE_DIRECTORY)/%.lss: $(RELEASE_DIRECTORY)/%.elf | $(RELEASE_DIRECTORY)
+	$(LSS) $< > $@
+
+$(RELEASE_DIRECTORY):
+	$(call mkdir_function, $@)
+
+$(BUILD_DIRECTORY): | $(RELEASE_DIRECTORY)
+	$(call mkdir_function, $@)
+
 
 #######################################
 # flash
 #######################################
-flash: $(BUILD_DIR)/$(TARGET).elf
-	"/usr/bin/openocd" -f ./openocd.cfg -c "program $(BUILD_DIR)/$(TARGET).elf verify reset exit"
+flash: all
+	"$(OPENOCD)" -f ./openocd.cfg -c "program $(RELEASE_DIRECTORY)/$(TARGET).elf verify reset exit"
 
 #######################################
 # erase
 #######################################
-erase: $(BUILD_DIR)/$(TARGET).elf
-	"/usr/bin/openocd" -f ./openocd.cfg -c "init; reset halt; stm32f4x mass_erase 0; exit"
+erase: all
+	"$(OPENOCD)" -f ./openocd.cfg -c "init; reset halt; stm32f4x mass_erase 0; exit"
 
 #######################################
 # clean up
 #######################################
 clean:
-	-rm -fR $(BUILD_DIR)
+	$(REMOVE_DIRECTORY_COMMAND) $(BUILD_DIRECTORY)
 
 #######################################
 # custom makefile rules
 #######################################
 
-
 	
 #######################################
 # dependencies
 #######################################
--include $(wildcard $(BUILD_DIR)/*.d)
+-include $(wildcard $(RELEASE_DIRECTORY)/*.d)
 
 # *** EOF ***
