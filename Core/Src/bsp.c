@@ -434,7 +434,7 @@ static const struct GPIO_Tuple LED_RGB_Device_to_GPIO_Tuples_map[LED_RGB_Device_
         {
             [RGB_DEVICE_ColorChnl_Red]   = {.GPIO_Port = RGB2_RED_CMD_GPIO_Port, .GPIO_Pin = RGB2_RED_CMD_Pin},
             [RGB_DEVICE_ColorChnl_Green] = {.GPIO_Port = RGB2_GREEN_CMD_GPIO_Port, .GPIO_Pin = RGB2_GREEN_CMD_Pin},
-            [RGB_DEVICE_ColorChnl_Blue]  = {.GPIO_Port = RGB2_BLUE_CMD_GPIO_Port, .GPIO_Pin = RGB2_BLUE_CMD_Pin},
+            //[RGB_DEVICE_ColorChnl_Blue]  = {.GPIO_Port = RGB2_BLUE_CMD_GPIO_Port, .GPIO_Pin = RGB2_BLUE_CMD_Pin},
         },
     [LED_RGB3] =
         {

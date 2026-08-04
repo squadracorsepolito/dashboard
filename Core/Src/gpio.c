@@ -64,13 +64,13 @@ void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(LCD_TFT_DC_GPIO_OUT_GPIO_Port, LCD_TFT_DC_GPIO_OUT_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, LCD_TFT_CS_GPIO_OUT_Pin|ERR_LED_GPIO_OUT_Pin|EBS_VALVE_1_OUT_Pin|EBS_VALVE_2_OUT_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOB, LCD_TFT_CS_GPIO_OUT_Pin|ERR_LED_GPIO_OUT_Pin|EBS_VALVE_1_OUT__Pin|EBS_VALVE_2_OUT_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOE, SST25VF080B_nCE_GPIO_OUT_Pin|SST25VF080B_nWP_GPIO_OUT_Pin|SST25VF080B_nHOLD_GPIO_OUT_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOD, RGB2_BLUE_CMD_Pin|RGB1_BLUE_CMD_Pin|RGB1_RED_CMD_Pin|RGB1_GREEN_CMD_Pin
+  HAL_GPIO_WritePin(GPIOD, EBS_VALVE_1_OUT_Pin|RGB1_BLUE_CMD_Pin|RGB1_RED_CMD_Pin|RGB1_GREEN_CMD_Pin
                           |RGB2_GREEN_CMD_Pin|RGB2_RED_CMD_Pin|ASSI_BLUE_OUT_Pin|ASSI_YELLOW_OUT_Pin
                           |STAT1_LED_GPIO_OUT_Pin|STAT2_LED_GPIO_OUT_Pin|WARN_LED_GPIO_OUT_Pin|STAT3_LED_GPIO_OUT_Pin, GPIO_PIN_RESET);
 
@@ -127,7 +127,7 @@ void MX_GPIO_Init(void)
   /*Configure GPIO pins : PDPin PDPin PDPin PDPin
                            PDPin PDPin PDPin PDPin
                            PDPin PDPin PDPin PDPin */
-  GPIO_InitStruct.Pin = RGB2_BLUE_CMD_Pin|RGB1_BLUE_CMD_Pin|RGB1_RED_CMD_Pin|RGB1_GREEN_CMD_Pin
+  GPIO_InitStruct.Pin = EBS_VALVE_1_OUT_Pin|RGB1_BLUE_CMD_Pin|RGB1_RED_CMD_Pin|RGB1_GREEN_CMD_Pin
                           |RGB2_GREEN_CMD_Pin|RGB2_RED_CMD_Pin|ASSI_BLUE_OUT_Pin|ASSI_YELLOW_OUT_Pin
                           |STAT1_LED_GPIO_OUT_Pin|STAT2_LED_GPIO_OUT_Pin|WARN_LED_GPIO_OUT_Pin|STAT3_LED_GPIO_OUT_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
@@ -136,7 +136,7 @@ void MX_GPIO_Init(void)
   HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
   /*Configure GPIO pins : PBPin PBPin PBPin */
-  GPIO_InitStruct.Pin = ERR_LED_GPIO_OUT_Pin|EBS_VALVE_1_OUT_Pin|EBS_VALVE_2_OUT_Pin;
+  GPIO_InitStruct.Pin = ERR_LED_GPIO_OUT_Pin|EBS_VALVE_1_OUT__Pin|EBS_VALVE_2_OUT_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;

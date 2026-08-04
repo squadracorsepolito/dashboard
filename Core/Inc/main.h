@@ -107,8 +107,8 @@ void Error_Handler(void);
 #define SD_SPI2_SCK_GPIO_Port GPIOB
 #define SD_SPI2_MOSI_Pin GPIO_PIN_15
 #define SD_SPI2_MOSI_GPIO_Port GPIOB
-#define RGB2_BLUE_CMD_Pin GPIO_PIN_10
-#define RGB2_BLUE_CMD_GPIO_Port GPIOD
+#define EBS_VALVE_1_OUT_Pin GPIO_PIN_10
+#define EBS_VALVE_1_OUT_GPIO_Port GPIOD
 #define RGB1_BLUE_CMD_Pin GPIO_PIN_11
 #define RGB1_BLUE_CMD_GPIO_Port GPIOD
 #define RGB1_RED_CMD_Pin GPIO_PIN_12
@@ -149,8 +149,8 @@ void Error_Handler(void);
 #define STAT3_LED_GPIO_OUT_GPIO_Port GPIOD
 #define ERR_LED_GPIO_OUT_Pin GPIO_PIN_5
 #define ERR_LED_GPIO_OUT_GPIO_Port GPIOB
-#define EBS_VALVE_1_OUT_Pin GPIO_PIN_8
-#define EBS_VALVE_1_OUT_GPIO_Port GPIOB
+#define EBS_VALVE_1_OUT__Pin GPIO_PIN_8
+#define EBS_VALVE_1_OUT__GPIO_Port GPIOB
 #define EBS_VALVE_2_OUT_Pin GPIO_PIN_9
 #define EBS_VALVE_2_OUT_GPIO_Port GPIOB
 
